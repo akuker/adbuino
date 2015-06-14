@@ -1,0 +1,59 @@
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+		<title>SCIENCE</title>
+		<link type="image/x-icon" href="favicon.ico" rel="shortcut icon">
+		<link href="style.css" rel="stylesheet">
+	</head>
+
+	<body>
+
+		<input id="switch" type="checkbox" checked="">
+		<label class="switch-label" for="switch" onclick="magicButton()">Turn </label>
+
+		<div class="container">
+			<img id="screen" class="screen" src="okabe.png">
+			<div id="overlay" class="overlay">AV-1</div>
+		</div>
+
+		<img src="overlay.png" style="position: absolute; left: -60px; top: -30px;">
+
+		<audio id="tune" loop="true" controls="controls" style="z-index: 3000; position: absolute; display:none">
+			<source src="hacking.mp3" type="audio/mpeg"></source>
+			Your browser does not support the audio element.
+		</audio>
+
+		<script>
+		document.getElementById("switch").checked=false
+		var mayuri = false;
+
+		function magicButton() {
+
+		if ((document.getElementById('tune')).paused)
+							{
+							jej=Math.random();
+							//console.log(jej);
+
+							if (jej>0.75 && mayuri==false)
+								{
+									(document.getElementById('tune')).children[0].src='tutturu.mp3';
+									document.getElementById('overlay').innerHTML='TUTTURU';
+									document.getElementById('screen').src='daytona.jpg';
+									(document.getElementById('tune')).load();
+									mayuri=true;
+								}
+
+							(document.getElementById('tune')).play();
+							}
+						else
+							(document.getElementById('tune')).pause();
+
+		}
+
+		</script>
+		<img src="daytona.jpg" style="display:none"/>
+	</body>
+</html>
+                                        
