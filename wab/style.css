@@ -1,0 +1,227 @@
+
+body {
+    background: none repeat scroll 0 0 #111111;
+    color: #FFFFFF;
+    padding-left: 20px;
+    padding-top: 20px;
+}
+#switch {
+    display: none;
+}
+.switch-label {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-radius: 5px 5px 5px 5px;
+    box-shadow: 0 2px #666666;
+    color: #111111;
+    cursor: pointer;
+    display: inline-block;
+    left: 900px;
+    margin-top: 10px;
+    padding: 10px 15px;
+    position: absolute;
+    top: 725px;
+    z-index: 500;
+}
+.switch-label:after {
+    content: "on";
+}
+.switch-label:before {
+    background: none repeat scroll 0 0 #003321;
+    border: 1px solid #111111;
+    border-radius: 100% 100% 100% 100%;
+    content: " ";
+    display: inline-block;
+    height: 10px;
+    margin-right: 10px;
+    width: 10px;
+}
+.switch-label:active {
+    box-shadow: none;
+    transform: translate3d(0px, 2px, 0px);
+}
+#switch:checked + .switch-label:before {
+    background: none repeat scroll 0 0 #22FF55;
+}
+#switch:checked + .switch-label:after {
+    content: "off";
+}
+@-moz-keyframes flicker {
+0% {
+    opacity: 0.70232;
+}
+5% {
+    opacity: 0.18381;
+}
+10% {
+    opacity: 0.69384;
+}
+15% {
+    opacity: 0.80268;
+}
+20% {
+    opacity: 0.81381;
+}
+25% {
+    opacity: 0.40025;
+}
+30% {
+    opacity: 0.63036;
+}
+35% {
+    opacity: 0.76397;
+}
+40% {
+    opacity: 0.96403;
+}
+45% {
+    opacity: 0.15331;
+}
+50% {
+    opacity: 0.70426;
+}
+55% {
+    opacity: 0.04536;
+}
+60% {
+    opacity: 0.98465;
+}
+65% {
+    opacity: 0.72795;
+}
+70% {
+    opacity: 0.99433;
+}
+75% {
+    opacity: 0.28689;
+}
+80% {
+    opacity: 0.76555;
+}
+85% {
+    opacity: 0.69012;
+}
+90% {
+    opacity: 0.65008;
+}
+95% {
+    opacity: 0.29259;
+}
+100% {
+    opacity: 0.61622;
+}
+}
+.container {
+    background: none repeat scroll 0 0 #121010;
+    border: 2px solid #666666;
+    height: 600px;
+    left: 100px;
+    margin-top: 10px;
+    overflow: hidden;
+    position: relative;
+    top: 50px;
+    width: 800px;
+}
+.container:after {
+    background: none repeat scroll 0 0 rgba(18, 16, 16, 0.1);
+    bottom: 0;
+    content: " ";
+    display: block;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+}
+.container:before {
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%) repeat scroll 0 0 / 100% 2px, linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)) repeat scroll 0 0 / 3px 100% rgba(0, 0, 0, 0);
+    bottom: 0;
+    content: " ";
+    display: block;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+}
+#switch:checked ~ .container:after {
+    animation: 0.15s ease 0s normal none infinite flicker;
+}
+@-moz-keyframes turn-on {
+0% {
+    opacity: 1;
+    transform: scale(1, 0.8) translate3d(0px, 0px, 0px);
+}
+3.5% {
+    transform: scale(1, 0.8) translate3d(0px, 100%, 0px);
+}
+3.6% {
+    opacity: 1;
+    transform: scale(1, 0.8) translate3d(0px, -100%, 0px);
+}
+9% {
+    opacity: 0;
+    transform: scale(1.3, 0.6) translate3d(0px, 100%, 0px);
+}
+11% {
+    opacity: 0;
+    transform: scale(1, 1) translate3d(0px, 0px, 0px);
+}
+100% {
+    opacity: 1;
+    transform: scale(1, 1) translate3d(0px, 0px, 0px);
+}
+}
+@-moz-keyframes turn-off {
+0% {
+    opacity: 1;
+    transform: scale(1, 1.3) translate3d(0px, 0px, 0px);
+}
+60% {
+    transform: scale(1.3, 0.001) translate3d(0px, 0px, 0px);
+}
+100% {
+    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    transform: scale(0, 0.0001) translate3d(0px, 0px, 0px);
+}
+}
+.screen {
+    border: medium none;
+    height: 100%;
+    width: 100%;
+}
+#switch ~ .container > .screen {
+    animation: 0.55s cubic-bezier(0.23, 1, 0.32, 1) 0s normal forwards 1 turn-off;
+}
+#switch:checked ~ .container > .screen {
+    animation: 4s linear 0s normal forwards 1 turn-on;
+}
+@-moz-keyframes overlay-anim {
+0% {
+    visibility: hidden;
+}
+20% {
+    visibility: hidden;
+}
+21% {
+    visibility: visible;
+}
+100% {
+    visibility: hidden;
+}
+}
+.overlay {
+    color: #00FF00;
+    font-size: 60px;
+    left: 20px;
+    pointer-events: none;
+    position: absolute;
+    top: 20px;
+    visibility: hidden;
+}
+#switch:checked ~ .container .overlay {
+    animation: 5s linear 0s normal forwards 1 overlay-anim;
+}
+

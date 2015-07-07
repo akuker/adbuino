@@ -1,0 +1,1 @@
+gets uptime and filesystem info with UNIX commands and displays them in a 80s cyberspace fashion
