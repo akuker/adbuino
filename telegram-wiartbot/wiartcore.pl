@@ -9,6 +9,7 @@ use Switch;
 use URL::Encode qw(:all);
 use Encode qw(decode encode);
 use Log::Log4perl;
+ use Data::Dumper;
 Log::Log4perl->init("log.conf");
 
 my $qrequest = new CGI;
@@ -16,7 +17,6 @@ my $accesstoken="nope";
 
 my @smileys = ("-_-'", "XD", ":p", ":)", ";p", "--'", "-__-", ":O", ":D", ":P");
 my @ponctuation = ("", "!", "!!", "..", "...", "!!!", ".....", "!", "!", "!");
-my @photos = ("AgADAgAD8bExG7ou5QLAQhvv4znGf-juWSoABGLfsfvbyriWE_sAAgI","AgADAgAD8LExG7ou5QJq4o60ytjlZl3pWSoABImZ0c0pmjoNyvYAAgI","AgADAgAD77ExG7ou5QL1Yrcc7XXrNqnFWSoABE__2CspbWKm5AEBAAEC");
 my @stickers = ("BQADBAADEgAD2zPJBHZZS1PvFGP0Ag","BQADBAADDwAD2zPJBFLXbidWFvnhAg");
 
 my $logger = Log::Log4perl->get_logger('wiart.bot');
@@ -67,7 +67,7 @@ if ($qrequest->param() && int(rand(100))<5)
 	#on envoie une réponse
 	my $response;
 
-		switch(int(rand(18))){
+		switch(int(rand(21))){
 							   case 0	{ $response = qq($postername le $keyword cuck ) }
 							   case 1	{ $response = int(rand(1337))."h pour réparer mon script " }
 							   case 2	{ $response = "et j'ai encore ".int(rand(1337))." warnings de variable non init "}
@@ -86,6 +86,9 @@ if ($qrequest->param() && int(rand(100))<5)
 							   case 15  { $response = qq($postername ... no comment ) }
 							   case 16  { $sendimage = 1 }
 							   case 17	{ $sendsticker = 1}
+							   case 18  { $response = qq(https://www.youtube.com/watch?v=a5uQMwRMHcs Daft punk ! :D ils sont quand meme au dessus ) }
+							   case 19  { $response = qq(https://www.youtube.com/watch?v=h5-FJsYj1ck Daft punk ! :D ils sont quand meme au dessus ) }
+							   case 20  { $response = qq(https://www.youtube.com/watch?v=5NV6Rdv1a3I Daft punk ! :D ils sont quand meme au dessus ) }
 							   else {} 
 							}
 
@@ -98,11 +101,7 @@ if ($qrequest->param() && int(rand(100))<5)
 	my $uri = "";
 
 	#On envoie la réponse.
-	if ($sendimage == 1)
-	{
-		$uri = 'https://api.telegram.org/bot'.$accesstoken.'/sendPhoto?chat_id='.$chatid."&photo=".@photos[int(rand(3))]."&caption=Ca c'est de la voiture ! :p";
-	}
-	elsif ($sendsticker == 1)
+	if ($sendsticker == 1)
 	{
 
 		$uri = 'https://api.telegram.org/bot'.$accesstoken.'/sendSticker?chat_id='.$chatid."&sticker=".@stickers[int(rand(2))];
@@ -113,12 +112,33 @@ if ($qrequest->param() && int(rand(100))<5)
 	}
 
 	$logger->info('Final request URL:'.$uri);
-	my $req = HTTP::Request->new( 'GET', $uri );
+	my $ua = LWP::UserAgent->new; 
+	my $res;
 
 	#Execution de la requête construite avec LWP
-	my $ua = LWP::UserAgent->new; 
-	my $res = $ua->request($req);
+	unless ($sendimage == 1)
+	{ 
+		my $req = HTTP::Request->new( 'GET', $uri );
+		$res = $ua->request($req);
+	}
+	else
+	{
+		my $image = &getBingImage('voiture');
 
+		$res = $ua->post(
+			'https://api.telegram.org/bot'.$accesstoken.'/sendPhoto',
+			[
+			'chat_id' => $chatid,
+			'photo' => [$image],
+			'caption' => "Ca c'est de la voiture ! :p",
+			],
+			'Content_Type' => 'form-data',
+			);
+
+		unlink $image;
+
+	}
+	
 	$logger->info('Request sent to Telegram! Status:'.$res->content());
 }
 
@@ -142,4 +162,55 @@ sub getLongestWord{
 		}
 
 	return $longestword;
+}
+
+sub getBingImage{
+
+	my $logger = Log::Log4perl->get_logger('wiart.bot');
+	$logger->info('Searching Bing for '.$_[0]);
+
+	my $keyword = $_[0];
+	#We query the bing API for this.
+	my $uri = qq(https://api.datamarket.azure.com/Bing/Search/v1/Composite?\$format=json&Sources=%27image%27&Query=%27$keyword%27&Options=%27DisableLocationDetection%27&Adult=%27Off%27);
+	my $bingtoken = "nein";
+
+	#my $req = HTTP::Request->new;
+	#$req->method('GET');
+	#$req->url($uri);
+	#$req->authentication_basic($bingtoken,$bingtoken);
+
+	#Execution de la requête construite avec LWP
+	my $ua = LWP::UserAgent->new; 
+	$ua->credentials("api.datamarket.azure.com".':443', '', '', $bingtoken);
+
+	my $res = $ua->get($uri);
+
+	#$res est la réponse JSON. On la décode, et on récupère le tableau data, qui contient nos events.
+	my $jsonresponse = $res -> decoded_content;
+	my $hash = parse_json($jsonresponse);
+	my $images = $hash->{"d"}->{"results"}[0]->{"Image"};
+
+	#size of the array
+	my $img = scalar @$images;
+	my $selector = int(rand($img));
+
+	$logger->info('Request sent to Bing! ');
+	$logger->info('Image array size: '.$img);
+
+	my $imageurl = @$images[$selector]->{"MediaUrl"};
+	#contentType = image/xxxx
+	my $imagetype = @$images[$selector]->{"ContentType"};
+	my $extension = substr $imagetype, 6;
+
+	$logger->info('URL obtained from Bing: '.$imageurl);
+
+	#we download the image
+	$ua = LWP::UserAgent->new(agent=>' Mozilla/5.0 (Windows NT 6.1; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0', cookie_jar=>{});
+	my $resp = $ua->mirror($imageurl, '/tmp/img.'.$extension);
+
+	$logger->info('Image saved to '.'/tmp/img.'.$extension);
+
+	#we return the path to the downloaded image
+	return '/tmp/img.'.$extension
+
 }
