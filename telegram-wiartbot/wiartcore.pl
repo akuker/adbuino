@@ -5,29 +5,42 @@ use CGI qw(:standard);
 use LWP::Simple qw/get/;
 use LWP::Protocol::https; 
 use JSON::Parse 'parse_json';
-use Switch;
 use URL::Encode qw(:all);
 use Encode qw(decode encode);
 use Log::Log4perl;
- use Data::Dumper;
+use Acme::Zalgo;
+use Text::UpsideDown;
+use Redis;
+use Switch;
+use utf8;
+
 Log::Log4perl->init("log.conf");
 
+#Initialization variables
 my $qrequest = new CGI;
 my $accesstoken="nope";
+my $redisaddress = "localhost:6379";
 
-my @smileys = ("-_-'", "XD", ":p", ":)", ";p", "--'", "-__-", ":O", ":D", ":P");
-my @ponctuation = ("", "!", "!!", "..", "...", "!!!", ".....", "!", "!", "!");
-my @stickers = ("BQADBAADEgAD2zPJBHZZS1PvFGP0Ag","BQADBAADDwAD2zPJBFLXbidWFvnhAg");
+my @smileys = ("-_-'", "XD", ":p", ":)", ";p", "--'", "-__-", ":O", ":D", "^^", ":^)","Ψ(｀∇´)Ψ","(´・ｪ・｀)","ヽ(;´Д｀)ﾉ","(´・ω・｀)","ヽ(´―｀)ノ","(＃ﾟДﾟ)","Σ(゜д゜;)","щ(ﾟДﾟщ)","(ﾟ∀ﾟ)","（･∀･)つ⑩","♪┏(・o･)┛♪┗ ( ･o･) ┓♪┏ ( ) ┛♪┗ (･o･ ) ┓♪┏(･o･)┛♪","(◑_◑)","┻━┻ ︵ヽ(`▭´)ﾉ︵﻿ ┻━┻","（‐＾▽＾‐）","(☞ﾟヮﾟ)☞ ☜(ﾟヮﾟ☜)","(>‿◠)✌");
+my @ponctuation = ("", "!", "!!", "..", "...", "!!!", ".....", "!", "!", "!","ｷﾀ━━━━━━(ﾟ∀ﾟ)━━━━━━!!!!!");
+my @stickers = ("BQADBAADEgAD2zPJBHZZS1PvFGP0Ag","BQADBAADDwAD2zPJBFLXbidWFvnhAg","BQADAgADaAADkjrfA8n7SFh4h4GeAg","BQADAgADVQADL1GyBWan0Lfa7fjmAg","BQADAgADTwADkjrfA4a3XwyXRbekAg","BQADAgADXwADkjrfA4OOCuDz__KmAg","BQADAQADpwQAAiBWmAJ8Va4tRld5nwI","BQADAgADcQADAqHaBWGmCCRjI3B2Ag","BQADAgADiQADAqHaBafsuyj2YD9uAg","BQADAgADlwADAqHaBR7ddBmJUxUfAg","BQADAgADrQADAqHaBTxjs2wKySKeAg","BQADAgADrwADAqHaBfeNSV_mSm0wAg","BQADAgADsQADAqHaBYkuGpLymUtbAg","BQADBAADXAADXSupAaa2MS1LMn26Ag","BQADBAADZgADXSupATsC2Pm0xdADAg","BQADBAADagADXSupAcBZICwpXF7JAg","BQADBQADpgEAAprnOwMzs6BU5mJvjgI","BQADAgADDAEAArou5QIaKkhJBeilzAI","BQADAgADGgEAArou5QIU-lmAYLxG5gI","BQADAgADKgEAArou5QJCHPl7rsjMnAI","BQADAgADBAEAArou5QKs0i4SszwmpAI","BQADBAAD-wEAAjqZlwG8FkVYTPAOngI","BQADBAAD3gEAAjqZlwHna8_WKMZ_xAI","BQADBAADAwIAAjqZlwFcuqAHOlAxIQI","BQADBAADFgAD6ZtlAAKpVijjJ0tPAg","BQADBAADJAAD6ZtlAAEQGjncHDFxpwI");
 
 my $logger = Log::Log4perl->get_logger('wiart.bot');
 
+#Default redis server location is localhost:6379. 
+#Auto-reconnect on, one attempt every 100ms up to 2 seconds. Die after that.
+my $redis = Redis->new(server => $redisaddress, 
+						reconnect => 100,
+						every     => 3000);
+
 $logger->info('Hello !');
 
-#If we got sent a message and RNG hits the 5%
-if ($qrequest->param() && int(rand(100))<5) 
+#If we got sent a message and RNG hits the designed value
+if ($qrequest->param()) #int(rand(100))<$RNG) 
 {
-
 	$logger->info('Request obtained!');
+
+	my $RNG = &getRNGValue();
 
     # Get the message object in result
 	my $jsonmessage = $qrequest->param('POSTDATA');
@@ -36,118 +49,218 @@ if ($qrequest->param() && int(rand(100))<5)
 
 	my $hash = parse_json($jsonmessage);
 
-	#structure of data: {"update_id":603591173,
-				#"message":{"message_id":755,"from":{"id":64961170,"first_name":"Amaury","last_name":"B\u00e9chu","username":"MSFag"},
-				#			"chat":{"id":-28889987,"title":"J -23"},"date":1438889893,"text":"mais genre ils ont meme pas rajout\u00e9 Farahlon du coup"
-				#			}
-				#}
-
 	#recup du message
 	my $data = $hash->{"message"};
 
 	#datas essentielles:
-
 	my $chatid = $data->{"chat"}->{"id"};
 	my $postername = $data->{"from"}->{"first_name"};
 	my $posterlastname = $data->{"from"}->{"last_name"};
+	my $posterid = $data->{"from"}->{"id"};
+	my $text = $data->{"text"};
 
-	$logger->info('Message posted by '.$postername." ".$posterlastname." in ".$chatid);
+	#RNG command ? Checks for specific user ID and text message.
+	if ($posterid eq "48574138" && exists $data->{"text"})
+	{
+		
+		$logger->info('Potential RNG changing command sent by master: '.$text);
 
-	#random keywords au cas ou aucun n'est spécifié ? 
-	my $keyword = "debian";
-	my $sendimage = 0;
-	my $sendsticker = 0;
+		if ((substr $text,0,4) eq "/rng")
+			{
+				#fucking confirmed
+				$RNG = substr $text,5;
+				#quick number check
+				$RNG += 0;
 
-	#le fun commence
-	if (exists $data->{"text"})
+				&setRNGValue($RNG);
+				&sendMessage("Posting occurence has been modified to ".$RNG."%. Have a nice day.",$chatid);
+				$logger->info('Occurence changed to '.$RNG);
+			}
+
+	}
+
+	#If adding quote
+	if ((substr $text,0,4) eq "/add")
 		{
-			$keyword = &getLongestWord($data->{"text"});
+			my $newquote = substr $text,5;
+
+			if (length($newquote)<30 && ($newquote=~ m/\[NAME\]/ || $newquote=~ m/\[KEYWORD\]/))
+				{
+					&addToRedis($newquote,"wiart");
+					&sendMessage("Quote added in common pool.",$chatid);
+				}
+			elsif (length($newquote)<100)
+				{
+					&addToRedis($newquote,"wiart_rare");
+					&sendMessage("Quote added in rare pool.",$chatid);
+				}
+			else
+				{
+					&sendMessage("This quote is shit.",$chatid);
+				}	
+
 		}
-
-	#on envoie une réponse
-	my $response;
-
-		switch(int(rand(21))){
-							   case 0	{ $response = qq($postername le $keyword cuck ) }
-							   case 1	{ $response = int(rand(1337))."h pour réparer mon script " }
-							   case 2	{ $response = "et j'ai encore ".int(rand(1337))." warnings de variable non init "}
-							   case 3	{ $response = qq($postername il manque de respect ) }
-							   case 4	{ $response = qq(il est con ce denis ) }
-							   case 5	{ $response = qq(il est con ce $postername ) }
-							   case 6	{ $response = qq(qu'est ce que t'as foutu avec $keyword $postername ) }
-							   case 7	{ $response = qq($postername cucké par $keyword ) }
-							   case 8	{ $response = qq(mon script marche toujours pas ) }
-							   case 9	{ $response = qq($postername le cuck ) }
-							   case 10  { $response = qq(hurr durr $postername $keyword ) }
-							   case 11  { $response = qq($postername $keyword $posterlastname ) }
-							   case 12  { $response = qq($postername cuck $posterlastname ) }
-							   case 13  { $response = qq(rends les clés denis palhais ) }
-							   case 14  { $response = qq(https://www.youtube.com/watch?v=3FY4MRdQOdE Daft punk ! :D ils sont quand meme au dessus ) }
-							   case 15  { $response = qq($postername ... no comment ) }
-							   case 16  { $sendimage = 1 }
-							   case 17	{ $sendsticker = 1}
-							   case 18  { $response = qq(https://www.youtube.com/watch?v=a5uQMwRMHcs Daft punk ! :D ils sont quand meme au dessus ) }
-							   case 19  { $response = qq(https://www.youtube.com/watch?v=h5-FJsYj1ck Daft punk ! :D ils sont quand meme au dessus ) }
-							   case 20  { $response = qq(https://www.youtube.com/watch?v=5NV6Rdv1a3I Daft punk ! :D ils sont quand meme au dessus ) }
-							   else {} 
-							}
-
-	#On ajoute ponctuation et smiley
-	$response .= @ponctuation[int(rand(10))]." ";
-	$response .= @smileys[int(rand(10))];
-
-	$logger->info('Final message: '.$response);
-
-	my $uri = "";
-
-	#On envoie la réponse.
-	if ($sendsticker == 1)
-	{
-
-		$uri = 'https://api.telegram.org/bot'.$accesstoken.'/sendSticker?chat_id='.$chatid."&sticker=".@stickers[int(rand(2))];
-	}
-	else
-	{
-		$uri = 'https://api.telegram.org/bot'.$accesstoken.'/sendMessage?chat_id='.$chatid."&text=".url_encode_utf8($response);
-	}
-
-	$logger->info('Final request URL:'.$uri);
-	my $ua = LWP::UserAgent->new; 
-	my $res;
-
-	#Execution de la requête construite avec LWP
-	unless ($sendimage == 1)
-	{ 
-		my $req = HTTP::Request->new( 'GET', $uri );
-		$res = $ua->request($req);
-	}
-	else
-	{
-		my $image = &getBingImage('voiture');
-
-		$res = $ua->post(
-			'https://api.telegram.org/bot'.$accesstoken.'/sendPhoto',
-			[
-			'chat_id' => $chatid,
-			'photo' => [$image],
-			'caption' => "Ca c'est de la voiture ! :p",
-			],
-			'Content_Type' => 'form-data',
-			);
-
-		unlink $image;
-
-	}
 	
-	$logger->info('Request sent to Telegram! Status:'.$res->content());
+	if (int(rand(100))<$RNG)
+	{
+		$logger->info('Message posted by '.$postername." ".$posterlastname." in ".$chatid);
+
+		#random keyword au cas ou aucun n'est spécifié
+		my $keyword = "debian";
+
+		#Si c'est un message texte, on peut récupérer un keyword pour l'utiliser dans la réponse finale.
+		if (exists $data->{"text"})
+			{
+				$keyword = &getLongestWord($data->{"text"});
+			}
+
+		#on construit une réponse.
+		my $response;
+		#On a une chance de piocher dans 3 pools: Commun, Rare(10%), et UltraRare(2%).
+		switch (int(rand(100))) {
+			case [1..2] { $response = &getFromRedis("wiart_ultra")}
+			case [10..20] { $response = &getFromRedis("wiart_rare")}
+			else { $response = &getFromRedis("wiart")}
+			}
+
+		#On ajoute ponctuation et smiley
+		$response .= @ponctuation[int(rand(scalar @ponctuation))]." ";
+		$response .= @smileys[int(rand(scalar @smileys))];
+
+		#On remplace les variables par les valeurs qu'on possède
+		my $int = int(rand(1337));
+		my $namecaps = uc($postername);
+		my $kwcaps = uc($keyword);
+		$response =~ s/\[NAME\]/$postername/g;
+		$response =~ s/\[INT\]/$int/g;
+		$response =~ s/\[LASTNAME\]/$posterlastname/g;
+		$response =~ s/\[KEYWORD\]/$keyword/g;
+		$response =~ s/\[NAMECAPS\]/$namecaps/g;
+		$response =~ s/\[KEYWORDCAPS\]/$kwcaps/g;
+
+		$logger->info('Final message: '.$response);
+
+		#Applique t-on un modifier ? 
+			#Modifiers possibles:
+			#Envoi d'image (auquel cas pas d'envoi de message)
+			#Envoi de sticker
+			#Zalgo 
+			#Reverse text
+
+		 switch (int(rand(100))) {
+			case [1..2] { $logger->info("zalgofying.."); $response = zalgo($response); &sendMessage($response,$chatid) }
+			case [3..4] { $logger->info("turning text upside down."); $response = upside_down($response); &sendMessage($response,$chatid) }
+			case [5..7] { $logger->info("imagesearch."); &sendImage("voiture",$chatid) }
+			case [8..9] { $logger->info("imagesearch."); &sendImage("daft punk",$chatid) }
+			case [10..29] { $logger->info("sending sticker."); &sendSticker(@stickers[int(rand(scalar @stickers))],$chatid) } #oh putain cette ligne est dégueu
+			case [30..31] { $logger->info("zalgo and upside down!"); $response = zalgo($response); $response = upside_down($response); &sendMessage($response,$chatid) }
+			else { &sendMessage($response,$chatid)}
+			}
+		
+	}
 }
 
 #on print 200 dans tous les cas en imprimant le header, pour indiquer à telegram qu'on a bien reçu la requête.
 print $qrequest->header;
+#c'est terminé
+$redis->quit();
 
+#-------------------------------------------------
+#-------------------------------------------------
+#-------------------------------------------------
+#fonctions annexes issi
+
+#sendMessage(Message,chatID)
+sub sendMessage{
+
+	my $ua = LWP::UserAgent->new; 
+	my $res;
+
+	my $encodedmessage = encode("UTF-8",$_[0]);
+
+	$res = $ua->post(
+			'https://api.telegram.org/bot'.$accesstoken.'/sendMessage',
+			[
+			'chat_id' => $_[1],
+			'text' => $encodedmessage,
+			],
+			'Content_Type' => 'form-data',
+		);
+
+	$logger->info('Request sent to Telegram! Status:'.$res->content());
+
+}
+
+#sendImage(BingKeyword,chatID)
+sub sendImage{
+
+	my $ua = LWP::UserAgent->new; 
+	my $res;
+
+	my $image = &getBingImage($_[0]);
+
+		$res = $ua->post(
+			'https://api.telegram.org/bot'.$accesstoken.'/sendPhoto',
+			[
+			'chat_id' => $_[1],
+			'photo' => [$image],
+			],
+			'Content_Type' => 'form-data',
+			);
+
+	unlink $image;
+
+	$logger->info('Request sent to Telegram! Status:'.$res->content());
+
+}
+
+#sendSticker(StickerID,chatID)
+sub sendSticker{
+
+	my $ua = LWP::UserAgent->new; 
+	my $res;
+
+		$res = $ua->post(
+			'https://api.telegram.org/bot'.$accesstoken.'/sendSticker',
+			[
+			'chat_id' => $_[1],
+			'sticker' => $_[0],
+			],
+			'Content_Type' => 'form-data',
+			);
+
+	$logger->info('Request sent to Telegram! Status:'.$res->content());
+
+}
+
+#addToRedis(Message,SetName)
+sub addToRedis{
+	$redis->sadd($_[1], $_[0]);
+}
+
+#getFromRedis(SetName)
+sub getFromRedis{
+
+	my $res = $redis->srandmember($_[0]);
+
+	return $res;
+}
+
+#getRNGValue()
+sub getRNGValue{
+
+	return $redis->get("wrng");
+}
+
+#setRNGValue(newVal)
+sub setRNGValue{
+
+	$redis->set("wrng",$_[0]);
+}
+
+#getLongestWord(Message)
 sub getLongestWord{
 
-	my $logger = Log::Log4perl->get_logger('wiart.bot');
 	$logger->info('Parsing words in '.$_[0]);
 
 	my @values = split(' ', $_[0]);
@@ -164,9 +277,9 @@ sub getLongestWord{
 	return $longestword;
 }
 
+#getBingImage(keyword)
 sub getBingImage{
 
-	my $logger = Log::Log4perl->get_logger('wiart.bot');
 	$logger->info('Searching Bing for '.$_[0]);
 
 	my $keyword = $_[0];
@@ -174,18 +287,13 @@ sub getBingImage{
 	my $uri = qq(https://api.datamarket.azure.com/Bing/Search/v1/Composite?\$format=json&Sources=%27image%27&Query=%27$keyword%27&Options=%27DisableLocationDetection%27&Adult=%27Off%27);
 	my $bingtoken = "nein";
 
-	#my $req = HTTP::Request->new;
-	#$req->method('GET');
-	#$req->url($uri);
-	#$req->authentication_basic($bingtoken,$bingtoken);
-
-	#Execution de la requête construite avec LWP
+	#Query Execution
 	my $ua = LWP::UserAgent->new; 
 	$ua->credentials("api.datamarket.azure.com".':443', '', '', $bingtoken);
 
 	my $res = $ua->get($uri);
 
-	#$res est la réponse JSON. On la décode, et on récupère le tableau data, qui contient nos events.
+	#$res contains the JSON answer.
 	my $jsonresponse = $res -> decoded_content;
 	my $hash = parse_json($jsonresponse);
 	my $images = $hash->{"d"}->{"results"}[0]->{"Image"};
