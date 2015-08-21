@@ -18,7 +18,7 @@ Log::Log4perl->init("log.conf");
 
 #Initialization variables
 my $qrequest = new CGI;
-my $accesstoken="nope";
+my $accesstoken="non";
 my $redisaddress = "localhost:6379";
 
 my @smileys = ("-_-'", "XD", ":p", ":)", ";p", "--'", "-__-", ":O", ":D", "^^", ":^)","Ψ(｀∇´)Ψ","(´・ｪ・｀)","ヽ(;´Д｀)ﾉ","(´・ω・｀)","ヽ(´―｀)ノ","(＃ﾟДﾟ)","Σ(゜д゜;)","щ(ﾟДﾟщ)","(ﾟ∀ﾟ)","（･∀･)つ⑩","♪┏(・o･)┛♪┗ ( ･o･) ┓♪┏ ( ) ┛♪┗ (･o･ ) ┓♪┏(･o･)┛♪","(◑_◑)","┻━┻ ︵ヽ(`▭´)ﾉ︵﻿ ┻━┻","（‐＾▽＾‐）","(☞ﾟヮﾟ)☞ ☜(ﾟヮﾟ☜)","(>‿◠)✌");
@@ -79,17 +79,26 @@ if ($qrequest->param()) #int(rand(100))<$RNG)
 
 	}
 
-	#If adding quote
-	if ((substr $text,0,4) eq "/add")
-		{
-			my $newquote = substr $text,5;
+	#User added?
+	if (exists $data->{"new_chat_participant"})
+	{
+		&sendMessage("Welcome, to my DEATH MACHINE, ".$data->{"new_chat_participant"}->{"first_name"}."!",$chatid);
+	}
 
-			if (length($newquote)<30 && ($newquote=~ m/\[NAME\]/ || $newquote=~ m/\[KEYWORD\]/))
+	#If adding quote
+	if ((substr $text,0,13) eq "/add\@WiartBot")
+		{
+			my $newquote = split(/ /, $text, 2);
+			$logger->info('New quote is '.$newquote);
+
+			unless($newquote eq "1")
+			{
+			if (length($newquote)<40 && ($newquote=~ m/\[NAME\]/ || $newquote=~ m/\[KEYWORD\]/))
 				{
 					&addToRedis($newquote,"wiart");
 					&sendMessage("Quote added in common pool.",$chatid);
 				}
-			elsif (length($newquote)<100)
+			elsif (length($newquote)<120)
 				{
 					&addToRedis($newquote,"wiart_rare");
 					&sendMessage("Quote added in rare pool.",$chatid);
@@ -98,9 +107,14 @@ if ($qrequest->param()) #int(rand(100))<$RNG)
 				{
 					&sendMessage("This quote is shit.",$chatid);
 				}	
-
+			}
+			else
+			{
+				&sendMessage("How can you challenge a perfect, immortal machine?",$chatid);
+			}
 		}
 	
+	#Regular use case, RNG verification
 	if (int(rand(100))<$RNG)
 	{
 		$logger->info('Message posted by '.$postername." ".$posterlastname." in ".$chatid);
@@ -118,8 +132,8 @@ if ($qrequest->param()) #int(rand(100))<$RNG)
 		my $response;
 		#On a une chance de piocher dans 3 pools: Commun, Rare(10%), et UltraRare(2%).
 		switch (int(rand(100))) {
-			case [1..2] { $response = &getFromRedis("wiart_ultra")}
-			case [10..20] { $response = &getFromRedis("wiart_rare")}
+			case [1..10] { $response = &getFromRedis("wiart_rare")}
+			case [11..12] { $response = &getFromRedis("wiart_ultra")}
 			else { $response = &getFromRedis("wiart")}
 			}
 
@@ -235,7 +249,16 @@ sub sendSticker{
 
 #addToRedis(Message,SetName)
 sub addToRedis{
-	$redis->sadd($_[1], $_[0]);
+	if (length($_[0])>0)
+	{
+		$redis->sadd($_[1], $_[0]);
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+	
 }
 
 #getFromRedis(SetName)
