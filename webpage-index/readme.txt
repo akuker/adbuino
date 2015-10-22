@@ -1,0 +1,1 @@
+front page for http://faglord.party
