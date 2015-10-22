@@ -4,7 +4,7 @@
 	<!-- Compiled and minified JavaScript -->
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.96.1/js/materialize.min.js"></script>
-	<script src="http://noctur.me:8255/socket.io/socket.io.js"></script>
+	<script src="http://faglord.party:8255/socket.io/socket.io.js"></script>
 	<title>La Webcam du Local E-EISTI</title>
 	 <meta charset="UTF-8"> 
 </head>
@@ -76,9 +76,20 @@
 	<div class="row container">
 
 		 <div class="row">
+<form id="voiceform" onsubmit="sendMessage();return false;" action="javascript:void(0);">
+
+	<div class="input-field col s6">
+                <input type="text" id="textarea2">
+            	<label class="" for="textarea2">LDAP Login</label>
+        </div>
+
+        <div class="input-field col s6">
+          <input id="password" type="password" class="validate">
+          <label for="password">Password</label>
+        </div>
 
         <div class="input-field col s11">
-            <form id="voiceform" onsubmit="sendMessage();return false;" action="javascript:void(0);">
+           
 		<input id="textarea1" type="text" length="100"></input>
             	<label for="textarea1">Send Voice Message</label>
             </form>
@@ -150,7 +161,7 @@
 	//One sec
 	var timeout = 5000;
 	//Starting socket.io
-	var t = io.connect("http://noctur.me:8255", {
+	var t = io.connect("http://faglord.party:8255", {
 		'connect timeout': timeout,
 		'reconnect': true,
 		'reconnection delay': 2000,
@@ -250,24 +261,26 @@
 
 	function sendMessage()
 	{
-		jQuery.get("http://noctur.me/jsonip/",
-    		function(data){
+		//jQuery.get("http://noctur.me/jsonip/",
+    		//function(data){
 	
 			Materialize.toast("Sending....",2000);
 			var mess = document.getElementById("textarea1").value;
-		
+			var login = document.getElementById("textarea2").value;		
 			if (mess.length >100)
 				Materialize.toast("Message exceeds 100 characters.",1000);
 			else	
 				jQuery.ajax({
 					method: "POST",
 					url: "msg.pl",
-					data: {message: mess, ip:data},
+					data: {message: mess, login:login, passw:document.getElementById("password").value},
 					}).always(function(data) {
 						Materialize.toast(data,1000);
-						document.getElementById("textarea1").value="";
+                                                if (data != "Audio message already playing."){
+						     document.getElementById("textarea1").value="";
+                                                }
 						});
-		});
+		//});
 
 		return false;
 	}
