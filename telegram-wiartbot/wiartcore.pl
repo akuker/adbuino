@@ -6,22 +6,26 @@ use LWP::Simple qw/get/;
 use LWP::Protocol::https; 
 use JSON::Parse 'parse_json';
 use URL::Encode qw(:all);
-use Encode qw(decode encode);
+use Encode;
 use Log::Log4perl;
 use Acme::Zalgo;
 use Text::UpsideDown;
 use Redis;
 use Switch;
 use utf8;
+use IPC::Filter qw(filter);
+use open ':std', ':encoding(UTF-8)';
 
 Log::Log4perl->init("log.conf");
+binmode STDOUT, ':encoding(UTF-8)';
+
 
 #Initialization variables
 my $qrequest = new CGI;
 my $accesstoken="non";
 my $redisaddress = "localhost:6379";
 
-my @smileys = ("-_-'", "XD", ":p", ":)", ";p", "--'", "-__-", ":O", ":D", "^^", ":^)","Ψ(｀∇´)Ψ","(´・ｪ・｀)","ヽ(;´Д｀)ﾉ","(´・ω・｀)","ヽ(´―｀)ノ","(＃ﾟДﾟ)","Σ(゜д゜;)","щ(ﾟДﾟщ)","(ﾟ∀ﾟ)","（･∀･)つ⑩","♪┏(・o･)┛♪┗ ( ･o･) ┓♪┏ ( ) ┛♪┗ (･o･ ) ┓♪┏(･o･)┛♪","(◑_◑)","┻━┻ ︵ヽ(`▭´)ﾉ︵﻿ ┻━┻","（‐＾▽＾‐）","(☞ﾟヮﾟ)☞ ☜(ﾟヮﾟ☜)","(>‿◠)✌");
+my @smileys = ("-_-'", "XD", ":p", ":)", ";p", "--'", "-__-", "(o.o)~", ":O", ":D", "^^", ":^)","Ψ(｀∇´)Ψ","(´・ｪ・｀)","ヽ(;´Д｀)ﾉ","(´・ω・｀)","ヽ(´―｀)ノ","(＃ﾟДﾟ)","Σ(゜д゜;)","щ(ﾟДﾟщ)","(ﾟ∀ﾟ)","（･∀･)つ⑩","♪┏(・o･)┛♪┗ ( ･o･) ┓♪┏ ( ) ┛♪┗ (･o･ ) ┓♪┏(･o･)┛♪","(◑_◑)","┻━┻ ︵ヽ(`▭´)ﾉ︵﻿ ┻━┻","（‐＾▽＾‐）","(☞ﾟヮﾟ)☞ ☜(ﾟヮﾟ☜)","(>‿◠)✌");
 my @ponctuation = ("", "!", "!!", "..", "...", "!!!", ".....", "!", "!", "!","ｷﾀ━━━━━━(ﾟ∀ﾟ)━━━━━━!!!!!");
 my @stickers = ("BQADBAADEgAD2zPJBHZZS1PvFGP0Ag","BQADBAADDwAD2zPJBFLXbidWFvnhAg","BQADAgADaAADkjrfA8n7SFh4h4GeAg","BQADAgADVQADL1GyBWan0Lfa7fjmAg","BQADAgADTwADkjrfA4a3XwyXRbekAg","BQADAgADXwADkjrfA4OOCuDz__KmAg","BQADAQADpwQAAiBWmAJ8Va4tRld5nwI","BQADAgADcQADAqHaBWGmCCRjI3B2Ag","BQADAgADiQADAqHaBafsuyj2YD9uAg","BQADAgADlwADAqHaBR7ddBmJUxUfAg","BQADAgADrQADAqHaBTxjs2wKySKeAg","BQADAgADrwADAqHaBfeNSV_mSm0wAg","BQADAgADsQADAqHaBYkuGpLymUtbAg","BQADBAADXAADXSupAaa2MS1LMn26Ag","BQADBAADZgADXSupATsC2Pm0xdADAg","BQADBAADagADXSupAcBZICwpXF7JAg","BQADBQADpgEAAprnOwMzs6BU5mJvjgI","BQADAgADDAEAArou5QIaKkhJBeilzAI","BQADAgADGgEAArou5QIU-lmAYLxG5gI","BQADAgADKgEAArou5QJCHPl7rsjMnAI","BQADAgADBAEAArou5QKs0i4SszwmpAI","BQADBAAD-wEAAjqZlwG8FkVYTPAOngI","BQADBAAD3gEAAjqZlwHna8_WKMZ_xAI","BQADBAADAwIAAjqZlwFcuqAHOlAxIQI","BQADBAADFgAD6ZtlAAKpVijjJ0tPAg","BQADBAADJAAD6ZtlAAEQGjncHDFxpwI");
 
@@ -59,16 +63,24 @@ if ($qrequest->param()) #int(rand(100))<$RNG)
 	my $posterid = $data->{"from"}->{"id"};
 	my $text = $data->{"text"};
 
+	#$text = decode_utf8($text);
+
+	my $command;
+	my $commandargument;
+	($command, $commandargument) = split(/ /, $text, 2);
+
+	$logger->info('command is '.$command.' and argument is '.$commandargument );
+
 	#RNG command ? Checks for specific user ID and text message.
 	if ($posterid eq "48574138" && exists $data->{"text"})
 	{
 		
 		$logger->info('Potential RNG changing command sent by master: '.$text);
 
-		if ((substr $text,0,4) eq "/rng")
+		if ($command eq "/rng")
 			{
 				#fucking confirmed
-				$RNG = substr $text,5;
+				$RNG = $commandargument;
 				#quick number check
 				$RNG += 0;
 
@@ -86,31 +98,32 @@ if ($qrequest->param()) #int(rand(100))<$RNG)
 	}
 
 	#If adding quote
-	if ((substr $text,0,13) eq "/add\@WiartBot")
+	if ($command eq "/add" || $command eq "/add\@WiartBot")
 		{
-			my $newquote = split(/ /, $text, 2);
+			my $newquote = $commandargument;
 			$logger->info('New quote is '.$newquote);
 
 			unless($newquote eq "1")
 			{
-			if (length($newquote)<40 && ($newquote=~ m/\[NAME\]/ || $newquote=~ m/\[KEYWORD\]/))
+			if (length($newquote)<100 && ($newquote=~ m/\[NAME\]/ || $newquote=~ m/\[KEYWORD\]/ || $newquote=~ m/\[INT\]/ ))
 				{
 					&addToRedis($newquote,"wiart");
 					&sendMessage("Quote added in common pool.",$chatid);
 				}
-			elsif (length($newquote)<120)
+			elsif (length($newquote)<250)
 				{
 					&addToRedis($newquote,"wiart_rare");
 					&sendMessage("Quote added in rare pool.",$chatid);
 				}
 			else
 				{
-					&sendMessage("This quote is shit.",$chatid);
+					&addToRedis($newquote,"wiart_ultra");
+					&sendMessage("Quote added in ULTRA rare pool !",$chatid);
 				}	
 			}
 			else
 			{
-				&sendMessage("How can you challenge a perfect, immortal machine?",$chatid);
+				&sendMessage("(◑_◑)",$chatid);
 			}
 		}
 	
@@ -120,12 +133,41 @@ if ($qrequest->param()) #int(rand(100))<$RNG)
 		$logger->info('Message posted by '.$postername." ".$posterlastname." in ".$chatid);
 
 		#random keyword au cas ou aucun n'est spécifié
-		my $keyword = "debian";
+		my $keyword = "tuning";
 
 		#Si c'est un message texte, on peut récupérer un keyword pour l'utiliser dans la réponse finale.
 		if (exists $data->{"text"})
 			{
-				$keyword = &getLongestWord($data->{"text"});
+				my $textout;
+				#Utilisation de treetagger
+				#my $textout = `echo "\$text" | tree-tagger-french | grep NOM`;
+				#run3("tree-tagger-french",$text,$textout);
+
+				$textout = filter($text, "tree-tagger-french");
+
+				#$logger->info('Treetagger return :'.$textout);
+
+				my @noms;
+				my @output = split /\n/, $textout;
+
+				foreach my $nom (@output) {
+					$logger->info('From treetagger: '.$nom);
+					if (index($nom,"NOM") !=-1)
+						{
+							push (@noms, (split ' ',$nom)[0]);
+						}
+				}
+
+				unless (@noms == 0)
+				{ 
+					$keyword = $noms[rand @noms];
+				}
+				else
+				{
+					$keyword = (split ' ',@output[0])[0];
+				}
+
+				#$keyword = &getLongestWord($data->{"text"});
 			}
 
 		#on construit une réponse.
@@ -251,7 +293,7 @@ sub sendSticker{
 sub addToRedis{
 	if (length($_[0])>0)
 	{
-		$redis->sadd($_[1], $_[0]);
+		$redis->sadd($_[1], encode_utf8($_[0]));
 		return 1;
 	}
 	else
