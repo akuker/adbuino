@@ -356,14 +356,14 @@ div#tadd select { width: 220px }
 .meter-text, #meter-disk-text{
 	overflow: visible!important;
     height: 17px!important;
-    width: 33px!important;
+    width: 0px!important;
     line-height: 17px!important;
     -moz-border-radius: 5px!important;
     border-radius: 5px!important;
     background-color: rgba(26,26,26,0.1)!important;
     text-align: center!important;
     position: relative!important;
-    margin-bottom: -19px!important;}
+    margin-bottom: 0px!important;}
 
 /* Position of Loading-icon at the bottom, right. */
 div#t #ind{
