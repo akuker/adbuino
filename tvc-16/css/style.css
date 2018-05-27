@@ -1,0 +1,207 @@
+@font-face {
+    font-family: Lemon Milk;
+    src: url("LemonMilk.otf") format("opentype");
+    }
+
+@font-face {
+    font-family: Lemon Milk Light;
+    src: url("LemonMilklight.otf") format("opentype");
+    }
+
+body{
+  margin: 0;
+  background: #eaeaea;
+  font-size: 22px;
+  font-family: 'Lato', sans-serif;
+  
+}
+
+#mainText {
+    overflow: hidden;
+}
+
+#stage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    filter: blur(1px) opacity(60%);
+}
+
+.terminal-text {
+    font-family: 'VT323', monospace;
+    font-size: 24px;
+}
+
+.top-border {
+
+    mask-image: url('../img/topbg.svg ');
+    height: 38px;
+    margin-bottom: -1px;
+}
+
+.bot-border {
+    mask-image: url('../img/botbg.svg ');
+    height: 38px;
+    margin-top: -1px;
+}
+
+.hello-background {
+    background-color: #a560ff;
+    
+}
+
+.project-background {
+    background-color: #f1c711;
+}
+
+.wrapper {
+    
+    color: #000000;
+    width: 500%;
+    margin-left: -200%;
+    overflow: hidden;
+
+  }
+
+.text {
+      overflow: hidden;
+      max-width: 80vw;
+      margin-left: 42%;
+      margin-top:30px;
+      margin-bottom:30px;
+
+  }
+
+.title {
+    text-shadow: 0.5vw 0.5vw #32cd32;
+    font-family: 'Monoton', cursive;
+    font-size: 10vw;
+    margin: 0px;
+    text-align: center;
+}
+
+.subtitle {
+    text-shadow: 0.2vw 0.2vw #32cd32;
+    font-family: 'Lemon Milk';
+    font-size: 2vw;
+    margin-top: 0px;
+    text-align: center;
+}
+
+.containerBox {
+    position: relative;
+    max-width: 200px;
+    vertical-align: middle;
+    float:left;
+    margin-right:40px;
+}
+
+.text-box {
+    position: absolute;    
+    text-align: left;    
+    width: 150%;
+    
+}
+
+.blue-button {
+    top: 40%;
+    left: 15%;
+}
+
+.pink-button {
+    top: 47%;
+    left: 13%;
+}
+
+.button-text {
+   display: inline-block;
+   font-size: 30px;
+   font-family: 'Lemon Milk';
+   color: #000;   
+}
+
+.blue-shadow {
+    text-shadow: 4px 4px #0070f8;
+}
+
+.pink-shadow {
+    text-shadow: 4px 4px #f040b0;
+}
+
+.project-list {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#mspb-nc9jl2ngc1i {
+    color: #000;
+}
+
+.img-responsive {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+@media only screen and (max-width: 1000px) {
+
+    .title {
+     font-size: 20vw;
+     text-shadow: 1vw 1vw #32cd32;
+     }
+ 
+     .subtitle {
+         font-size: 5vw;
+         text-shadow: 0.4vw 0.4vw #32cd32;
+     }
+
+     .containerBox {
+        max-width: 150px;
+     }
+
+     .button-text {
+        font-size: 25px; 
+     }
+
+     .pink-button {
+        top: 43%;
+        left: 13%;
+    }
+ 
+ }
+
+.footer-container {
+    position:fixed;
+    right:1%;
+    bottom:0;
+    width:200px;
+    height:100px;
+}
+
+.footer-text {
+    display: inline-block;
+    font-family: 'Lemon Milk';
+    position:absolute; 
+    left: 30%;
+    top: 30%;
+    z-index: 10;
+    font-size:22px;
+    text-shadow: 4px 4px #000;
+    text-align: center;
+    color: #eaeaea;
+}
+
+.footer-image {
+    animation:spin 60s linear infinite;
+    position:relative;
+    overflow:hidden;
+    width:200px;
+}
+
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }

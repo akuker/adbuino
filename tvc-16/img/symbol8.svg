@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="61.858109mm"
+   height="14.358747mm"
+   viewBox="0 0 61.858108 14.358748"
+   version="1.1"
+   id="svg67"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="symbol8.svg">
+  <defs
+     id="defs61" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.8"
+     inkscape:cx="-22.953822"
+     inkscape:cy="-3.2090562"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata64">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-63.191339,-62.283357)">
+    <g
+       transform="matrix(0.28222223,0,0,0.28222223,26.42671,20.358595)"
+       id="g6033-5-8"
+       style="fill:#32cd32;fill-opacity:1;stroke:#32cd32;stroke-opacity:1"
+       inkscape:export-xdpi="184.6227"
+       inkscape:export-ydpi="184.6227">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5978-3-2"
+         d="m 169.28571,173.0765 c 151.42857,7.14285 151.42857,7.14285 151.42857,7.14285"
+         style="fill:#32cd32;fill-opacity:1;fill-rule:evenodd;stroke:#32cd32;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5978-2-1-3"
+         d="m 197.85715,188.79079 c 151.42857,7.14285 151.42857,7.14285 151.42857,7.14285"
+         style="fill:#32cd32;fill-opacity:1;fill-rule:evenodd;stroke:#32cd32;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5978-9-0-2"
+         d="m 140.71428,157.36222 c 151.42857,7.14285 151.42857,7.14285 151.42857,7.14285"
+         style="fill:#32cd32;fill-opacity:1;fill-rule:evenodd;stroke:#32cd32;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       id="g6033-2"
+       transform="matrix(0.28222223,0,0,0.28222223,23.525183,18.858921)"
+       inkscape:export-xdpi="184.6227"
+       inkscape:export-ydpi="184.6227">
+      <path
+         inkscape:connector-curvature="0"
+         id="path5978-1"
+         d="m 169.28571,173.0765 c 151.42857,7.14285 151.42857,7.14285 151.42857,7.14285"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5978-2-6"
+         d="m 197.85715,188.79079 c 151.42857,7.14285 151.42857,7.14285 151.42857,7.14285"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5978-9-7"
+         d="m 140.71428,157.36222 c 151.42857,7.14285 151.42857,7.14285 151.42857,7.14285"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+  </g>
+</svg>
