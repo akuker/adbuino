@@ -38,12 +38,14 @@ body{
 .top-border {
 
     mask-image: url('../img/topbg.svg ');
+    -webkit-mask-image: url('../img/topbg.svg ');
     height: 38px;
     margin-bottom: -1px;
 }
 
 .bot-border {
     mask-image: url('../img/botbg.svg ');
+    -webkit-mask-image: url('../img/botbg.svg ');
     height: 38px;
     margin-top: -1px;
 }
