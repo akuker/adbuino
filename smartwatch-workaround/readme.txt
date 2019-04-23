@@ -1,1 +1,0 @@
-uses free mobile and pushbullet apis to resend all notifications through sms so my budget smartwatch can read them
