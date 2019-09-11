@@ -22,10 +22,11 @@ jobs:
       env:
         LCL_ID: ${{ secrets.LCL_ID }}
         LCL_CODE: ${{ secrets.LCL_CODE }}
-        TIMELINE_TOKEN: ${{ secrets.TIMELINE_TOKEN }}
       run: |
         node lclscraper.js  
     - name: Push pebble timeline pin
+      env:
+        TIMELINE_TOKEN: ${{ secrets.TIMELINE_TOKEN }}
       run: | 
         LAB1=$(cat lcl.json | jq -r '.[0].label')
         TOT1=$(cat lcl.json | jq -r '.[0].total')
