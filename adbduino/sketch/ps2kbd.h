@@ -236,62 +236,6 @@ void InitPS2Mouse(void)
   pinMode(kPS2MouseDataArduinoPin, INPUT);
   digitalWrite(kPS2MouseDataArduinoPin, HIGH);
 }
-int HandlePS2Mouse(uint8_t *status, uint8_t *xmove, uint8_t *ymove)
-{
-        uint16_t ps2frame = 0;
-        while(kPS2MouseInPort & kPS2MouseClockPin);
-        ps2frame = 0;
-        do {
-                ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
-                if(ps2frame == kPS2ErrorCode) {
-                        //Serial.println("Failure on status");
-                        return -1;
-                }
-        }while(ps2frame == kPS2RetryCode);
-        *status = (ps2frame >> 1) & 0xFF;
-        // self-test passed, a mouse was probably just attached
-        if(*status == 0xAA) {
-                // Read mouse id
-                ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
-                
-                //SetupPS2Mouse();
-                Serial.println("Re-setup mouse");
-                return -1;
-        }
-        while(kPS2MouseInPort & kPS2MouseClockPin);
-        ps2frame = 0;
-        do {
-                ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
-                if(ps2frame == kPS2ErrorCode) {
-                        Serial.println("Failure on xmove");
-                        return -1;
-                }
-        }while(ps2frame == kPS2RetryCode);
-        *xmove = (ps2frame >> 1) & 0xFF;
-        while(kPS2MouseInPort & kPS2MouseClockPin);
-        ps2frame = 0;
-        do {
-                ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
-                if(ps2frame == kPS2ErrorCode) {
-                        Serial.println("Failure on ymove");
-                        return -1;
-                }
-        }while(ps2frame == kPS2RetryCode);
-        *ymove = (ps2frame >> 1) & 0xFF;
-        if(!(*status & 0x08)) {
-                //Serial.print("Status is missing bit 0x08: ");
-                Serial.println(*status);
-                return -1;
-        }
-#if 0
-        USART2_SendString("PS2: ");
-        USART2_SendHexByte(*status);
-        USART2_SendHexByte(*xmove);
-        USART2_SendHexByte(*ymove);
-        USART2_SendString("\n\r");
-#endif
-        return 0;
-}
 void SetupPS2Mouse(void)
 {
         uint16_t ps2frame = 0;
@@ -370,6 +314,61 @@ void SetupPS2Mouse(void)
         ps2scancode = ps2frame >> 1;
         // ps2scancode should be 0xFA for ack
         Serial.println(ps2scancode, HEX);
+}
+int HandlePS2Mouse(uint8_t *status, uint8_t *xmove, uint8_t *ymove)
+{
+        uint16_t ps2frame = 0;
+        while(kPS2MouseInPort & kPS2MouseClockPin);
+        ps2frame = 0;
+        do {
+                ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
+                if(ps2frame == kPS2ErrorCode) {
+                        //Serial.println("Failure on status");
+                        return -1;
+                }
+        }while(ps2frame == kPS2RetryCode);
+        *status = (ps2frame >> 1) & 0xFF;
+        // self-test passed, a mouse was probably just attached
+        if(*status == 0xAA) {
+                // Read mouse id
+                ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
+                
+                Serial.println("Re-setup mouse");
+                //SetupPS2Mouse();
+                return -1;
+        }
+        while(kPS2MouseInPort & kPS2MouseClockPin);
+        ps2frame = 0;
+        do {
+                ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
+                if(ps2frame == kPS2ErrorCode) {
+                        Serial.println("Failure on xmove");
+                        return -1;
+                }
+        }while(ps2frame == kPS2RetryCode);
+        *xmove = (ps2frame >> 1) & 0xFF;
+        while(kPS2MouseInPort & kPS2MouseClockPin);
+        ps2frame = 0;
+        do {
+                ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
+                if(ps2frame == kPS2ErrorCode) {
+                        Serial.println("Failure on ymove");
+                        return -1;
+                }
+        }while(ps2frame == kPS2RetryCode);
+        *ymove = (ps2frame >> 1) & 0xFF;
+        if(!(*status & 0x08)) {
+                //Serial.print("Status is missing bit 0x08: ");
+                Serial.println(*status);
+                return -1;
+        }
+#if 0 
+        Serial.print("PS2: ");
+        Serial.print(*status);
+        Serial.print(*xmove);
+        Serial.println(*ymove);
+#endif
+        return 0;
 }
 void SendPS2MouseCommand(uint8_t cmd, uint8_t clock, uint8_t data)
 {

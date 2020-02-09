@@ -41,11 +41,12 @@ POSSIBILITY OF SUCH DAMAGE.
 #define kModCaps    32
 #define kModDelete  64
 uint8_t mousepending = 0;
-uint8_t kbdpending = 0;
-uint16_t mousereg0 = 0;
-uint16_t kbdreg0 = 0;
-uint8_t kbdsrq = 0;
-uint8_t mousesrq = 0;
+uint8_t kbdpending   = 0;
+uint16_t kbdprev0    = 0;
+uint16_t mousereg0   = 0;
+uint16_t kbdreg0     = 0;
+uint8_t kbdsrq       = 0;
+uint8_t mousesrq     = 0;
 uint8_t modifierkeys = 0xFF;
 #define ADB_PORT        PORTB
 #define ADB_PIN         PINB
@@ -389,6 +390,8 @@ void loop() {
     if(us) {
       if(HandlePS2Keyboard(&ps2key, &ps2keyup, &ps2extended)) {
         PS2ToADBScancode(ps2key, ps2keyup, ps2extended);
+        Serial.print("Transmitting adb maccode ");
+        Serial.println(kbdreg0);
        }
     }
   }
@@ -427,6 +430,24 @@ void loop() {
     switch(cmd & 0x0F) {
       case 0xC: // talk register 0
         if(kbdpending) {
+
+          //kdbprev0 = kbdreg0;
+          
+          if (kbdreg0 == 0xFFFF) {
+            // 65535 keypresses are invalid, skip them and the next press
+            kbdpending = 0;
+            Serial.println("Skipping 0xFFFF signal");
+            break;
+          }
+
+          if (kbdprev0) {
+            kbdpending = 0;
+            // Send a 'key released' code to avoid ADB sticking to the previous key
+            kbdprev0 |= 0x80;
+            Serial.println("Nope, sending reset 46079 instead");
+            kbdreg0 = 0x3BFF;
+          }
+          
           kbdsrq = 0;
           _delay_us(180); // stop to start time / interframe delay
           ADB_DDR |= 1<<ADB_DATA_BIT;  // set output
