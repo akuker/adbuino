@@ -42,12 +42,14 @@ POSSIBILITY OF SUCH DAMAGE.
 #define kModDelete  64
 uint8_t mousepending = 0;
 uint8_t kbdpending   = 0;
+uint8_t kbdskip      = 0;
 uint16_t kbdprev0    = 0;
 uint16_t mousereg0   = 0;
 uint16_t kbdreg0     = 0;
 uint8_t kbdsrq       = 0;
 uint8_t mousesrq     = 0;
 uint8_t modifierkeys = 0xFF;
+uint32_t kbskiptimer = 0;
 #define ADB_PORT        PORTB
 #define ADB_PIN         PINB
 #define ADB_DDR         DDRB
@@ -307,6 +309,15 @@ uint8_t PS2ToADBScancode(uint8_t code, uint8_t keyup, uint8_t extended)
         if(keyup) {
                 maccode |= 0x80;
         }
+
+        if (maccode == 0xFF) {
+          // 255 codes are invalid(bad keyboard?), set the skip flag
+          kbdskip = 1;
+        } else {
+          // Save valid codes so we can fallback to them in case of 255
+          kbdprev0 = maccode;
+        }
+
         kbdreg0 = (maccode << 8) | 0xFF;
         kbdpending = 1;
         return maccode;
@@ -430,23 +441,31 @@ void loop() {
     switch(cmd & 0x0F) {
       case 0xC: // talk register 0
         if(kbdpending) {
-
-          //kdbprev0 = kbdreg0;
           
-          if (kbdreg0 == 0xFFFF) {
+          if (kbdskip) {
             // 65535 keypresses are invalid, skip them and the next press
             kbdpending = 0;
-            Serial.println("Skipping 0xFFFF signal");
-            break;
-          }
+            kbdskip = 0;
+            Serial.println("Skipping invalid 255 signal");
 
-          if (kbdprev0) {
-            kbdpending = 0;
             // Send a 'key released' code to avoid ADB sticking to the previous key
             kbdprev0 |= 0x80;
-            Serial.println("Nope, sending reset 46079 instead");
-            kbdreg0 = 0x3BFF;
+            kbdreg0 = (kbdprev0 << 8) | 0xFF;
+            Serial.print("Sending keyup ");
+            Serial.print(kbdreg0);
+            Serial.println(" instead");
+
+            // Save timestamp 
+            kbskiptimer = millis();
           }
+
+          // Check timestamp and don't process the key event if it came right after a 255
+          // This is meant to avoid a glitch where releasing a key sends 255->keydown instead
+          if (millis() - kbskiptimer < 5) {
+            Serial.println("Too little time since bugged keyup, skipping this keydown event");
+            kbdpending = 0;
+            break;
+          } 
           
           kbdsrq = 0;
           _delay_us(180); // stop to start time / interframe delay
