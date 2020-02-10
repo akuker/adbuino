@@ -443,29 +443,26 @@ void loop() {
         if(kbdpending) {
           
           if (kbdskip) {
-            // 65535 keypresses are invalid, skip them and the next press
-            kbdpending = 0;
             kbdskip = 0;
-            Serial.println("Skipping invalid 255 signal");
+            // Serial.println("Skipping invalid 255 signal and sending keyup instead");
 
             // Send a 'key released' code to avoid ADB sticking to the previous key
             kbdprev0 |= 0x80;
             kbdreg0 = (kbdprev0 << 8) | 0xFF;
-            Serial.print("Sending keyup ");
-            Serial.print(kbdreg0);
-            Serial.println(" instead");
 
             // Save timestamp 
             kbskiptimer = millis();
-          }
-
+          } else if (millis() - kbskiptimer < 90) {
           // Check timestamp and don't process the key event if it came right after a 255
           // This is meant to avoid a glitch where releasing a key sends 255->keydown instead
-          if (millis() - kbskiptimer < 5) {
             Serial.println("Too little time since bugged keyup, skipping this keydown event");
             kbdpending = 0;
             break;
           } 
+          
+          // Serial.print("Sending keycode ");
+          // Serial.print(kbdreg0);
+          // Serial.println(" to ADB");
           
           kbdsrq = 0;
           _delay_us(180); // stop to start time / interframe delay
