@@ -1,19 +1,4 @@
-# Chaotic-Realm
-Miscellaneous webpages and tiny scripts who don't need their own repo.
+This is a modified version of [bbraun's](http://synack.net/svn/adbduino/) PS/2 to ADB arduino sketch,  
+with some extra code added to alleviate issues with my own PS/2 keyboard.  
 
-
----------------------------------------
-
-                        DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-                                Version 2, December 2004
-
-             Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
-
-             Everyone is permitted to copy and distribute verbatim or modified
-             copies of this license document, and changing it is allowed as long
-             as the name is changed.
-
-              DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-              TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
-
-              0. You just DO WHAT THE FUCK YOU WANT TO.
+Read more info [here.](https://tvc-16.science/adbuino-ps2.html)

@@ -1,1 +1,0 @@
-Telegram bot which spews stupid shit every now and then.
