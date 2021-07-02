@@ -1,3 +1,0 @@
-[submodule "src/adbpico/tinyusb"]
-	path = src/adbpico/tinyusb
-	url = https://github.com/raspberrypi/tinyusb
