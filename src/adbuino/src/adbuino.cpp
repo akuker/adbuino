@@ -34,7 +34,8 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 #include "Arduino.h"
 #include <util/delay.h>
-
+#include "adb.h"
+#include "ps2kbd.h"
 // Example code from: https://platformio.org/lib/show/59/USB-Host-Shield-20
 #include <hidboot.h>
 #include <usbhub.h>
@@ -66,105 +67,105 @@ uint8_t kbdsrq       = 0;
 uint8_t mousesrq     = 0;
 uint8_t modifierkeys = 0xFF;
 uint32_t kbskiptimer = 0;
-#define ADB_PORT        PORTB
-#define ADB_PIN         PINB
-#define ADB_DDR         DDRB
-#define ADB_DATA_BIT    3
-// The original data_lo code would just set the bit as an output
-// That works for a host, since the host is doing the pullup on the ADB line,
-// but for a device, it won't reliably pull the line low.  We need to actually
-// set it.
-#define data_lo() { (ADB_DDR |=  (1<<ADB_DATA_BIT)); (ADB_PORT &= ~(1<<ADB_DATA_BIT)); }
-#define data_hi() (ADB_DDR &= ~(1<<ADB_DATA_BIT))
-#define data_in() (ADB_PIN &   (1<<ADB_DATA_BIT))
-static inline uint16_t wait_data_lo(uint16_t us)
-{
-    do {
-        if ( !data_in() )
-            break;
-        _delay_us(1 - (6 * 1000000.0 / F_CPU));
-    }
-    while ( --us );
-    return us;
-}
-static inline uint16_t wait_data_hi(uint16_t us)
-{
-    do {
-        if ( data_in() )
-            break;
-        _delay_us(1 - (6 * 1000000.0 / F_CPU));
-    }
-    while ( --us );
-    return us;
-}
-#include "ps2kbd.h"
-static inline void place_bit0(void)
-{
-    data_lo();
-    _delay_us(65);
-    data_hi();
-    _delay_us(35);
-}
-static inline void place_bit1(void)
-{
-    data_lo();
-    _delay_us(35);
-    data_hi();
-    _delay_us(65);
-}
-static inline void send_byte(uint8_t data)
-{
-    for (int i = 0; i < 8; i++) {
-        if (data&(0x80>>i))
-            place_bit1();
-        else
-            place_bit0();
-    }
-}
-static uint8_t inline adb_recv_cmd(uint8_t srq) 
-{
-  uint8_t bits;
-  uint16_t data = 0;
+// #define ADB_PORT        PORTD
+// #define ADB_PIN         PIND
+// #define ADB_DDR         DDRD
+// #define ADB_DATA_BIT    (1<<3)
+// // The original data_lo code would just set the bit as an output
+// // That works for a host, since the host is doing the pullup on the ADB line,
+// // but for a device, it won't reliably pull the line low.  We need to actually
+// // set it.
+// #define data_lo() { (ADB_DDR |=  (1<<ADB_DATA_BIT)); (ADB_PORT &= ~(1<<ADB_DATA_BIT)); }
+// #define data_hi() (ADB_DDR &= ~(1<<ADB_DATA_BIT))
+// #define data_in() (ADB_PIN &   (1<<ADB_DATA_BIT))
+// static inline uint16_t wait_data_lo(uint16_t us)
+// {
+//     do {
+//         if ( !data_in() )
+//             break;
+//         _delay_us(1 - (6 * 1000000.0 / F_CPU));
+//     }
+//     while ( --us );
+//     return us;
+// }
+// static inline uint16_t wait_data_hi(uint16_t us)
+// {
+//     do {
+//         if ( data_in() )
+//             break;
+//         _delay_us(1 - (6 * 1000000.0 / F_CPU));
+//     }
+//     while ( --us );
+//     return us;
+// }
+// #include "ps2kbd.h"
+// static inline void place_bit0(void)
+// {
+//     data_lo();
+//     _delay_us(65);
+//     data_hi();
+//     _delay_us(35);
+// }
+// static inline void place_bit1(void)
+// {
+//     data_lo();
+//     _delay_us(35);
+//     data_hi();
+//     _delay_us(65);
+// }
+// static inline void send_byte(uint8_t data)
+// {
+//     for (int i = 0; i < 8; i++) {
+//         if (data&(0x80>>i))
+//             place_bit1();
+//         else
+//             place_bit0();
+//     }
+// }
+// static uint8_t inline adb_recv_cmd(uint8_t srq) 
+// {
+//   uint8_t bits;
+//   uint16_t data = 0;
   
-  // find attention & start bit
-  if(!wait_data_lo(5000)) return 0;
-  uint16_t lowtime = wait_data_hi(1000);
-  if(!lowtime || lowtime > 500) {
-    return 0;
-  }
-  wait_data_lo(100);
+//   // find attention & start bit
+//   if(!wait_data_lo(5000)) return 0;
+//   uint16_t lowtime = wait_data_hi(1000);
+//   if(!lowtime || lowtime > 500) {
+//     return 0;
+//   }
+//   wait_data_lo(100);
   
-  for(bits = 0; bits < 8; bits++) {
-    uint8_t lo = wait_data_hi(130);
-    if(!lo) {
-      goto out;
-    }
-    uint8_t hi = wait_data_lo(lo);
-    if(!hi) {
-      goto out;
-    }
-    hi = lo - hi;
-    lo = 130 - lo;
+//   for(bits = 0; bits < 8; bits++) {
+//     uint8_t lo = wait_data_hi(130);
+//     if(!lo) {
+//       goto out;
+//     }
+//     uint8_t hi = wait_data_lo(lo);
+//     if(!hi) {
+//       goto out;
+//     }
+//     hi = lo - hi;
+//     lo = 130 - lo;
     
-    data <<= 1;
-    if(lo < hi) {
-      data |= 1;
-    }
-  }
+//     data <<= 1;
+//     if(lo < hi) {
+//       data |= 1;
+//     }
+//   }
   
-  if(srq) {
-    data_lo();
-    _delay_us(250);
-    data_hi();
-  } else {
-    // Stop bit normal low time is 70uS + can have an SRQ time of 300uS
-    wait_data_hi(400);
-  }
+//   if(srq) {
+//     data_lo();
+//     _delay_us(250);
+//     data_hi();
+//   } else {
+//     // Stop bit normal low time is 70uS + can have an SRQ time of 300uS
+//     wait_data_hi(400);
+//   }
   
-  return data;
-out:
-  return 0;
-}
+//   return data;
+// out:
+//   return 0;
+// }
 uint8_t PS2ToADBScancode(uint8_t code, uint8_t keyup, uint8_t extended)
 {
         uint8_t maccode = 0xFF;
@@ -339,19 +340,21 @@ uint8_t PS2ToADBScancode(uint8_t code, uint8_t keyup, uint8_t extended)
         return maccode;
 }
 void setup() {
-  Serial.begin(19200);
+  Serial.begin(115200);
+  while(!Serial);
   
   // Set ADB line as input
-  ADB_DDR &= ~(1<<ADB_DATA_BIT);
+  // ADB_DDR &= ~(1<<ADB_DATA_BIT);
+  adb_pin_in();
   
   Serial.println("Initializing keyboard");
   InitPS2Keyboard();
   Serial.println("Initializing mouse");
   InitPS2Mouse();
-  Serial.println("Setting keyboard repeat");
-  SetPS2Repeat();
-  Serial.println("Setting up mouse");
-  SetupPS2Mouse();
+  // Serial.println("Setting keyboard repeat");
+  // SetPS2Repeat();
+  // Serial.println("Setting up mouse");
+  // SetupPS2Mouse();
   kPS2MouseModePort &= kPS2MouseClockPin;
   kPS2MouseOutPort |= kPS2MouseClockPin;
   kPS2MouseModePort &= kPS2MouseDataPin;
@@ -424,99 +427,106 @@ void loop() {
   }
   kPS2KbdModePort |= kPS2KbdClockPin;
   kPS2KbdOutPort &= ~kPS2KbdClockPin;
-  if(mousepending || kbdpending) {
-    cmd = adb_recv_cmd(mousesrq|kbdsrq);
-  }
-  // see if it is addressed to us
-  if(((cmd >> 4) & 0x0F) == 3) {
-    switch(cmd & 0x0F) {
-      case 0xC: // talk register 0
-        if(mousepending) {
-          _delay_us(180); // stop to start time / interframe delay
-          ADB_DDR |= 1<<ADB_DATA_BIT;  // set output
-          place_bit1(); // start bit
-          send_byte((mousereg0 >> 8) & 0x00FF);
-          send_byte(mousereg0 & 0x00FF);
-          place_bit0(); // stop bit
-          ADB_DDR &= ~(1<<ADB_DATA_BIT); // set input
-          mousepending = 0;
-          mousesrq = 0;
-        }
-        break;
-      default:
-        Serial.print("Unknown cmd: ");
-        Serial.println(cmd, HEX);
-        break;
+  // if(mousepending || kbdpending) {
+    // cmd = adb_recv_cmd(mousesrq|kbdsrq);
+    cmd = adb_recv_cmd(3);
+    if(cmd != 0)
+    {
+      Serial.print("Received ADB command: ");
+      Serial.println(cmd, HEX);
     }
-  } else {
-    if(mousepending) mousesrq = 1;
-  }
+  // }
+  // // see if it is addressed to us
+  // if(((cmd >> 4) & 0x0F) == 3) {
+  //   switch(cmd & 0x0F) {
+  //     case 0xC: // talk register 0
+  //       if(mousepending) {
+  //         _delay_us(180); // stop to start time / interframe delay
+  //         ADB_DDR |= 1<<ADB_DATA_BIT;  // set output
+  //         place_bit1(); // start bit
+  //         send_byte((mousereg0 >> 8) & 0x00FF);
+  //         send_byte(mousereg0 & 0x00FF);
+  //         place_bit0(); // stop bit
+  //         ADB_DDR &= ~(1<<ADB_DATA_BIT); // set input
+  //         mousepending = 0;
+  //         mousesrq = 0;
+  //       }
+  //       break;
+  //     default:
+  //       Serial.print("Unknown cmd: ");
+  //       Serial.println(cmd, HEX);
+  //       break;
+  //   }
+  // } else {
+  //   if(mousepending) mousesrq = 1;
+  // }
   
-  if(((cmd >> 4) & 0x0F) == 2) {
-    uint8_t adbleds;
-    switch(cmd & 0x0F) {
-      case 0xC: // talk register 0
-        if(kbdpending) {
+  handle_adb_cmd(cmd);
+  // if(((cmd >> 4) & 0x0F) == 2) {
+  //   uint8_t adbleds;
+  //   switch(cmd & 0x0F) {
+  //     case 0xC: // talk register 0
+  //       if(kbdpending) {
           
-          if (kbdskip) {
-            kbdskip = 0;
-            // Serial.println("Skipping invalid 255 signal and sending keyup instead");
+  //         if (kbdskip) {
+  //           kbdskip = 0;
+  //           // Serial.println("Skipping invalid 255 signal and sending keyup instead");
 
-            // Send a 'key released' code to avoid ADB sticking to the previous key
-            kbdprev0 |= 0x80;
-            kbdreg0 = (kbdprev0 << 8) | 0xFF;
+  //           // Send a 'key released' code to avoid ADB sticking to the previous key
+  //           kbdprev0 |= 0x80;
+  //           kbdreg0 = (kbdprev0 << 8) | 0xFF;
 
-            // Save timestamp 
-            kbskiptimer = millis();
-          } else if (millis() - kbskiptimer < 90) {
-          // Check timestamp and don't process the key event if it came right after a 255
-          // This is meant to avoid a glitch where releasing a key sends 255->keydown instead
-            Serial.println("Too little time since bugged keyup, skipping this keydown event");
-            kbdpending = 0;
-            break;
-          } 
+  //           // Save timestamp 
+  //           kbskiptimer = millis();
+  //         } else if (millis() - kbskiptimer < 90) {
+  //         // Check timestamp and don't process the key event if it came right after a 255
+  //         // This is meant to avoid a glitch where releasing a key sends 255->keydown instead
+  //           Serial.println("Too little time since bugged keyup, skipping this keydown event");
+  //           kbdpending = 0;
+  //           break;
+  //         } 
           
-          // Serial.print("Sending keycode ");
-          // Serial.print(kbdreg0);
-          // Serial.println(" to ADB");
+  //         // Serial.print("Sending keycode ");
+  //         // Serial.print(kbdreg0);
+  //         // Serial.println(" to ADB");
           
-          kbdsrq = 0;
-          _delay_us(180); // stop to start time / interframe delay
-          ADB_DDR |= 1<<ADB_DATA_BIT;  // set output
-          place_bit1(); // start bit
-          send_byte((kbdreg0 >> 8) & 0x00FF);
-          send_byte(kbdreg0 & 0x00FF);
-          place_bit0(); // stop bit
-          ADB_DDR &= ~(1<<ADB_DATA_BIT); // set input
-          kbdpending = 0;
-        }
-        break;
-      case 0xD: // talk register 1
-        break;
-      case 0xE: // talk register 2
-        adbleds = 0xFF;
-        if(!(ps2ledstate & kPS2LEDCaps)) adbleds &= ~2;
-        if(!(ps2ledstate & kPS2LEDScroll)) adbleds &= ~4;
-        if(!(ps2ledstate & kPS2LEDNum)) adbleds &= ~1;
+  //         kbdsrq = 0;
+  //         _delay_us(180); // stop to start time / interframe delay
+  //         ADB_DDR |= 1<<ADB_DATA_BIT;  // set output
+  //         place_bit1(); // start bit
+  //         send_byte((kbdreg0 >> 8) & 0x00FF);
+  //         send_byte(kbdreg0 & 0x00FF);
+  //         place_bit0(); // stop bit
+  //         ADB_DDR &= ~(1<<ADB_DATA_BIT); // set input
+  //         kbdpending = 0;
+  //       }
+  //       break;
+  //     case 0xD: // talk register 1
+  //       break;
+  //     case 0xE: // talk register 2
+  //       adbleds = 0xFF;
+  //       if(!(ps2ledstate & kPS2LEDCaps)) adbleds &= ~2;
+  //       if(!(ps2ledstate & kPS2LEDScroll)) adbleds &= ~4;
+  //       if(!(ps2ledstate & kPS2LEDNum)) adbleds &= ~1;
         
-        _delay_us(180); // stop to start time / interframe delay
-        ADB_DDR |= 1<<ADB_DATA_BIT;  // set output
-        place_bit1(); // start bit
-        send_byte(modifierkeys);
-        send_byte(adbleds);
-        place_bit0(); // stop bit
-        ADB_DDR &= ~(1<<ADB_DATA_BIT); // set input
+  //       _delay_us(180); // stop to start time / interframe delay
+  //       ADB_DDR |= 1<<ADB_DATA_BIT;  // set output
+  //       place_bit1(); // start bit
+  //       send_byte(modifierkeys);
+  //       send_byte(adbleds);
+  //       place_bit0(); // stop bit
+  //       ADB_DDR &= ~(1<<ADB_DATA_BIT); // set input
         
-        break;
-      case 0xF: // talk register 3
-        // sets device address
-        break;
-      default:
-        Serial.print("Unknown cmd: ");
-        Serial.println(cmd, HEX);
-        break;
-    }
-  } else {
-    if(kbdpending) kbdsrq = 1;
-  }
+  //       break;
+  //     case 0xF: // talk register 3
+  //       // sets device address
+  //       break;
+  //     default:
+  //       Serial.print("Unknown cmd: ");
+  //       Serial.println(cmd, HEX);
+  //       break;
+  // //   }
+  // } else {
+  //   if(kbdpending) kbdsrq = 1;
+  // }
 }
