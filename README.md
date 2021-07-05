@@ -26,3 +26,5 @@ https://www.raspberrypi-spy.co.uk/2021/01/pi-pico-pinout-and-power-pins/
 [Running OpenOCD without root](https://forgge.github.io/theCore/guides/running-openocd-without-sudo.html)
 
 [Apple ADB Manager Documenation](https://developer.apple.com/library/archive/documentation/mac/pdf/Devices/ADB_Manager.pdf)
+
+https://www.mouser.com/ProductDetail/TE-Connectivity/5749181-1?qs=XlZqES4cpWbRcAMR%2FcJqkQ%3D%3D
