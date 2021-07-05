@@ -39,7 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
 // Example code from: https://platformio.org/lib/show/59/USB-Host-Shield-20
 #include <hidboot.h>
 #include <usbhub.h>
-
+#include "usbinterface.h"
 // Satisfy the IDE, which needs to see the include statment in the ino too.
 #ifdef dobogusinclude
 #include <spi4teensy3.h>
@@ -69,6 +69,7 @@ uint8_t modifierkeys = 0xFF;
 uint32_t kbskiptimer = 0;
 
 AdbInterface adb;
+UsbInterface usb;
 // #define ADB_PORT        PORTD
 // #define ADB_PIN         PIND
 // #define ADB_DDR         DDRD
@@ -341,11 +342,37 @@ uint8_t PS2ToADBScancode(uint8_t code, uint8_t keyup, uint8_t extended)
         kbdpending = 1;
         return maccode;
 }
+
+
+USB     Usb;
+USBHub  Hub1(&Usb);
+USBHub  Hub2(&Usb);
+USBHub  Hub3(&Usb);
+USBHub  Hub4(&Usb);
+HIDBoot<USB_HID_PROTOCOL_KEYBOARD>    HidKeyboard(&Usb);
+HIDBoot<USB_HID_PROTOCOL_MOUSE>    HidMouse(&Usb);
+
+MouseRptParser                               MousePrs;
+KbdRptParser KeyboardPrs;
+
 void setup() {
   Serial.begin(115200);
   while(!Serial);
   
+  Serial.println("Initializing ADB");
   adb.Init();
+  Serial.println("Initializing USB");
+  // usb.Init();
+
+  if (Usb.Init() == -1)
+    Serial.println("OSC did not start.");
+
+  HidKeyboard.SetReportParser(0, &KeyboardPrs);
+  HidMouse.SetReportParser(0, &MousePrs);
+
+  // delay( 200 );
+
+  delay(1);
   
   Serial.println("Initializing keyboard");
   InitPS2Keyboard();
@@ -363,7 +390,7 @@ void setup() {
   PORTC &= ~(1<<5);
   DDRC |= 1<<5;
   PORTC &= ~(1<<5);
-  Serial.println("adbpoll setup");  
+  Serial.println("setup complete");  
 }
 void loop() {
   uint8_t ps2key, ps2keyup, ps2extended;
@@ -371,6 +398,11 @@ void loop() {
   uint8_t cmd = 0;
   uint16_t us;
   
+  // Serial.println("Run USB");
+  // usb.RunTask();
+  Usb.Task();
+  return;
+
   if(!mousepending) {
     // uninhibit mouse communication
     kPS2MouseModePort &= ~kPS2MouseClockPin;
@@ -430,11 +462,11 @@ void loop() {
   // if(mousepending || kbdpending) {
     // cmd = adb_recv_cmd(mousesrq|kbdsrq);
     cmd = adb.ReceiveCommand(3);
-    if(cmd != 0)
-    {
-      Serial.print("Received ADB command: ");
-      Serial.println(cmd, HEX);
-    }
+    // if(cmd != 0)
+    // {
+    //   Serial.print("Received ADB command: ");
+    //   Serial.println(cmd, HEX);
+    // }
   // }
   // // see if it is addressed to us
   // if(((cmd >> 4) & 0x0F) == 3) {
