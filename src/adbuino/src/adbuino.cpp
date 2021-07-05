@@ -67,6 +67,8 @@ uint8_t kbdsrq       = 0;
 uint8_t mousesrq     = 0;
 uint8_t modifierkeys = 0xFF;
 uint32_t kbskiptimer = 0;
+
+AdbInterface adb;
 // #define ADB_PORT        PORTD
 // #define ADB_PIN         PIND
 // #define ADB_DDR         DDRD
@@ -343,9 +345,7 @@ void setup() {
   Serial.begin(115200);
   while(!Serial);
   
-  // Set ADB line as input
-  // ADB_DDR &= ~(1<<ADB_DATA_BIT);
-  adb_pin_in();
+  adb.Init();
   
   Serial.println("Initializing keyboard");
   InitPS2Keyboard();
@@ -429,7 +429,7 @@ void loop() {
   kPS2KbdOutPort &= ~kPS2KbdClockPin;
   // if(mousepending || kbdpending) {
     // cmd = adb_recv_cmd(mousesrq|kbdsrq);
-    cmd = adb_recv_cmd(3);
+    cmd = adb.ReceiveCommand(3);
     if(cmd != 0)
     {
       Serial.print("Received ADB command: ");
@@ -461,7 +461,7 @@ void loop() {
   //   if(mousepending) mousesrq = 1;
   // }
   
-  handle_adb_cmd(cmd);
+    adb.ProcessCommand(cmd);
   // if(((cmd >> 4) & 0x0F) == 2) {
   //   uint8_t adbleds;
   //   switch(cmd & 0x0F) {

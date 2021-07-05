@@ -1,7 +1,6 @@
 #include "adb.h"
 #include <stdio.h>
 
-
 extern uint8_t mousepending;
 extern uint8_t kbdpending  ;
 extern uint8_t kbdskip     ;
@@ -13,13 +12,119 @@ extern uint8_t mousesrq    ;
 extern uint8_t modifierkeys;
 extern uint32_t kbskiptimer;
 
-#ifdef PICO_SDK
-uint32_t millis(){
-    return to_ms_since_boot(get_absolute_time());
+// The original data_lo code would just set the bit as an output
+// That works for a host, since the host is doing the pullup on the ADB line,
+// but for a device, it won't reliably pull the line low.  We need to actually
+// set it.
+inline void AdbInterface::data_lo() { 
+  (ADB_DDR |=  (1<<ADB_DATA_BIT)); 
+  (ADB_PORT &= ~(1<<ADB_DATA_BIT)); 
 }
-#endif
 
-void handle_adb_cmd(uint8_t cmd){
+inline void AdbInterface::data_hi(){
+  (ADB_DDR &= ~(1<<ADB_DATA_BIT));
+} 
+inline uint8_t AdbInterface::data_in() {
+  return (ADB_PIN &   (1<<ADB_DATA_BIT));
+}
+inline void AdbInterface::adb_pin_out(){
+  (ADB_DDR |=  (1<<ADB_DATA_BIT));
+}
+inline void AdbInterface::adb_pin_in() {
+(ADB_DDR &= ~(1<<ADB_DATA_BIT));
+} 
+
+inline uint16_t AdbInterface::wait_data_lo(uint32_t us)
+{
+    do {
+        if ( !data_in() )
+            break;
+        _delay_us(1 - (6 * 1000000.0 / F_CPU));
+    }
+    while ( --us );
+    return us;
+}
+inline uint16_t AdbInterface::wait_data_hi(uint32_t us)
+{
+    do {
+        if ( data_in() )
+            break;
+        _delay_us(1 - (6 * 1000000.0 / F_CPU));
+    }
+    while ( --us );
+    return us;
+}
+
+inline void AdbInterface::place_bit0(void)
+{
+    data_lo();
+    _delay_us(65);
+    data_hi();
+    _delay_us(35);
+}
+inline void AdbInterface::place_bit1(void)
+{
+    data_lo();
+    _delay_us(35);
+    data_hi();
+    _delay_us(65);
+}
+inline void AdbInterface::send_byte(uint8_t data)
+{
+    for (int i = 0; i < 8; i++) {
+        if (data&(0x80>>i))
+            place_bit1();
+        else
+            place_bit0();
+    }
+}
+uint8_t AdbInterface::ReceiveCommand(uint8_t srq) 
+{
+  uint8_t bits;
+  uint16_t data = 0;
+  // Serial.println("Checking for command");
+  
+  // find attention & start bit
+  if(!wait_data_lo(5000)) return 0;
+  uint16_t lowtime = wait_data_hi(1000);
+  if(!lowtime || lowtime > 500) {
+    return 0;
+  }
+  wait_data_lo(100);
+  // Serial.println("Got command");
+  for(bits = 0; bits < 8; bits++) {
+    uint8_t lo = wait_data_hi(130);
+    if(!lo) {
+      goto out;
+    }
+    uint8_t hi = wait_data_lo(lo);
+    if(!hi) {
+      goto out;
+    }
+    hi = lo - hi;
+    lo = 130 - lo;
+    
+    data <<= 1;
+    if(lo < hi) {
+      data |= 1;
+    }
+  }
+  
+  if(srq) {
+    data_lo();
+    _delay_us(250);
+    data_hi();
+  } else {
+    // Stop bit normal low time is 70uS + can have an SRQ time of 300uS
+    wait_data_hi(400);
+  }
+  
+  return data;
+out:
+  return 0;
+}
+
+void AdbInterface::ProcessCommand(uint8_t cmd){
 
     // see if it is addressed to us
   if(((cmd >> 4) & 0x0F) == 3) {
@@ -117,4 +222,10 @@ void handle_adb_cmd(uint8_t cmd){
   } else {
     if(kbdpending) kbdsrq = 1;
   }
+}
+
+void AdbInterface::Init(){
+    // Set ADB line as input
+  // ADB_DDR &= ~(1<<ADB_DATA_BIT);
+  adb_pin_in();
 }
