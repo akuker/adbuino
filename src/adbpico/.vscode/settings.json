@@ -15,5 +15,9 @@
                },
      },
      "cmake.buildBeforeRun": true,
-     "C_Cpp.default.configurationProvider": "ms_vscode.cmake_tools"
+    "C_Cpp.default.configurationProvider": "ms_vscode.cmake_tools",
+    "files.associations": {
+      "tusb_common.h": "c",
+      "tusb.h": "c"
+    }
 }

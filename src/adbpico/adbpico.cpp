@@ -7,6 +7,8 @@
 #include "bsp/board.h"
 #include "tusb.h"
 
+#include "adb.h"
+
 
 //--------------------------------------------------------------------+
 // MACRO CONSTANT TYPEDEF PROTYPES
@@ -23,6 +25,12 @@ int main()
 
     puts("Hello, world!");
 
+    sleep_ms(1000);
+
+    gpio_init(ADB_GPIO);
+    gpio_init(PWR_GPIO);
+    gpio_set_dir(ADB_GPIO, GPIO_IN);
+    gpio_set_dir(PWR_GPIO, GPIO_IN);
 
   board_init();
   print_greeting();
@@ -34,6 +42,23 @@ int main()
     // tinyusb host task
     tuh_task();
     led_blinking_task();
+
+
+        uint8_t cmd = adb_recv_cmd(0);
+        if(cmd != 0){
+
+            // uint32_t rand_val = rand();
+            // if(rand_val > 0x8000){
+            //     mousereg0 = (uint16_t)(rand_val & 0xFFFF);
+            //     mousepending = 1;
+            //     printf("moving mouse %04X  ", mousereg0);
+            // }
+
+
+            // printf("ADB cmd: %02X\n", cmd);
+            handle_adb_cmd(cmd);
+        }
+
 
 #if CFG_TUH_CDC
     cdc_task();
@@ -119,16 +144,6 @@ void led_blinking_task(void)
 //--------------------------------------------------------------------+
 void print_greeting(void)
 {
-//   char const * const rtos_name[] =
-//   {
-//       [OPT_OS_NONE]      = "None",
-//       [OPT_OS_FREERTOS]  = "FreeRTOS",
-//       [OPT_OS_MYNEWT]    = "Mynewt OS",
-//       [OPT_OS_CUSTOM]    = "Custom OS implemnted by application",
-//       [OPT_OS_PICO]      = "Raspberry Pi Pico SDK",
-//     //   [OPT_OS_RTTHREAD]  = "RT-Thread"
-//   };
-
   printf("----------------------------------------------------\r\n");
   printf("TinyUSB Host Example\r\n");
   printf("If you find any bugs or problems, feel free to open\r\n");
@@ -136,5 +151,5 @@ void print_greeting(void)
   printf("----------------------------------------------------\r\n\r\n");
 
   printf("This Host demo is configured to support:\r\n");
-//   printf("  - RTOS = %s\r\n", rtos_name[CFG_TUSB_OS]);
+  printf("  - RTOS = %s\r\n", "Raspberry Pi Pico SDK");
 }

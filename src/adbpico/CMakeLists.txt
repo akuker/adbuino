@@ -38,7 +38,8 @@ pico_add_extra_outputs(adbpico)
 target_sources(adbpico PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/hid_app.c
     ${CMAKE_CURRENT_SOURCE_DIR}/adbpico.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/msc_app.c)
+    ${CMAKE_CURRENT_SOURCE_DIR}/msc_app.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/adb.cpp)
 
 target_include_directories(adbpico PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}

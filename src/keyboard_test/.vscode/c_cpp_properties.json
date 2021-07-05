@@ -1,0 +1,60 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "/home/akuker/adbuino/src/keyboard_test/include",
+                "/home/akuker/adbuino/src/keyboard_test/src",
+                "/home/akuker/adbuino/src/keyboard_test/.pio/libdeps/uno/USB-Host-Shield-20",
+                "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "/home/akuker/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "/home/akuker/.platformio/packages/framework-arduino-avr/variants/standard",
+                "/home/akuker/adbuino/src/keyboard_test/.pio/libdeps/uno/USBHost/src",
+                "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/home/akuker/adbuino/src/keyboard_test/include",
+                    "/home/akuker/adbuino/src/keyboard_test/src",
+                    "/home/akuker/adbuino/src/keyboard_test/.pio/libdeps/uno/USB-Host-Shield-20",
+                    "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "/home/akuker/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "/home/akuker/.platformio/packages/framework-arduino-avr/variants/standard",
+                    "/home/akuker/adbuino/src/keyboard_test/.pio/libdeps/uno/USBHost/src",
+                    "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=50101",
+                "ARDUINO_AVR_UNO",
+                "F_CPU=16000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10808",
+                "__AVR_ATmega328P__",
+                ""
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "compilerPath": "/home/akuker/.platformio/packages/toolchain-atmelavr/bin/avr-gcc",
+            "compilerArgs": [
+                "-mmcu=atmega328p",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}
