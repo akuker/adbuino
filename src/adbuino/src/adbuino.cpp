@@ -32,7 +32,23 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
+#include "Arduino.h"
 #include <util/delay.h>
+
+// Example code from: https://platformio.org/lib/show/59/USB-Host-Shield-20
+#include <hidboot.h>
+#include <usbhub.h>
+
+// Satisfy the IDE, which needs to see the include statment in the ino too.
+#ifdef dobogusinclude
+#include <spi4teensy3.h>
+#endif
+#include <SPI.h>
+
+#include <usbhub.h>
+// #include "pgmstrings.h"
+
+
 #define kModCmd      1
 #define kModOpt      2
 #define kModShift    4
@@ -362,7 +378,7 @@ void loop() {
     do {
       if ( !(kPS2MouseInPort & kPS2MouseClockPin) )
         break;
-        _delay_us(1 - (6 * 1000000.0 / F_CPU));
+      _delay_us(1 - (6 * 1000000.0 / F_CPU));
     }
     while ( --us );
   
@@ -395,7 +411,7 @@ void loop() {
     do {
       if ( !(kPS2KbdInPort & kPS2KbdClockPin) )
         break;
-        _delay_us(1 - (6 * 1000000.0 / F_CPU));
+      _delay_us(1 - (6 * 1000000.0 / F_CPU));
     }
     while ( --us );
     if(us) {
