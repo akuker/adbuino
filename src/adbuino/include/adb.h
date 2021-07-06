@@ -3,12 +3,17 @@
 #include <stdint.h>
 #include "Arduino.h"
 
+
 class AdbInterface {
   public:
     void Init();
     //void ReadAdbCommand();
     uint8_t ReceiveCommand(uint8_t srq);
     void ProcessCommand(uint8_t cmd);
+
+    protected:
+    uint16_t GetAdbRegister3Keyboard();
+    uint16_t GetAdbRegister3Mouse();
 
   private:
     const uint8_t m_adb_gpio = 3;

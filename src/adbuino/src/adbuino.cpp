@@ -154,15 +154,14 @@ void loop()
   // kPS2MouseOutPort &= ~kPS2MouseClockPin;
 
   if(!kbdpending) {
-    if(KeyboardPrs.GetLastKey() != KbdRptParser::NoKey){
+    if(KeyboardPrs.PendingKeyboardEvent()){
       kbdreg0 = KeyboardPrs.GetAdbRegister0();
-      KeyboardPrs.ClearLastKey();
       kbdpending = 1;
     }
   }
 
-  if (mousepending || kbdpending)
-  {
+  // if (mousepending || kbdpending)
+  // {
     cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
     // cmd = adb.ReceiveCommand(3);
     // if(cmd != 0)
@@ -170,7 +169,7 @@ void loop()
     //   Serial.print("Received ADB command: ");
     //   Serial.println(cmd, HEX);
     // }
-  }
+  // }
 
   adb.ProcessCommand(cmd);
   // if(((cmd >> 4) & 0x0F) == 2) {

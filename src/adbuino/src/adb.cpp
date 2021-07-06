@@ -1,5 +1,6 @@
 #include "adb.h"
 #include <stdio.h>
+#include "bithacks.h"
 
 extern uint8_t mousepending;
 extern uint8_t kbdpending  ;
@@ -124,12 +125,22 @@ out:
   return 0;
 }
 
+
+bool first_mouse = true;
+bool first_keybd = true;
 void AdbInterface::ProcessCommand(uint8_t cmd){
+
+  uint16_t mousereg3, kbdreg3;
 
     // see if it is addressed to us
   if(((cmd >> 4) & 0x0F) == 3) {
     switch(cmd & 0x0F) {
       case 0xC: // talk register 0
+        if(first_mouse){
+          Serial.print("MOUSE: Got read register 0: ");
+          Serial.println(cmd, HEX);
+          first_mouse = false;
+        }
         if(mousepending) {
           _delay_us(180); // stop to start time / interframe delay
         //   ADB_DDR |= 1<<ADB_DATA_BIT;  // set output
@@ -144,8 +155,42 @@ void AdbInterface::ProcessCommand(uint8_t cmd){
           mousesrq = 0;
         }
         break;
+      case 0xD: // talk register 1
+        Serial.println("MOUSE: Got request for register 1");
+        break;
+      case 0xE: // talk register 2
+        Serial.println("MOUSE Got request for register 2");
+        // adbleds = 0xFF;
+        // // if(!(ps2ledstate & kPS2LEDCaps)) adbleds &= ~2;
+        // // if(!(ps2ledstate & kPS2LEDScroll)) adbleds &= ~4;
+        // // if(!(ps2ledstate & kPS2LEDNum)) adbleds &= ~1;
+        
+        // // _delay_us(180); // stop to start time / interframe delay
+        // // // ADB_DDR |= 1<<ADB_DATA_BIT;  // set output
+        // // adb_pin_out();
+        // // place_bit1(); // start bit
+        // // send_byte(modifierkeys);
+        // // send_byte(adbleds);
+        // // place_bit0(); // stop bit
+        // // // ADB_DDR &= ~(1<<ADB_DATA_BIT); // set input
+        // // adb_pin_in();
+        break;
+      case 0xF: // talk register 3
+        Serial.println("MOUSE: Got request for register 3");
+        // // sets device address
+        // mousereg3 = GetAdbRegister3Mouse();
+        // _delay_us(180); // stop to start time / interframe delay
+        // //   ADB_DDR |= 1<<ADB_DATA_BIT;  // set output
+        // adb_pin_out();
+        // place_bit1(); // start bit
+        // send_byte((mousereg3 >> 8) & 0x00FF);
+        // send_byte(mousereg3 & 0x00FF);
+        // place_bit0(); // stop bit
+        // //   ADB_DDR &= ~(1<<ADB_DATA_BIT); // set input
+        // adb_pin_in();
+        break;
       default:
-        printf("Unknown cmd: %02X",cmd);
+        printf("MOUSE: Unknown cmd: %02X",cmd);
         break;
     }
   } else {
@@ -156,6 +201,11 @@ void AdbInterface::ProcessCommand(uint8_t cmd){
     uint8_t adbleds;
     switch(cmd & 0x0F) {
       case 0xC: // talk register 0
+        if(first_keybd){
+          Serial.print("KBD: Got read register 0: ");
+          Serial.println(cmd, HEX);
+          first_keybd = false;
+        }
         if(kbdpending) {
           
           if (kbdskip) {
@@ -194,8 +244,10 @@ void AdbInterface::ProcessCommand(uint8_t cmd){
         }
         break;
       case 0xD: // talk register 1
+        Serial.println("KBD: Got request for register 1");
         break;
       case 0xE: // talk register 2
+        Serial.println("KBD Got request for register 2");
         adbleds = 0xFF;
         // if(!(ps2ledstate & kPS2LEDCaps)) adbleds &= ~2;
         // if(!(ps2ledstate & kPS2LEDScroll)) adbleds &= ~4;
@@ -213,10 +265,21 @@ void AdbInterface::ProcessCommand(uint8_t cmd){
         
         break;
       case 0xF: // talk register 3
+        Serial.println("KBD: Got request for register 3");
         // sets device address
+        kbdreg3 = GetAdbRegister3Keyboard();
+        _delay_us(180); // stop to start time / interframe delay
+        //   ADB_DDR |= 1<<ADB_DATA_BIT;  // set output
+        adb_pin_out();
+        place_bit1(); // start bit
+        send_byte((kbdreg3 >> 8) & 0x00FF);
+        send_byte(kbdreg3 & 0x00FF);
+        place_bit0(); // stop bit
+        //   ADB_DDR &= ~(1<<ADB_DATA_BIT); // set input
+        adb_pin_in();
         break;
       default:
-        printf("Unknown cmd: %02X\n", cmd);
+        printf("KBD: Unknown cmd: %02X\n", cmd);
         break;
     }
   } else {
@@ -228,4 +291,41 @@ void AdbInterface::Init(){
     // Set ADB line as input
   // ADB_DDR &= ~(1<<ADB_DATA_BIT);
   adb_pin_in();
+}
+
+
+uint16_t AdbInterface::GetAdbRegister3Keyboard(){
+  uint16_t kbdreg3 = 0;
+
+  // Bit 15 Reserved; must be 0
+  B_UNSET(kbdreg3, 15);
+  // 14      Exceptional event, device specific; always 1 if not used
+  B_SET(kbdreg3, 14);
+  // 13      Service Request enable; 1 = enabled
+  B_UNSET(kbdreg3, 13);
+  // 12      Reserved; must be 0
+  B_UNSET(kbdreg3, 12);
+  // 11-8      Device address
+  kbdreg3 |= (0x02 << 8);
+  // 7-0       Device Handler ID
+
+  return kbdreg3;
+}
+uint16_t AdbInterface::GetAdbRegister3Mouse(){
+  uint16_t mousereg3 = 0;
+
+  // Bit 15 Reserved; must be 0
+  B_UNSET(mousereg3, 15);
+  // 14      Exceptional event, device specific; always 1 if not used
+  B_SET(mousereg3, 14);
+  // 13      Service Request enable; 1 = enabled
+  B_UNSET(mousereg3, 13);
+  // 12      Reserved; must be 0
+  B_UNSET(mousereg3, 12);
+  // 11-8      Device address
+  mousereg3 |= (0x03 << 8);
+  // 7-0       Device Handler ID
+
+  return mousereg3;
+
 }

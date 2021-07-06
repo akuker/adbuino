@@ -1,6 +1,7 @@
 
 #include "usb_hid_keys.h"
 #include <stdint.h>
+#include <Arduino.h>
 
 // Based upon the virtual keycodes provided at:
 //    http://meandmark.com/keycodes.html
@@ -8,10 +9,8 @@
 // Also refer to teh Guide to the Macintosh family hardware, figure 8-10:
 //    https://archive.org/details/apple-guide-macintosh-family-hardware/page/n345/mode/2up
 
-
 // Virtual Keycodes for the Mac QWERTY Layout
-// Keycodes are in hexadecimal. A blank entry means either there is no key assigned to that keycode or I was unable to find the assigned key.
-
+// Keycodes are in hexadecimal.
 uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
 {
     switch (usb_code)
@@ -204,8 +203,26 @@ uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
         return 0x7D;
     case USB_KEY_UP:
         return 0x7E;
+    case USB_KEY_LEFTCTRL:
+        return 0x36;
+    case USB_KEY_LEFTSHIFT:
+        return 0x38;
+    case USB_KEY_LEFTALT:
+        return 0x3A;
+    case USB_KEY_LEFTMETA:
+        return 0x37;
+    case USB_KEY_RIGHTCTRL:
+        return 0x36;
+    case USB_KEY_RIGHTSHIFT:
+        return 0x38;
+    case USB_KEY_RIGHTALT:
+        return 0x3A;
+    case USB_KEY_RIGHTMETA:
+        return 0x37;
     default:
-        return 0x00;
+        Serial.print("Unknown keycode found: ");
+        Serial.println(usb_code, HEX);
+        return 0xFF;
 
         // 0x37        USB_KEY_Cmd (Apple)
         // 0x38        USB_KEY_LEFTSHIFT
