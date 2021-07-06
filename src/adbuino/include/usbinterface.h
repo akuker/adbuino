@@ -10,6 +10,8 @@
 #endif
 #include <SPI.h>
 
+extern uint8_t usb_keycode_to_adb_code(uint8_t usb_code);
+
 class MouseRptParser : public MouseReportParser
 {
 public:
@@ -37,7 +39,16 @@ private:
 
 class KbdRptParser : public KeyboardReportParser
 {
+    public: 
     void PrintKey(uint8_t mod, uint8_t key);
+    uint8_t GetLastKey();
+    uint8_t GetLastUpOrDown();
+    void ClearLastKey();
+    static const uint8_t NoKey = 0x00;
+    static const uint8_t KeyDown = 0x01;
+    static const uint8_t KeyUp = 0x02;
+
+    uint16_t GetAdbRegister0();
 
 protected:
     void OnControlKeysChanged(uint8_t before, uint8_t after);
@@ -45,6 +56,13 @@ protected:
     void OnKeyDown(uint8_t mod, uint8_t key);
     void OnKeyUp(uint8_t mod, uint8_t key);
     void OnKeyPressed(uint8_t key);
+    uint8_t m_last_key_pressed;
+    uint8_t m_last_key_up_or_down;
+
+    uint8_t m_previous_key_pressed;
+
+    // Flag to indicated that the key was released
+    const uint16_t KeyReleasedFlag = 0x80;
 };
 
 class UsbInterface
