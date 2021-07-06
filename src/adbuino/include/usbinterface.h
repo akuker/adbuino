@@ -36,6 +36,7 @@ private:
     int32_t m_movedx = 0;
     int32_t m_movedy = 0;
     bool m_mouse_button_is_pressed = false;
+    bool m_mouse_button_changed = false;
 };
 
 class KeyEvent

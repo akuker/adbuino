@@ -2,7 +2,7 @@
 
 bool MouseRptParser::MouseChanged()
 {
-    return ((m_movedx != 0) || (m_movedy != 0));
+    return ((m_movedx != 0) || (m_movedy != 0) || m_mouse_button_changed);
 }
 int32_t MouseRptParser::GetDeltaX()
 {
@@ -16,6 +16,7 @@ void MouseRptParser::ResetMouseMovement()
 {
     m_movedy = 0;
     m_movedx = 0;
+    m_mouse_button_changed = false;
 }
 bool MouseRptParser::MouseButtonIsPressed()
 {
@@ -53,11 +54,13 @@ void MouseRptParser::OnLeftButtonUp(MOUSEINFO *mi)
 {
     Serial.println("L Butt Up");
     m_mouse_button_is_pressed = false;
+    m_mouse_button_changed = true;
 };
 void MouseRptParser::OnLeftButtonDown(MOUSEINFO *mi)
 {
     Serial.println("L Butt Dn");
     m_mouse_button_is_pressed = true;
+    m_mouse_button_changed = true;
 };
 void MouseRptParser::OnRightButtonUp(MOUSEINFO *mi)
 {
