@@ -1,418 +1,262 @@
 # SE/30 Startup Sequence
 ```
-Rx command: F addr:0 cmd: Talk   reg: 3
-Rx command: 1F addr:1 cmd: Talk   reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: 4F addr:4 cmd: Talk   reg: 3
-Rx command: 5F addr:5 cmd: Talk   reg: 3
-Rx command: 6F addr:6 cmd: Talk   reg: 3
-Rx command: 7F addr:7 cmd: Talk   reg: 3
-Rx command: 8F addr:8 cmd: Talk   reg: 3
-Rx command: 9F addr:9 cmd: Talk   reg: 3
-Rx command: AF addr:A cmd: Talk   reg: 3
-Rx command: BF addr:B cmd: Talk   reg: 3
-Rx command: CF addr:C cmd: Talk   reg: 3
-Rx command: DF addr:D cmd: Talk   reg: 3
-Rx command: EF addr:E cmd: Talk   reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 2B addr:2 cmd: Listn  reg: 3
-Rx command: 2F addr:2 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
-Rx command: FF addr:F cmd: Talk   reg: 3
-Rx command: 3B addr:3 cmd: Listn  reg: 3
-Rx command: 3F addr:3 cmd: Talk   reg: 3
-Rx command: FB addr:F cmd: Listn  reg: 3
+
+ADB Command:2F (Talk) addr:2 reg:3 Data[2]: B50
+ADB Command:3F (Talk) addr:3 reg:3 Data[2]: B680
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2B (Listen) addr:2 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 817F
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]: 87FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]: 81FF
+ADB Command:2C (Talk) addr:2 reg:0 Data[2]: 807F
+ADB Command:2C (Talk) addr:2 reg:0 Data[2]: C07F
+ADB Command:2C (Talk) addr:2 reg:0 Data[2]: 807F
+ADB Command:2C (Talk) addr:2 reg:0 Data[2]: C07F
+ADB Command:2C (Talk) addr:2 reg:0 Data[2]: 807F
+ADB Command:2C (Talk) addr:2 reg:0 Data[2]: C07F
+ADB Command:2C (Talk) addr:2 reg:0 Data[2]: 807F
+ADB Command:2C (Talk) addr:2 reg:0 Data[2]: C07F
+ADB Command:2C (Talk) addr:2 reg:0 Data[2]: 80FF
+ADB Command:2C (Talk) addr:2 reg:0 Data[2]: C0FF
+ADB Command:2C (Talk) addr:2 reg:0 Data[2]: 80FF
+ADB Command:2C (Talk) addr:2 reg:0 Data[2]: C0FF
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C0C4
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C144
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C041
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FFC0
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FF40
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FF40
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FF7F
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FF40
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FF7F
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FFFF
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FFFF
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C0FE
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C17F
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C17E
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C0FF
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C27E
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C2FE
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C2C0
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C340
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C342
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C242
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C1C2
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C1C4
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C0C4
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FFC3
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FF41
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FEC1
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FEC0
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FEFF
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FF40
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FEFF
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FF7F
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FF7F
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FF7E
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FFFC
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C1FE
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C1FF
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C240
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C240
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C1C1
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C141
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C0C1
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: C041
+ADB Command:3C (Talk) addr:3 reg:0 Data[2]: FFC0
 ```
