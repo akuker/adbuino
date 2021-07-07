@@ -18,4 +18,10 @@ K
 F https://datasheet.lcsc.com/szlcsc/XKB-U254-051N-4BH806_C319170.pdf
 $ENDCMP
 #
+$CMP 74HC4050D,653
+D 74HC4050 - Hex non-inverting HIGH-to-LOW level shifter@en-us
+K
+F https://assets.nexperia.com/documents/data-sheet/74HC4050.pdf
+$ENDCMP
+#
 #End Doc Library
