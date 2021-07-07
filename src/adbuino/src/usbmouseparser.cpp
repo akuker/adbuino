@@ -1,4 +1,5 @@
 #include "usbinterface.h"
+extern bool global_debug;
 
 bool MouseRptParser::MouseChanged()
 {
@@ -23,6 +24,15 @@ bool MouseRptParser::MouseButtonIsPressed()
     return m_mouse_button_is_pressed;
 }
 
+uint32_t MouseRptParser::EightBitToSevenBitSigned(int8_t value)
+{
+    // Dividing the value by 2 has 2 benefits:
+    //   - Easy way to convert from 8 bit to 7 bit number
+    //   - It "softens" the mouse movement. Modern optical
+    //     mice seem a little jumpy.
+    return (uint32_t)((value/2) & 0x7F);
+}
+
 uint16_t MouseRptParser::GetAdbRegister0()
 {
     uint16_t reg_value = 0;
@@ -34,47 +44,71 @@ uint16_t MouseRptParser::GetAdbRegister0()
     // Bit 7 = Not used. Always 1
     reg_value |= (1 << 7);
     // Bits 14-8 = Y move Counts (Two's compliment. Negative = up, positive = down)
-    reg_value |= ((GetDeltaY() & 0x7F) << 8);
+    reg_value |= (EightBitToSevenBitSigned(GetDeltaY()) << 8);
 
     // Bits 6-0 = X move counts (Two's compliment. Negative = left, positive = right)
-    reg_value |= ((GetDeltaX() & 0x7F) << 0);
+    reg_value |= (EightBitToSevenBitSigned(GetDeltaX()) << 0);
+
+    ResetMouseMovement();
+
     return reg_value;
 }
 
 void MouseRptParser::OnMouseMove(MOUSEINFO *mi)
 {
-    Serial.print("dx=");
-    Serial.print(mi->dX, DEC);
-    Serial.print(" dy=");
-    Serial.println(mi->dY, DEC);
-    m_movedy += (int32_t)mi->dY;
-    m_movedx += (int32_t)mi->dX;
+    if (global_debug)
+    {
+        Serial.print("dx=");
+        Serial.print(mi->dX, DEC);
+        Serial.print(" dy=");
+        Serial.println(mi->dY, DEC);
+    }
+    m_movedy = mi->dY;
+    m_movedx = mi->dX;
 };
 void MouseRptParser::OnLeftButtonUp(MOUSEINFO *mi)
 {
-    Serial.println("L Butt Up");
+    if (global_debug)
+    {
+        Serial.println("L Butt Up");
+    }
     m_mouse_button_is_pressed = false;
     m_mouse_button_changed = true;
 };
 void MouseRptParser::OnLeftButtonDown(MOUSEINFO *mi)
 {
-    Serial.println("L Butt Dn");
+    if (global_debug)
+    {
+        Serial.println("L Butt Dn");
+    }
     m_mouse_button_is_pressed = true;
     m_mouse_button_changed = true;
 };
 void MouseRptParser::OnRightButtonUp(MOUSEINFO *mi)
 {
-    Serial.println("R Butt Up");
+    if (global_debug)
+    {
+        Serial.println("R Butt Up");
+    }
 };
 void MouseRptParser::OnRightButtonDown(MOUSEINFO *mi)
 {
-    Serial.println("R Butt Dn");
+    if (global_debug)
+    {
+        Serial.println("R Butt Dn");
+    }
 };
 void MouseRptParser::OnMiddleButtonUp(MOUSEINFO *mi)
 {
-    Serial.println("M Butt Up");
+    if (global_debug)
+    {
+        Serial.println("M Butt Up");
+    }
 };
 void MouseRptParser::OnMiddleButtonDown(MOUSEINFO *mi)
 {
-    Serial.println("M Butt Dn");
+    if (global_debug)
+    {
+        Serial.println("M Butt Dn");
+    }
 };

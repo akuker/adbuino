@@ -31,10 +31,12 @@ protected:
     void OnRightButtonDown(MOUSEINFO *mi);
     void OnMiddleButtonUp(MOUSEINFO *mi);
     void OnMiddleButtonDown(MOUSEINFO *mi);
+    uint32_t EightBitToSevenBitSigned(int8_t value);
+
 
 private:
-    int32_t m_movedx = 0;
-    int32_t m_movedy = 0;
+    int8_t m_movedx = 0;
+    int8_t m_movedy = 0;
     bool m_mouse_button_is_pressed = false;
     bool m_mouse_button_changed = false;
 };
