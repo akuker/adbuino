@@ -322,7 +322,10 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
 
 void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
 {
-    Serial.print("UP ");
+    if (global_debug)
+    {
+        Serial.print("UP ");
+    }
     PrintKey(mod, key);
 
     if (!m_keyboard_events->enqueue(new KeyEvent(key, KeyEvent::KeyUp)))
