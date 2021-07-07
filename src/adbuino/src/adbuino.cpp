@@ -35,7 +35,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "Arduino.h"
 #include <util/delay.h>
 #include "adb.h"
-#include "ps2kbd.h"
 // Example code from: https://platformio.org/lib/show/59/USB-Host-Shield-20
 #include <hidboot.h>
 #include <usbhub.h>
@@ -100,26 +99,6 @@ void setup()
   HidKeyboard.SetReportParser(0, &KeyboardPrs);
   HidMouse.SetReportParser(0, &MousePrs);
 
-  // delay( 200 );
-
-  // delay(1);
-
-  // Serial.println("Initializing keyboard");
-  // InitPS2Keyboard();
-  // Serial.println("Initializing mouse");
-  // InitPS2Mouse();
-  // // Serial.println("Setting keyboard repeat");
-  // // SetPS2Repeat();
-  // // Serial.println("Setting up mouse");
-  // // SetupPS2Mouse();
-  // kPS2MouseModePort &= kPS2MouseClockPin;
-  // kPS2MouseOutPort |= kPS2MouseClockPin;
-  // kPS2MouseModePort &= kPS2MouseDataPin;
-  // kPS2MouseOutPort |= kPS2MouseDataPin;
-  // DDRB |= 1 << 5;
-  // PORTC &= ~(1 << 5);
-  // DDRC |= 1 << 5;
-  // PORTC &= ~(1 << 5);
   Serial.println("setup complete");
 }
 void loop()
