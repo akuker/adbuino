@@ -1,4 +1,5 @@
 # SE/30 Startup Sequence
+```
 Rx command: F addr:0 cmd: Talk   reg: 3
 Rx command: 1F addr:1 cmd: Talk   reg: 3
 Rx command: 2F addr:2 cmd: Talk   reg: 3
@@ -414,3 +415,4 @@ Rx command: FF addr:F cmd: Talk   reg: 3
 Rx command: 3B addr:3 cmd: Listn  reg: 3
 Rx command: 3F addr:3 cmd: Talk   reg: 3
 Rx command: FB addr:F cmd: Listn  reg: 3
+```
