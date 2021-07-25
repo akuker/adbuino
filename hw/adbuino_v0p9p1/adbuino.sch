@@ -1329,12 +1329,6 @@ F 3 "" H 6000 4700 50  0001 C CNN
 	1    6000 4700
 	0    -1   -1   0   
 $EndComp
-Text GLabel 5500 4500 0    50   Input ~ 0
-SPI_MISO
-Text GLabel 6000 4600 2    50   Input ~ 0
-TTL_SPI_MOSI
-Text GLabel 5500 4600 0    50   Input ~ 0
-TTL_SPI_SCLK
 NoConn ~ 4850 1200
 NoConn ~ 2250 5400
 NoConn ~ 2250 5500
@@ -1502,28 +1496,6 @@ F 3 "~" H 2550 6300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Connector:TestPoint_Small TP10
-U 1 1 610DB1F2
-P 2350 6200
-F 0 "TP10" H 2350 6250 50  0000 L CNN
-F 1 "TestPoint_Small" H 2398 6155 50  0001 L CNN
-F 2 "TestPoint:TestPoint_Pad_D1.0mm" H 2550 6200 50  0001 C CNN
-F 3 "~" H 2550 6200 50  0001 C CNN
-	1    2350 6200
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector:TestPoint_Small TP9
-U 1 1 610DB1F8
-P 2350 6100
-F 0 "TP9" H 2350 6150 50  0000 L CNN
-F 1 "TestPoint_Small" H 2398 6055 50  0001 L CNN
-F 2 "TestPoint:TestPoint_Pad_D1.0mm" H 2550 6100 50  0001 C CNN
-F 3 "~" H 2550 6100 50  0001 C CNN
-	1    2350 6100
-	1    0    0    -1  
-$EndComp
-$Comp
 L Connector:TestPoint_Small TP13
 U 1 1 610DB204
 P 2350 6800
@@ -1544,16 +1516,6 @@ Wire Wire Line
 Connection ~ 2350 6300
 Wire Wire Line
 	2350 6300 2500 6300
-Wire Wire Line
-	2250 6200 2350 6200
-Connection ~ 2350 6200
-Wire Wire Line
-	2350 6200 2500 6200
-Wire Wire Line
-	2250 6100 2350 6100
-Connection ~ 2350 6100
-Wire Wire Line
-	2350 6100 2500 6100
 Wire Wire Line
 	2250 6800 2350 6800
 Connection ~ 2350 6800
@@ -1924,10 +1886,10 @@ F 3 "" H 7450 5350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:GND #PWR?
+L power:GND #PWR0102
 U 1 1 614ED05B
 P 10300 1000
-F 0 "#PWR?" H 10300 750 50  0001 C CNN
+F 0 "#PWR0102" H 10300 750 50  0001 C CNN
 F 1 "GND" V 10300 850 50  0000 R CNN
 F 2 "" H 10300 1000 50  0001 C CNN
 F 3 "" H 10300 1000 50  0001 C CNN
@@ -1935,14 +1897,24 @@ F 3 "" H 10300 1000 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L power:GND #PWR?
+L power:GND #PWR0103
 U 1 1 614F679B
 P 10300 2000
-F 0 "#PWR?" H 10300 1750 50  0001 C CNN
+F 0 "#PWR0103" H 10300 1750 50  0001 C CNN
 F 1 "GND" V 10300 1850 50  0000 R CNN
 F 2 "" H 10300 2000 50  0001 C CNN
 F 3 "" H 10300 2000 50  0001 C CNN
 	1    10300 2000
 	0    1    1    0   
 $EndComp
+Wire Wire Line
+	2250 6200 2500 6200
+Wire Wire Line
+	2500 6100 2250 6100
+Text GLabel 5500 4500 0    50   Input ~ 0
+ATMEGA_SPI_MISO
+Text GLabel 6000 4600 2    50   Input ~ 0
+ATMEGA_SPI_MOSI
+Text GLabel 5500 4600 0    50   Input ~ 0
+ATMEGA_SPI_SCLK
 $EndSCHEMATC
