@@ -30,4 +30,10 @@ K
 F http://www.te.com/commerce/DocumentDelivery/DDEController?Action=showdoc&DocId=Customer+Drawing%7F5749181%7FP%7Fpdf%7FEnglish%7FENG_CD_5749181_P.pdf%7F5749181-1
 $ENDCMP
 #
+$CMP 67643-2910
+D USB Connectors USB REC 4P RA SHLD TYPE A AUFL
+K
+F https://componentsearchengine.com/Datasheets/1/67643-2910.pdf
+$ENDCMP
+#
 #End Doc Library

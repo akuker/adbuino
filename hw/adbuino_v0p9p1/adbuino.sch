@@ -393,6 +393,7 @@ F 8 "U254-051N-4BH806" H 1700 450 50  0001 L CNN "Arrow Part Number"
 F 9 "" H 1700 350 50  0001 L CNN "Arrow Price/Stock"
 F 10 "" H 1700 250 50  0001 L CNN "Mouser Part Number"
 F 11 "" H 1700 150 50  0001 L CNN "Mouser Price/Stock"
+F 12 "C319170" H 950 950 50  0001 C CNN "LCSC"
 	1    950  950 
 	1    0    0    -1  
 $EndComp
