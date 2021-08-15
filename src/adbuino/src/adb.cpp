@@ -101,7 +101,6 @@ uint8_t AdbInterface::ReceiveCommand(uint8_t srq)
     return 0;
   }
   wait_data_lo(100);
-  // Serial.println("Got command");
   for (bits = 0; bits < 8; bits++)
   {
     uint8_t lo = wait_data_hi(130);
