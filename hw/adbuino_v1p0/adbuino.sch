@@ -648,8 +648,6 @@ F 3 "" H 700 4400 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	1050 4400 900  4400
-NoConn ~ 950  1050
-NoConn ~ 950  1150
 $Comp
 L Device:C_Small C5
 U 1 1 60E6B3E2
@@ -944,7 +942,6 @@ $EndComp
 Wire Wire Line
 	5250 2100 5850 2100
 NoConn ~ 3950 1900
-NoConn ~ 950  1250
 $Comp
 L power:PWR_FLAG #FLG01
 U 1 1 60FC9A15
@@ -993,7 +990,7 @@ $EndComp
 Wire Wire Line
 	7750 1400 7900 1400
 Wire Wire Line
-	8200 1400 8300 1400
+	8200 1400 8250 1400
 $Comp
 L power:PWR_FLAG #FLG0101
 U 1 1 61190B69
@@ -1259,54 +1256,6 @@ Text GLabel 2250 5300 2    50   Input ~ 0
 DEBUG_LED
 Text GLabel 8050 5350 1    50   Input ~ 0
 DEBUG_LED
-$Comp
-L Connector:TestPoint_Small TP12
-U 1 1 610DB1E6
-P 2350 6400
-F 0 "TP12" H 2350 6450 50  0000 L CNN
-F 1 "TestPoint_Small" H 2398 6355 50  0001 L CNN
-F 2 "TestPoint:TestPoint_Pad_D1.0mm" H 2550 6400 50  0001 C CNN
-F 3 "~" H 2550 6400 50  0001 C CNN
-	1    2350 6400
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector:TestPoint_Small TP11
-U 1 1 610DB1EC
-P 2350 6300
-F 0 "TP11" H 2350 6350 50  0000 L CNN
-F 1 "TestPoint_Small" H 2398 6255 50  0001 L CNN
-F 2 "TestPoint:TestPoint_Pad_D1.0mm" H 2550 6300 50  0001 C CNN
-F 3 "~" H 2550 6300 50  0001 C CNN
-	1    2350 6300
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector:TestPoint_Small TP13
-U 1 1 610DB204
-P 2350 6800
-F 0 "TP13" H 2350 6850 50  0000 L CNN
-F 1 "TestPoint_Small" H 2398 6755 50  0001 L CNN
-F 2 "TestPoint:TestPoint_Pad_D1.0mm" H 2550 6800 50  0001 C CNN
-F 3 "~" H 2550 6800 50  0001 C CNN
-	1    2350 6800
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	2250 6400 2350 6400
-Connection ~ 2350 6400
-Wire Wire Line
-	2350 6400 2500 6400
-Wire Wire Line
-	2250 6300 2350 6300
-Connection ~ 2350 6300
-Wire Wire Line
-	2350 6300 2500 6300
-Wire Wire Line
-	2250 6800 2350 6800
-Connection ~ 2350 6800
-Wire Wire Line
-	2350 6800 2500 6800
 Wire Wire Line
 	2250 5900 3050 5900
 Wire Wire Line
@@ -1678,4 +1627,59 @@ F 3 "~" H 6000 4500 50  0001 C CNN
 	1    6000 4500
 	1    0    0    -1  
 $EndComp
+$Comp
+L power:PWR_FLAG #FLG0103
+U 1 1 6122E8C3
+P 8250 1400
+F 0 "#FLG0103" H 8250 1475 50  0001 C CNN
+F 1 "PWR_FLAG" H 8250 1573 50  0000 C CNN
+F 2 "" H 8250 1400 50  0001 C CNN
+F 3 "~" H 8250 1400 50  0001 C CNN
+	1    8250 1400
+	-1   0    0    1   
+$EndComp
+Connection ~ 8250 1400
+Wire Wire Line
+	8250 1400 8300 1400
+Wire Wire Line
+	2250 6400 2500 6400
+Wire Wire Line
+	2250 6300 2500 6300
+Wire Wire Line
+	2250 6800 2500 6800
+$Comp
+L Connector:TestPoint_Small TP1
+U 1 1 612D0E4C
+P 950 1050
+F 0 "TP1" H 700 1050 50  0000 L CNN
+F 1 "TestPoint_Small" H 998 1005 50  0001 L CNN
+F 2 "TestPoint:TestPoint_THTPad_D1.0mm_Drill0.5mm" H 1150 1050 50  0001 C CNN
+F 3 "~" H 1150 1050 50  0001 C CNN
+	1    950  1050
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:TestPoint_Small TP2
+U 1 1 612D5E3D
+P 950 1150
+F 0 "TP2" H 700 1150 50  0000 L CNN
+F 1 "TestPoint_Small" H 998 1105 50  0001 L CNN
+F 2 "TestPoint:TestPoint_THTPad_D1.0mm_Drill0.5mm" H 1150 1150 50  0001 C CNN
+F 3 "~" H 1150 1150 50  0001 C CNN
+	1    950  1150
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:TestPoint_Small TP3
+U 1 1 612D9332
+P 950 1250
+F 0 "TP3" H 700 1250 50  0000 L CNN
+F 1 "TestPoint_Small" H 998 1205 50  0001 L CNN
+F 2 "TestPoint:TestPoint_THTPad_D1.0mm_Drill0.5mm" H 1150 1250 50  0001 C CNN
+F 3 "~" H 1150 1250 50  0001 C CNN
+	1    950  1250
+	1    0    0    -1  
+$EndComp
+Text Notes 2200 950  0    50   ~ 0
+The test points on pins 2-4 are \ncompletely non-functional. \nThey only exist to help anchor \ndown the pads so that they\ndon't fall off.
 $EndSCHEMATC
