@@ -6,7 +6,7 @@
 // Based upon the virtual keycodes provided at:
 //    http://meandmark.com/keycodes.html
 
-// Also refer to teh Guide to the Macintosh family hardware, figure 8-10:
+// Also refer to the Guide to the Macintosh family hardware, figure 8-10:
 //    https://archive.org/details/apple-guide-macintosh-family-hardware/page/n345/mode/2up
 
 // Virtual Keycodes for the Mac QWERTY Layout
@@ -231,102 +231,3 @@ uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
         // 0x3B        USB_KEY_Control
     }
 }
-// 0x00        USB_KEY_A
-// 0x01        USB_KEY_S
-// 0x02        USB_KEY_D
-// 0x03        USB_KEY_F
-// 0x04        USB_KEY_H
-// 0x05        USB_KEY_G
-// 0x06        USB_KEY_Z
-// 0x07        USB_KEY_X
-// 0x08        USB_KEY_C
-// 0x09        USB_KEY_V
-// 0x0B        USB_KEY_B
-// 0x0C        USB_KEY_Q
-// 0x0D        USB_KEY_W
-// 0x0E        USB_KEY_E
-// 0x0F        USB_KEY_R
-// 0x10        USB_KEY_Y
-// 0x11        USB_KEY_T
-// 0x12        USB_KEY_1
-// 0x13        USB_KEY_2
-// 0x14        USB_KEY_3
-// 0x15        USB_KEY_4
-// 0x16        USB_KEY_6
-// 0x17        USB_KEY_5
-// 0x18        USB_KEY_EQUAL
-// 0x19        USB_KEY_9
-// 0x1A        USB_KEY_7
-// 0x1B        USB_KEY_MINUS
-// 0x1C        USB_KEY_8
-// 0x1D        USB_KEY_0
-// 0x1E        USB_KEY_RIGHTBRACE
-// 0x1F        USB_KEY_O
-// 0x20        USB_KEY_U
-// 0x21        USB_KEY_LEFTBRACE
-// 0x22        USB_KEY_I
-// 0x23        USB_KEY_P
-// 0x24        USB_KEY_ENTER
-// 0x25        USB_KEY_L
-// 0x26        USB_KEY_J
-// 0x27        USB_KEY_APOSTROPHE
-// 0x28        USB_KEY_K
-// 0x29        USB_KEY_SEMICOLON
-// 0x2A        USB_KEY_BACKSLASH
-// 0x2B        USB_KEY_COMMA
-// 0x2C        USB_KEY_SLASH
-// 0x2D        USB_KEY_N
-// 0x2E        USB_KEY_M
-// 0x2F        USB_KEY_DOT
-// 0x30        USB_KEY_TAB
-// 0x31        USB_KEY_SPACE
-// 0x32        USB_KEY_GRAVE
-// 0x33        USB_KEY_BACKSPACE
-// 0x35        USB_KEY_ESC
-// // 0x37        USB_KEY_Cmd (Apple)
-// // 0x38        USB_KEY_LEFTSHIFT
-// // 0x39        USB_KEY_CAPSLOCK
-// // 0x3A        USB_KEY_Option
-// // 0x3B        USB_KEY_Control
-// 0x41        USB_KEY_KPDOT
-// 0x43        USB_KEY_KPASTERISK
-// 0x45        USB_KEY_KPPLUS
-// 0x4B        USB_KEY_KPSLASH
-// 0x4C        USB_KEY_KPEQUAL
-// 0x4E        USB_KEY_KPDOT
-// 0x51        USB_KEY_KPEQUAL
-// 0x52        USB_KEY_KP0
-// 0x53        USB_KEY_KP1
-// 0x54        USB_KEY_KP2
-// 0x55        USB_KEY_KP3
-// 0x56        USB_KEY_KP4
-// 0x57        USB_KEY_KP5
-// 0x58        USB_KEY_KP6
-// 0x59        USB_KEY_KP7
-// 0x5B        USB_KEY_KP8
-// 0x5C        USB_KEY_KP9
-// 0x60        USB_KEY_F5
-// 0x61        USB_KEY_F6
-// 0x62        USB_KEY_F7
-// 0x63        USB_KEY_F3
-// 0x64        USB_KEY_F8
-// 0x65        USB_KEY_F9
-// 0x67        USB_KEY_F11
-// 0x69        USB_KEY_F13
-// 0x6B        USB_KEY_F14
-// 0x6D        USB_KEY_F10
-// 0x6F        USB_KEY_F12
-// 0x71        USB_KEY_F15
-// 0x72        USB_KEY_HELP
-// 0x73        USB_KEY_HOME
-// 0x74        USB_KEY_PAGEUP
-// 0x75        USB_KEY_DELETE
-// 0x76        USB_KEY_F4
-// 0x77        USB_KEY_END
-// 0x78        USB_KEY_F2
-// 0x79        USB_KEY_PAGEDOWN
-// 0x7A        USB_KEY_F1
-// 0x7B        USB_KEY_LEFT
-// 0x7C        USB_KEY_RIGHT
-// 0x7D        USB_KEY_DOWN
-// 0x7E        USB_KEY_UP

@@ -35,18 +35,17 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "Arduino.h"
 #include <util/delay.h>
 #include "adb.h"
+
 // Example code from: https://platformio.org/lib/show/59/USB-Host-Shield-20
 #include <hidboot.h>
 #include <usbhub.h>
 #include "usbinterface.h"
+#include "usb_description.h"
 // Satisfy the IDE, which needs to see the include statment in the ino too.
 #ifdef dobogusinclude
 #include <spi4teensy3.h>
 #endif
 #include <SPI.h>
-
-#include <usbhub.h>
-// #include "pgmstrings.h"
 
 #define kModCmd 1
 #define kModOpt 2
@@ -82,11 +81,22 @@ HIDBoot<USB_HID_PROTOCOL_MOUSE> HidMouse(&Usb);
 MouseRptParser MousePrs;
 KbdRptParser KeyboardPrs;
 
+unsigned long blink_timer = 0;
+int led_state = HIGH;
+
 void setup()
 {
   Serial.begin(115200);
   while (!Serial)
     ;
+
+  // Clear the reset signal from the USB controller
+  pinMode(7, OUTPUT);
+  digitalWrite(7,HIGH);
+
+  // Setup blinking LED
+  pinMode(A0, OUTPUT);
+  digitalWrite(A0, HIGH);
 
   Serial.println("Initializing ADB");
   adb.Init();
@@ -95,36 +105,61 @@ void setup()
 
   if (Usb.Init() == -1)
     Serial.println("OSC did not start.");
+  else 
+    Serial.println("OSC started");
 
   HidKeyboard.SetReportParser(0, &KeyboardPrs);
   HidMouse.SetReportParser(0, &MousePrs);
 
   Serial.println("setup complete");
 }
+
+void update_blinker(){
+  if((millis() - blink_timer) > 500){
+    led_state = (led_state == HIGH) ? LOW : HIGH;
+    digitalWrite(A0, led_state);
+    blink_timer = millis();
+  }
+
+}
+
 void loop()
 {
+  static int first_time=1;
   uint8_t cmd = 0;
 
   Usb.Task();
 
-  if (!mousepending)
-  {
-    if (MousePrs.MouseChanged())
-    {
-      mousereg0 = MousePrs.GetAdbRegister0();
-      mousepending = 1;
-    }
-  }
+  if(( Usb.getUsbTaskState() == USB_STATE_RUNNING )){
 
-  if (!kbdpending)
-  {
-    if (KeyboardPrs.PendingKeyboardEvent())
+    if (global_debug && first_time)
     {
-      kbdreg0 = KeyboardPrs.GetAdbRegister0();
-      kbdpending = 1;
+      first_time=0;
+      Usb.ForEachUsbDevice(&PrintAllDescriptors);
+      Usb.ForEachUsbDevice(&PrintAllAddresses);
     }
-  }
 
-  cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
-  adb.ProcessCommand(cmd);
+    update_blinker();
+
+    if (!mousepending)
+    {
+      if (MousePrs.MouseChanged())
+      {
+        mousereg0 = MousePrs.GetAdbRegister0();
+        mousepending = 1;
+      }
+    }
+
+    if (!kbdpending)
+    {
+      if (KeyboardPrs.PendingKeyboardEvent())
+      {
+        kbdreg0 = KeyboardPrs.GetAdbRegister0();
+        kbdpending = 1;
+      }
+    }
+
+    cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
+    adb.ProcessCommand(cmd);
+  }
 }
