@@ -4,6 +4,14 @@ This is a fork of Difegue's version of the [adbuino](https://github.com/Difegue/
 
 ![ADBuino picture](images/adbuino_0p9.png)
 
+# Hack-y Alternative
+The USB ADBuino is essentially a "value-engineered" version of a bunch of off-the-shelf components. 
+
+<a href="https://www.sparkfun.com/products/11021"><img src="images/arduino_uno.jpg" width="150"/></a> <a href="https://www.sparkfun.com/products/9947"><img src="images/host_shield.jpg" width="150"/></a> 
+<a href="https://www.sparkfun.com/products/12009"><img src="images/logic_level_converter.jpg" width="150"/></a>
+
+<img src="images/hacky_adbuino.png" width="600"/>
+
 # What's this repo for?
 
 The intent of this repository is to add "USB Host" support to the design. This will allow a USB keyboard and/or mouse to be used to drive an ADB host, as well as PS/2. 
@@ -17,10 +25,6 @@ I'm a stubborn SOB, so I'm hoping to prove him wrong. :) Since Wombat is closed 
 Note: The [BMOW "Wombat"](https://www.bigmessowires.com/usb-wombat/) is an AWESOME project. It works fantastic for everything except interfacing with a PiKVM. I highly recommend picking one up!
 
 # References
-![Pi Pico Pinout](images/Pico-R3-Pinout.png)
-
-https://www.raspberrypi-spy.co.uk/2021/01/pi-pico-pinout-and-power-pins/
-
 ![ADB Pinout](images/adb_pinout.png)
 
 [TinyUSB Library](https://github.com/raspberrypi/tinyusb)
