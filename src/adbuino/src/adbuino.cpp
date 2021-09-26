@@ -35,7 +35,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "Arduino.h"
 #include <util/delay.h>
 #include "adb.h"
-
+#ifdef ADBUINO_DEBUG
+#include "avr8-stub.h"
+#include "app_api.h"
+#endif
 // Example code from: https://platformio.org/lib/show/59/USB-Host-Shield-20
 #include <hidboot.h>
 #include <usbhub.h>
@@ -65,7 +68,7 @@ uint8_t mousesrq = 0;
 uint8_t modifierkeys = 0xFF;
 uint32_t kbskiptimer = 0;
 
-bool global_debug = false;
+bool global_debug = true;
 
 AdbInterface adb;
 UsbInterface usb;
@@ -75,8 +78,13 @@ USBHub Hub1(&Usb);
 USBHub Hub2(&Usb);
 USBHub Hub3(&Usb);
 USBHub Hub4(&Usb);
-HIDBoot<USB_HID_PROTOCOL_KEYBOARD> HidKeyboard(&Usb);
-HIDBoot<USB_HID_PROTOCOL_MOUSE> HidMouse(&Usb);
+// HIDBoot<USB_HID_PROTOCOL_KEYBOARD> HidKeyboard(&Usb);
+// HIDBoot<USB_HID_PROTOCOL_MOUSE> HidMouse(&Usb);
+HIDBoot < USB_HID_PROTOCOL_KEYBOARD | USB_HID_PROTOCOL_MOUSE > HidComposite(&Usb);
+
+// HIDBoot<USB_HID_PROTOCOL_KEYBOARD> HidKeyboard2(&Usb);
+// HIDBoot<USB_HID_PROTOCOL_MOUSE> HidMouse2(&Usb);
+// HIDBoot < USB_HID_PROTOCOL_KEYBOARD | USB_HID_PROTOCOL_MOUSE > HidComposite2(&Usb);
 
 MouseRptParser MousePrs;
 KbdRptParser KeyboardPrs;
@@ -86,9 +94,13 @@ int led_state = HIGH;
 
 void setup()
 {
+#ifdef ADBUINO_DEBUG
+  debug_init();
+#else
   Serial.begin(115200);
   while (!Serial)
     ;
+#endif
 
   // Clear the reset signal from the USB controller
   pinMode(7, OUTPUT);
@@ -98,20 +110,34 @@ void setup()
   pinMode(A0, OUTPUT);
   digitalWrite(A0, HIGH);
 
+#ifndef ADBUINO_DEBUG
   Serial.println("Initializing ADB");
+#endif
   adb.Init();
+#ifndef ADBUINO_DEBUG
   Serial.println("Initializing USB");
+#endif
   // usb.Init();
 
+#ifndef ADBUINO_DEBUG
   if (Usb.Init() == -1)
     Serial.println("OSC did not start.");
   else 
     Serial.println("OSC started");
+#else
+  Usb.Init();
+#endif
 
-  HidKeyboard.SetReportParser(0, &KeyboardPrs);
-  HidMouse.SetReportParser(0, &MousePrs);
+  // HidKeyboard.SetReportParser(0, &KeyboardPrs);
+  // HidMouse.SetReportParser(0, &MousePrs);
+  HidComposite.SetReportParser(0, &KeyboardPrs);
+  HidComposite.SetReportParser(1, &MousePrs);
+  // HidKeyboard2.SetReportParser(0, &KeyboardPrs);
+  // HidMouse2.SetReportParser(0, &MousePrs);
 
+#ifndef DRV_DEBUG_H_
   Serial.println("setup complete");
+#endif
 }
 
 void update_blinker(){
@@ -135,8 +161,10 @@ void loop()
     if (global_debug && first_time)
     {
       first_time=0;
+#ifndef ADBUINO_DEBUG
       Usb.ForEachUsbDevice(&PrintAllDescriptors);
       Usb.ForEachUsbDevice(&PrintAllAddresses);
+#endif
     }
 
     update_blinker();

@@ -56,6 +56,7 @@ uint16_t MouseRptParser::GetAdbRegister0()
 
 void MouseRptParser::OnMouseMove(MOUSEINFO *mi)
 {
+#ifndef ADBUINO_DEBUG
     if (global_debug)
     {
         Serial.print("dx=");
@@ -63,6 +64,7 @@ void MouseRptParser::OnMouseMove(MOUSEINFO *mi)
         Serial.print(" dy=");
         Serial.println(mi->dY, DEC);
     }
+#endif
     m_movedy = mi->dY;
     m_movedx = mi->dX;
 };

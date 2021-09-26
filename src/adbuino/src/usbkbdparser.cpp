@@ -8,11 +8,11 @@ extern bool global_debug;
 
 KbdRptParser::KbdRptParser()
 {
-    if (global_debug)
-    {
+    // if (global_debug)
+    // {
 
         Serial.println("Running KbdRptParser::KbdRptParser()");
-    }
+    // }
     m_keyboard_events = new ArduinoQueue<KeyEvent *>(20);
 }
 
@@ -162,11 +162,11 @@ void KbdRptParser::PrintKey(uint8_t m, uint8_t key)
 
 void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
 {
-    if (global_debug)
-    {
+    // if (global_debug)
+    // {
         Serial.print("DN ");
         PrintKey(mod, key);
-    }
+    // }
     uint8_t c = OemToAscii(mod, key);
     // m_last_key_pressed = key;
     // m_last_key_up_or_down = KeyEvent::KeyDown;
@@ -322,11 +322,11 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
 
 void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
 {
-    if (global_debug)
-    {
+    // if (global_debug)
+    // {
         Serial.print("UP ");
         PrintKey(mod, key);
-    }
+    // }
 
     if (!m_keyboard_events->enqueue(new KeyEvent(key, KeyEvent::KeyUp)))
     {

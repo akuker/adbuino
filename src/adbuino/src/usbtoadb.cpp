@@ -220,8 +220,10 @@ uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
     case USB_KEY_RIGHTMETA:
         return 0x37;
     default:
+#ifndef ADBUINO_DEBUG
         Serial.print("Unknown keycode found: ");
         Serial.println(usb_code, HEX);
+#endif
         return 0xFF;
 
         // 0x37        USB_KEY_Cmd (Apple)

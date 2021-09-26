@@ -10,8 +10,8 @@
             "includePath": [
                 "/home/akuker/adbuino/src/adbuino/include",
                 "/home/akuker/adbuino/src/adbuino/src",
-                "/home/akuker/adbuino/src/adbuino/.pio/libdeps/uno/ArduinoQueue",
-                "/home/akuker/adbuino/src/adbuino/.pio/libdeps/uno/USB-Host-Shield-20",
+                "/home/akuker/adbuino/src/adbuino/.pio/libdeps/release/ArduinoQueue",
+                "/home/akuker/adbuino/src/adbuino/.pio/libdeps/release/USB-Host-Shield-20",
                 "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                 "/home/akuker/.platformio/packages/framework-arduino-avr/cores/arduino",
                 "/home/akuker/.platformio/packages/framework-arduino-avr/variants/standard",
@@ -26,8 +26,8 @@
                 "path": [
                     "/home/akuker/adbuino/src/adbuino/include",
                     "/home/akuker/adbuino/src/adbuino/src",
-                    "/home/akuker/adbuino/src/adbuino/.pio/libdeps/uno/ArduinoQueue",
-                    "/home/akuker/adbuino/src/adbuino/.pio/libdeps/uno/USB-Host-Shield-20",
+                    "/home/akuker/adbuino/src/adbuino/.pio/libdeps/release/ArduinoQueue",
+                    "/home/akuker/adbuino/src/adbuino/.pio/libdeps/release/USB-Host-Shield-20",
                     "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                     "/home/akuker/.platformio/packages/framework-arduino-avr/cores/arduino",
                     "/home/akuker/.platformio/packages/framework-arduino-avr/variants/standard",
@@ -39,7 +39,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=50101",
+                "PLATFORMIO=50200",
                 "ARDUINO_AVR_UNO",
                 "F_CPU=16000000L",
                 "ARDUINO_ARCH_AVR",

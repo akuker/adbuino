@@ -12,21 +12,21 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "/home/akuker/adbuino/src/adbuino/.pio/build/uno/firmware.elf",
-            "projectEnvName": "uno",
+            "executable": "/home/akuker/adbuino/src/adbuino/.pio/build/release/firmware.elf",
+            "projectEnvName": "release",
             "toolchainBinDir": "/home/akuker/.platformio/packages/toolchain-atmelavr/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "preLaunchTask": {
                 "type": "PlatformIO",
-                "task": "Pre-Debug"
+                "task": "Pre-Debug (release)"
             }
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "/home/akuker/adbuino/src/adbuino/.pio/build/uno/firmware.elf",
-            "projectEnvName": "uno",
+            "executable": "/home/akuker/adbuino/src/adbuino/.pio/build/release/firmware.elf",
+            "projectEnvName": "release",
             "toolchainBinDir": "/home/akuker/.platformio/packages/toolchain-atmelavr/bin",
             "internalConsoleOptions": "openOnSessionStart"
         }

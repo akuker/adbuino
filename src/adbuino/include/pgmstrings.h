@@ -5,6 +5,7 @@
 #define HIBYTE(x) ((char*)(&(x)))[1]
 #define BUFSIZE 256    //buffer size
  
+#ifndef ADBUINO_DEBUG
 
 /* Print strings in Program Memory */
 const char Gen_Error_str[] PROGMEM = "\r\nRequest error. Error code:\t"; 
@@ -48,5 +49,6 @@ const char Unk_Header_str[] PROGMEM = "\r\nUnknown descriptor:";
 const char Unk_Length_str[] PROGMEM ="\r\nLength:\t\t";
 const char Unk_Type_str[] PROGMEM ="\r\nType:\t\t";
 const char Unk_Contents_str[] PROGMEM ="\r\nContents:\t";
- 
+#endif
+
 #endif // __PGMSTRINGS_H__

@@ -17,11 +17,13 @@
 #include "pgmstrings.h"
 
 
+#ifndef ADBUINO_DEBUG
 
 void PrintAllAddresses(UsbDevice *pdev)
 {
   UsbDeviceAddress adr;
   adr.devAddress = pdev->address.devAddress;
+#ifndef ADBUINO_DEBUG
   Serial.print("\r\nAddr:");
   Serial.print(adr.devAddress, HEX);
   Serial.print("(");
@@ -31,6 +33,7 @@ void PrintAllAddresses(UsbDevice *pdev)
   Serial.print(".");
   Serial.print(adr.bmAddress, HEX);
   Serial.println(")");
+#endif
 }
 
 void PrintAddress(uint8_t addr)
@@ -258,7 +261,9 @@ void print_hex(int v, int num_places)
   }
   do {
     digit = ((v >> (num_nibbles - 1) * 4)) & 0x0f;
+#ifndef ADBUINO_DEBUG
     Serial.print(digit, HEX);
+#endif
   }
   while (--num_nibbles);
 }
@@ -343,5 +348,8 @@ void printProgStr(const char* str)
   char c;
   if (!str) return;
   while ((c = pgm_read_byte(str++)))
+#ifndef ADBUINO_DEBUG
     Serial.print(c);
+#endif
 }
+#endif
