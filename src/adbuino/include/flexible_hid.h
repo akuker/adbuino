@@ -19,6 +19,9 @@ class FlexibleUsbHidDevice : public HIDComposite
 public:
     FlexibleUsbHidDevice(USB *p) : HIDComposite(p) {};
 
+    HIDReportParser* KeyboardParser;
+    HIDReportParser* MouseParser;
+
 protected:
     void ParseHIDData(USBHID *hid, uint8_t ep, bool is_rpt_id, uint8_t len, uint8_t *buf);
     bool SelectInterface(uint8_t iface, uint8_t proto);

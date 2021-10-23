@@ -83,6 +83,10 @@ USBHub Hub4(&Usb);
 // HIDBoot<USB_HID_PROTOCOL_MOUSE> HidMouse(&Usb);
 // HIDBoot < USB_HID_PROTOCOL_KEYBOARD | USB_HID_PROTOCOL_MOUSE > HidComposite(&Usb);
 FlexibleUsbHidDevice HidDevice(&Usb);
+FlexibleUsbHidDevice HidDevice2(&Usb);
+FlexibleUsbHidDevice HidDevice3(&Usb);
+FlexibleUsbHidDevice HidDevice4(&Usb);
+FlexibleUsbHidDevice HidDevice5(&Usb);
 
 // HIDBoot<USB_HID_PROTOCOL_KEYBOARD> HidKeyboard2(&Usb);
 // HIDBoot<USB_HID_PROTOCOL_MOUSE> HidMouse2(&Usb);
@@ -130,6 +134,10 @@ void setup()
   Usb.Init();
 #endif
 
+  HidDevice.KeyboardParser = &KeyboardPrs;
+  HidDevice.MouseParser = &MousePrs;
+// HidDevice.SetReportParser(0, &KeyboardPrs);
+// HidDevice.SetReportParser(1, &MousePrs);
   // HidKeyboard.SetReportParser(0, &KeyboardPrs);
   // HidMouse.SetReportParser(0, &MousePrs);
   // HidComposite.SetReportParser(0, &KeyboardPrs);

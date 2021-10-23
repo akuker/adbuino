@@ -43,22 +43,50 @@ void FlexibleUsbHidDevice::ParseHIDData(USBHID *hid, uint8_t ep, bool is_rpt_id,
 
 
 
-    if(protocol == USB_HID_PROTOCOL_KEYBOARD){
-        if(len >= sizeof(KBDINFO)){
+    if (protocol == USB_HID_PROTOCOL_KEYBOARD){
+        this->KeyboardParser->Parse(hid, is_rpt_id, len, buf);
+    }
+    else if (protocol == USB_HID_PROTOCOL_MOUSE){
+        this->MouseParser->Parse(hid,is_rpt_id,len,buf);
+        // HIDReportParser* parser = this->GetReportParser((protocol-1));
+        // parser->Parse(hid, is_rpt_id, len, buf);
+        // if(len >= sizeof(KBDINFO)){
 
-            KBDINFO *ki = (KBDINFO*)buf;
-            sprintf(mystring,"Keyboard: Key1:%02X Key2:%02X Key3:%02X Key4:%02X Key5:%02X\n\r",
-                ki->Keys[0], ki->Keys[1], ki->Keys[2], ki->Keys[3], ki->Keys[4]);
-            Serial.print(mystring);
-        }
+        //     KBDINFO *ki = (KBDINFO*)buf;
+        //     sprintf(mystring,"Keyboard: Key1:%02X Key2:%02X Key3:%02X Key4:%02X Key5:%02X\n\r",
+        //         ki->Keys[0], ki->Keys[1], ki->Keys[2], ki->Keys[3], ki->Keys[4]);
+        //     Serial.print(mystring);
+        // }
         // MyParseKeyboardData(hid,ep,is_rpt_id,len,buf);
     }
-    if(protocol == USB_HID_PROTOCOL_MOUSE){
-        // MyParseMouseData(hid,ep,is_rpt_id,len,buf);
-        Serial.println("");
-    }
+    // if(protocol == USB_HID_PROTOCOL_MOUSE){
+    //     // MyParseMouseData(hid,ep,is_rpt_id,len,buf);
+    //     Serial.println("");
+    // }
+    else{
+        // For composite devices, end point 1 is typically the keyboard
+        if(ep == 1){
+            Serial.print(" keyboard evt ");
+            this->KeyboardParser->Parse(hid, is_rpt_id, len, buf);
+        }
+        else if(len == sizeof(MOUSEINFO)){ 
+            Serial.print(" mouse evt ");
+            this->MouseParser->Parse(hid, is_rpt_id, len, buf);
+        }
+        else {
+            ABSOLUTEMOUSEINFO *abs = (ABSOLUTEMOUSEINFO*)buf;
+            Serial.print(" Left:");
+            Serial.print(abs->bmLeftButton);
+            Serial.print(" Mid:");
+            Serial.print(abs->bmMiddleButton);
+            Serial.print(" Right:");
+            Serial.print(abs->bmRightButton);
+            Serial.print(" X:");
+            Serial.print(abs->dX);
+            Serial.print(" Y:");
+            Serial.print(abs->dY);
 
-    if(protocol == USB_HID_PROTOCOL_NONE){
+        }
         Serial.println("");
         // Serial.print("devsubclassok:");
         // Serial.print(hid->DEVSUBCLASSOK(),HEX);
