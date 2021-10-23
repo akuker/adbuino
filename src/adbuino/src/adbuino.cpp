@@ -44,6 +44,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <usbhub.h>
 #include "usbinterface.h"
 #include "usb_description.h"
+#include "flexible_hid.h"
 // Satisfy the IDE, which needs to see the include statment in the ino too.
 #ifdef dobogusinclude
 #include <spi4teensy3.h>
@@ -80,7 +81,8 @@ USBHub Hub3(&Usb);
 USBHub Hub4(&Usb);
 // HIDBoot<USB_HID_PROTOCOL_KEYBOARD> HidKeyboard(&Usb);
 // HIDBoot<USB_HID_PROTOCOL_MOUSE> HidMouse(&Usb);
-HIDBoot < USB_HID_PROTOCOL_KEYBOARD | USB_HID_PROTOCOL_MOUSE > HidComposite(&Usb);
+// HIDBoot < USB_HID_PROTOCOL_KEYBOARD | USB_HID_PROTOCOL_MOUSE > HidComposite(&Usb);
+FlexibleUsbHidDevice HidDevice(&Usb);
 
 // HIDBoot<USB_HID_PROTOCOL_KEYBOARD> HidKeyboard2(&Usb);
 // HIDBoot<USB_HID_PROTOCOL_MOUSE> HidMouse2(&Usb);
@@ -130,8 +132,8 @@ void setup()
 
   // HidKeyboard.SetReportParser(0, &KeyboardPrs);
   // HidMouse.SetReportParser(0, &MousePrs);
-  HidComposite.SetReportParser(0, &KeyboardPrs);
-  HidComposite.SetReportParser(1, &MousePrs);
+  // HidComposite.SetReportParser(0, &KeyboardPrs);
+  // HidComposite.SetReportParser(1, &MousePrs);
   // HidKeyboard2.SetReportParser(0, &KeyboardPrs);
   // HidMouse2.SetReportParser(0, &MousePrs);
 
