@@ -19,6 +19,17 @@ class AdbInterface {
     const uint8_t m_adb_gpio = 3;
     const uint8_t m_pwr_gpio = 2;
 
+    enum e_adb_device_address : uint8_t {
+      e_adb_macintosh_host = 0x0,
+      e_adb_protection_device = 0x1,
+      e_adb_addr_keyboard = 0x2,
+      e_adb_addr_mouse = 0x3,
+      e_adb_addr_tablet = 0x4,
+      e_adb_addr_modem = 0x5,
+      e_adb_addr_reserved = 0x6,
+      e_adb_adr_appliances = 0x7,
+    };
+
     // These need to be looked upon the arduino schematic to figure out
     // which bank and databit the ADB pin is connected to
     #define ADB_PORT      PORTD

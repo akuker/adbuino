@@ -6,13 +6,34 @@
 
 extern bool global_debug;
 
+void printProgStr(const char* str);
+void print_hex(int v, int num_places);
+
+const char STR_KBD_PARSER_INIT[] PROGMEM = "Running KbdRptParser::KbdRptParser()";
+const char STR_KBD_REGISTER_0[] PROGMEM = "Keyboard Register 0 = ";
+const char STR_KBD_REGISTER_1[] PROGMEM = "Keyboard Register 1 = ";
+const char STR_KBD_REGISTER_2[] PROGMEM = "Keyboard Register 2 = ";
+const char STR_KBD_REGISTER_3[] PROGMEM = "Keyboard Register 3 = ";
+const char STR_OVERFLOW_WARN[] PROGMEM = "Warning! unable to enqueue new KeyDown";
+const char STR_RIGHT[] PROGMEM = "Right ";
+const char STR_LEFT[] PROGMEM = "Left ";
+const char STR_ALT[] PROGMEM = "Alt ";
+const char STR_CTRL[] PROGMEM = "Ctrl ";
+const char STR_GUI[] PROGMEM = "GUI ";
+const char STR_SHIFT[] PROGMEM = "Shift ";
+const char STR_CHANGED[] PROGMEM = "changed\n";
+const char STR_DOWN[] PROGMEM = "down";
+const char STR_UP[] PROGMEM = "up";
+const char STR_ASCII[] PROGMEM = "ASCII: ";
+const char STR_BEFORE[] PROGMEM = "Before: ";
+const char STR_AFTER[] PROGMEM = "After: ";
+const char STR_SPACE[] PROGMEM = " ";
+const char STR_FAILED[] PROGMEM = " !!! FAILED !!!\n";
+
+
 KbdRptParser::KbdRptParser()
 {
-    // if (global_debug)
-    // {
-
-        Serial.println("Running KbdRptParser::KbdRptParser()");
-    // }
+    printProgStr(STR_KBD_PARSER_INIT);
     m_keyboard_events = new ArduinoQueue<KeyEvent *>(20);
 }
 
@@ -63,8 +84,8 @@ uint16_t KbdRptParser::GetAdbRegister0()
     if (global_debug)
     {
 
-        Serial.print("Keyboard Register 0 = ");
-        Serial.println(kbdreg0, HEX);
+        printProgStr(STR_KBD_REGISTER_0);
+        Serial.println(kbdreg0,HEX);
     }
     return kbdreg0;
 }
@@ -135,8 +156,8 @@ uint16_t KbdRptParser::GetAdbRegister2()
     }
     if (global_debug)
     {
-        Serial.print("Kbdreg2 is ");
-        Serial.println(kbdreg2, HEX);
+        printProgStr(STR_KBD_REGISTER_2);
+        print_hex(kbdreg2, 4);
     }
     return kbdreg2;
 }
@@ -164,7 +185,7 @@ void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
 {
     // if (global_debug)
     // {
-        Serial.print("DN ");
+        printProgStr(STR_DOWN);
         PrintKey(mod, key);
     // }
     uint8_t c = OemToAscii(mod, key);
@@ -174,9 +195,11 @@ void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
     if (c)
         OnKeyPressed(c);
 
-    if (!m_keyboard_events->enqueue(new KeyEvent(key, KeyEvent::KeyDown)))
+    KeyEvent *new_event = new KeyEvent(key, KeyEvent::KeyDown);
+    if (!m_keyboard_events->enqueue(new_event))
     {
-        Serial.println("Warning! unable to enqueue new KeyDown");
+        printProgStr(STR_OVERFLOW_WARN);
+        free(new_event);
     }
 
     if (key == USB_KEY_SCROLLLOCK)
@@ -222,18 +245,21 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
 
     if (global_debug)
     {
-        Serial.print("Before: ");
+        printProgStr(STR_BEFORE);
         Serial.print(before, HEX);
-        Serial.print(" after: ");
+        printProgStr(STR_SPACE);
+        printProgStr(STR_AFTER);
         Serial.print(after, HEX);
-        Serial.print(" ");
+        printProgStr(STR_SPACE);
         Serial.print(*((uint8_t *)&m_modifier_keys), HEX);
     }
     if (beforeMod.bmLeftCtrl != afterMod.bmLeftCtrl)
     {
         if (global_debug)
         {
-            Serial.println("LeftCtrl changed");
+            printProgStr(STR_LEFT);
+            printProgStr(STR_CTRL);
+            printProgStr(STR_CHANGED);
         }
         if (afterMod.bmLeftCtrl)
         {
@@ -248,7 +274,10 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
     {
         if (global_debug)
         {
-            Serial.println("LeftShift changed");
+            printProgStr(STR_LEFT);
+            printProgStr(STR_SHIFT);
+            printProgStr(STR_CHANGED);
+
         }
         if (afterMod.bmLeftShift)
         {
@@ -263,7 +292,10 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
     {
         if (global_debug)
         {
-            Serial.println("LeftAlt changed");
+            printProgStr(STR_LEFT);
+            printProgStr(STR_ALT);
+            printProgStr(STR_CHANGED);
+
         }
         if (afterMod.bmLeftAlt)
         {
@@ -278,7 +310,10 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
     {
         if (global_debug)
         {
-            Serial.println("LeftGUI changed");
+            printProgStr(STR_LEFT);
+            printProgStr(STR_GUI);
+            printProgStr(STR_CHANGED);
+
         }
         if (afterMod.bmLeftGUI)
         {
@@ -294,28 +329,36 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
     {
         if (global_debug)
         {
-            Serial.println("RightCtrl changed");
+            printProgStr(STR_RIGHT);
+            printProgStr(STR_CTRL);
+            printProgStr(STR_CHANGED);
         }
     }
     if (beforeMod.bmRightShift != afterMod.bmRightShift)
     {
         if (global_debug)
         {
-            Serial.println("RightShift changed");
+            printProgStr(STR_RIGHT);
+            printProgStr(STR_SHIFT);
+            printProgStr(STR_CHANGED);
         }
     }
     if (beforeMod.bmRightAlt != afterMod.bmRightAlt)
     {
         if (global_debug)
         {
-            Serial.println("RightAlt changed");
+            printProgStr(STR_RIGHT);
+            printProgStr(STR_ALT);
+            printProgStr(STR_CHANGED);
         }
     }
     if (beforeMod.bmRightGUI != afterMod.bmRightGUI)
     {
         if (global_debug)
         {
-            Serial.println("RightGUI changed");
+            printProgStr(STR_RIGHT);
+            printProgStr(STR_GUI);
+            printProgStr(STR_CHANGED);
         }
     }
 }
@@ -324,14 +367,18 @@ void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
 {
     // if (global_debug)
     // {
-        Serial.print("UP ");
+        printProgStr(STR_UP);
         PrintKey(mod, key);
     // }
 
-    if (!m_keyboard_events->enqueue(new KeyEvent(key, KeyEvent::KeyUp)))
+    KeyEvent *new_event = new KeyEvent(key, KeyEvent::KeyDown);
+    if (!m_keyboard_events->enqueue(new_event))
     {
-        Serial.println("Warning! unable to enqueue new KeyDown");
+        printProgStr(STR_OVERFLOW_WARN);
+        free(new_event);
     }
+
+
 
     if (key == USB_KEY_SCROLLLOCK)
     {
@@ -368,7 +415,7 @@ void KbdRptParser::OnKeyPressed(uint8_t key)
     if (global_debug)
     {
 
-        Serial.print("ASCII: ");
-        Serial.println((char)key);
+        printProgStr(STR_ASCII);
+        print_hex(key,2);
     }
 };

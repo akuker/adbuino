@@ -4,12 +4,15 @@
 
 extern uint8_t mousepending;
 extern uint8_t kbdpending;
+extern uint8_t tabletpending;
 extern uint8_t kbdskip;
 extern uint16_t kbdprev0;
 extern uint16_t mousereg0;
+extern uint16_t tabletreg0;
 extern uint16_t kbdreg0;
 extern uint8_t kbdsrq;
 extern uint8_t mousesrq;
+extern uint8_t tabletsrq;
 extern uint8_t modifierkeys;
 extern uint32_t kbskiptimer;
 extern bool global_debug;
@@ -145,7 +148,7 @@ bool first_keybd = true;
 void AdbInterface::ProcessCommand(uint8_t cmd)
 {
 
-  uint16_t mousereg3, kbdreg3;
+  uint16_t mousereg3, kbdreg3, tabletreg3;
 
   // see if it is addressed to us
   if (((cmd >> 4) & 0x0F) == 3)
@@ -181,7 +184,7 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
       Serial.println("MOUSE: Got request for register 3");
 #endif
       // // sets device address
-      // mousereg3 = GetAdbRegister3Mouse();
+      //mousereg3 = GetAdbRegister3Mouse();
       // _delay_us(180); // stop to start time / interframe delay
       // //   ADB_DDR |= 1<<ADB_DATA_BIT;  // set output
       // adb_pin_out();
@@ -299,6 +302,69 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
     if (kbdpending)
       kbdsrq = 1;
   }
+
+
+  // see if it is addressed to us
+  if (((cmd >> 4) & 0x0F) == e_adb_addr_tablet)
+  {
+    switch (cmd & 0x0F)
+    {
+    case 0xC: // talk register 0
+//       if (tabletpending)
+//       {
+//         _delay_us(180); // stop to start time / interframe delay
+//         adb_pin_out();fd
+//         place_bit1(); // start bit
+//         send_byte((tabletreg0 >> 8) & 0x00FF);
+//         send_byte(tabletreg0 & 0x00FF);
+//         place_bit0(); // stop bit
+//         adb_pin_in();
+//         tabletpending = 0;
+//         tabletsrq = 0;
+//       }
+      break;
+    case 0xD: // talk register 1
+#ifndef ADBUINO_DEBUG
+      Serial.println("TABLET: Got request for register 1");
+#endif
+      break;
+    case 0xE: // talk register 2
+#ifndef ADBUINO_DEBUG
+      Serial.println("TABLET Got request for register 2");
+#endif
+      break;
+    case 0xF: // talk register 3
+// #ifndef ADBUINO_DEBUG
+//       Serial.println("TABLET: Got request for register 3");
+// #endif
+//       // // sets device address
+//       // mousereg3 = GetAdbRegister3Mouse();
+//       // _delay_us(180); // stop to start time / interframe delay
+//       // //   ADB_DDR |= 1<<ADB_DATA_BIT;  // set output
+//       // adb_pin_out();
+//       // place_bit1(); // start bit
+//       // send_byte((mousereg3 >> 8) & 0x00FF);
+//       // send_byte(mousereg3 & 0x00FF);
+//       // place_bit0(); // stop bit
+//       // //   ADB_DDR &= ~(1<<ADB_DATA_BIT); // set input
+//       // adb_pin_in();
+//       break;
+    default:
+#ifndef ADBUINO_DEBUG
+      printf("TABLET: Unknown cmd: %02X", cmd);
+#endif
+      break;
+    }
+  }
+  else
+  {
+    if (tabletpending)
+      tabletsrq = 1;
+  }
+
+
+
+
 }
 
 void AdbInterface::Init()

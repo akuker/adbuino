@@ -1,6 +1,16 @@
 #include "usbinterface.h"
 extern bool global_debug;
 
+void printProgStr(const char* str);
+
+const char STR_DX[] PROGMEM ="dx=";
+const char STR_DY[] PROGMEM =" dy=";
+const char STR_LFT_BUTTON[] PROGMEM ="Left Button ";
+const char STR_MID_BUTTON[] PROGMEM ="Middle Button ";
+const char STR_RHT_BUTTON[] PROGMEM ="Right Button ";
+const char STR_DOWN[] PROGMEM ="Down\n";
+const char STR_UP[] PROGMEM ="Up\n";
+
 bool MouseRptParser::MouseChanged()
 {
     return ((m_movedx != 0) || (m_movedy != 0) || m_mouse_button_changed);
@@ -59,9 +69,9 @@ void MouseRptParser::OnMouseMove(MOUSEINFO *mi)
 #ifndef ADBUINO_DEBUG
     if (global_debug)
     {
-        Serial.print("dx=");
+        printProgStr(STR_DX);
         Serial.print(mi->dX, DEC);
-        Serial.print(" dy=");
+        printProgStr(STR_DY);
         Serial.println(mi->dY, DEC);
     }
 #endif
@@ -72,7 +82,8 @@ void MouseRptParser::OnLeftButtonUp(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("L Butt Up");
+        printProgStr(STR_LFT_BUTTON);
+        printProgStr(STR_UP);
     }
     m_mouse_button_is_pressed = false;
     m_mouse_button_changed = true;
@@ -81,7 +92,8 @@ void MouseRptParser::OnLeftButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("L Butt Dn");
+        printProgStr(STR_LFT_BUTTON);
+        printProgStr(STR_DOWN);
     }
     m_mouse_button_is_pressed = true;
     m_mouse_button_changed = true;
@@ -90,27 +102,31 @@ void MouseRptParser::OnRightButtonUp(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("R Butt Up");
+        printProgStr(STR_RHT_BUTTON);
+        printProgStr(STR_UP);
     }
 };
 void MouseRptParser::OnRightButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("R Butt Dn");
+        printProgStr(STR_RHT_BUTTON);
+        printProgStr(STR_DOWN);
     }
 };
 void MouseRptParser::OnMiddleButtonUp(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("M Butt Up");
+        printProgStr(STR_MID_BUTTON);
+        printProgStr(STR_UP);
     }
 };
 void MouseRptParser::OnMiddleButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("M Butt Dn");
+        printProgStr(STR_MID_BUTTON);
+        printProgStr(STR_DOWN);
     }
 };

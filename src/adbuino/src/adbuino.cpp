@@ -60,12 +60,15 @@ POSSIBILITY OF SUCH DAMAGE.
 #define kModDelete 64
 uint8_t mousepending = 0;
 uint8_t kbdpending = 0;
+uint8_t tabletpending = 0;
 uint8_t kbdskip = 0;
 uint16_t kbdprev0 = 0;
 uint16_t mousereg0 = 0;
+uint16_t tabletreg0 = 0;
 uint16_t kbdreg0 = 0;
 uint8_t kbdsrq = 0;
 uint8_t mousesrq = 0;
+uint8_t tabletsrq = 0;
 uint8_t modifierkeys = 0xFF;
 uint32_t kbskiptimer = 0;
 
@@ -73,6 +76,17 @@ bool global_debug = true;
 
 AdbInterface adb;
 UsbInterface usb;
+
+const char STR_INITIALIZING_USB[] PROGMEM ="Initializing USB\n";
+const char STR_INITIALIZING_ADB[] PROGMEM ="Initializing ADB\n";
+const char STR_OSC_DID_NOT_START[] PROGMEM ="OSC did not start\n";
+const char STR_OSC_STARTED_OK[] PROGMEM ="OSC started OK\n";
+const char STR_SETUP_COMPLETE[] PROGMEM ="Setup complete!\n";
+
+
+
+
+void printProgStr(const char* str);
 
 USB Usb;
 USBHub Hub1(&Usb);
@@ -94,6 +108,7 @@ FlexibleUsbHidDevice HidDevice5(&Usb);
 
 MouseRptParser MousePrs;
 KbdRptParser KeyboardPrs;
+TabletRptParser TabletPrs;
 
 unsigned long blink_timer = 0;
 int led_state = HIGH;
@@ -117,25 +132,28 @@ void setup()
   digitalWrite(A0, HIGH);
 
 #ifndef ADBUINO_DEBUG
-  Serial.println("Initializing ADB");
+printProgStr(STR_INITIALIZING_ADB);
+  // Serial.println("Initializing ADB");
 #endif
   adb.Init();
 #ifndef ADBUINO_DEBUG
-  Serial.println("Initializing USB");
+printProgStr(STR_INITIALIZING_USB);
+  // Serial.println("Initializing USB");
 #endif
   // usb.Init();
 
 #ifndef ADBUINO_DEBUG
   if (Usb.Init() == -1)
-    Serial.println("OSC did not start.");
+    printProgStr(STR_OSC_DID_NOT_START);
   else 
-    Serial.println("OSC started");
+    printProgStr(STR_OSC_STARTED_OK);
 #else
   Usb.Init();
 #endif
 
   HidDevice.KeyboardParser = &KeyboardPrs;
   HidDevice.MouseParser = &MousePrs;
+  HidDevice.TabletParser = &TabletPrs;
 // HidDevice.SetReportParser(0, &KeyboardPrs);
 // HidDevice.SetReportParser(1, &MousePrs);
   // HidKeyboard.SetReportParser(0, &KeyboardPrs);
@@ -146,7 +164,7 @@ void setup()
   // HidMouse2.SetReportParser(0, &MousePrs);
 
 #ifndef DRV_DEBUG_H_
-  Serial.println("setup complete");
+  printProgStr(STR_SETUP_COMPLETE);
 #endif
 }
 

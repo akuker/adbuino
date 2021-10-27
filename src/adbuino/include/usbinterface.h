@@ -41,6 +41,85 @@ private:
     bool m_mouse_button_changed = false;
 };
 
+
+struct ABSOLUTEMOUSEINFO {
+
+        struct {
+                uint8_t bmLeftButton : 1;
+                uint8_t bmRightButton : 1;
+                uint8_t bmMiddleButton : 1;
+                uint8_t bmDummy : 5;
+        };
+        uint16_t dX;
+        uint16_t dY;
+};
+
+
+class TabletReportParser : public HIDReportParser {
+
+        union {
+                ABSOLUTEMOUSEINFO mouseInfo;
+                uint8_t bInfo[sizeof (ABSOLUTEMOUSEINFO)];
+        } prevState;
+
+public:
+        void Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8_t *buf);
+
+protected:
+
+        virtual void OnMouseMove(ABSOLUTEMOUSEINFO *mi __attribute__((unused))) {
+        };
+
+        virtual void OnLeftButtonUp(ABSOLUTEMOUSEINFO *mi __attribute__((unused))) {
+        };
+
+        virtual void OnLeftButtonDown(ABSOLUTEMOUSEINFO *mi __attribute__((unused))) {
+        };
+
+        virtual void OnRightButtonUp(ABSOLUTEMOUSEINFO *mi __attribute__((unused))) {
+        };
+
+        virtual void OnRightButtonDown(ABSOLUTEMOUSEINFO *mi __attribute__((unused))) {
+        };
+
+        virtual void OnMiddleButtonUp(ABSOLUTEMOUSEINFO *mi __attribute__((unused))) {
+        };
+
+        virtual void OnMiddleButtonDown(ABSOLUTEMOUSEINFO *mi __attribute__((unused))) {
+        };
+};
+
+
+class TabletRptParser : public TabletReportParser
+{
+public:
+    bool MouseChanged();
+    int32_t GetX();
+    int32_t GetY();
+    void ResetMouseMovement();
+    uint16_t GetAdbRegister0();
+    bool MouseButtonIsPressed();
+
+protected:
+    void OnMouseMove(ABSOLUTEMOUSEINFO *mi);
+    void OnLeftButtonUp(ABSOLUTEMOUSEINFO *mi);
+    void OnLeftButtonDown(ABSOLUTEMOUSEINFO *mi);
+    void OnRightButtonUp(ABSOLUTEMOUSEINFO *mi);
+    void OnRightButtonDown(ABSOLUTEMOUSEINFO *mi);
+    void OnMiddleButtonUp(ABSOLUTEMOUSEINFO *mi);
+    void OnMiddleButtonDown(ABSOLUTEMOUSEINFO *mi);
+    uint32_t EightBitToSevenBitSigned(int8_t value);
+
+
+private:
+    uint16_t m_pos_x = 0;
+    uint16_t m_pos_y = 0;
+    bool m_mouse_button_is_pressed = false;
+    bool m_mouse_button_changed = false;
+    bool m_mouse_position_changed = false;
+};
+
+
 class KeyEvent
 {
 public:
