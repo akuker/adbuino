@@ -243,7 +243,6 @@ int Receive_ADB_Data(uint8_t *data_buf, int buf_size)
   return word_count;
 }
 
-#define CHECKIF(x) {if(x){/*Serial.print(#x); Serial.println(" passed!");*/}else{Serial.print(#x);Serial.println(" failed!");}}
 
 void setup()
 {
@@ -256,81 +255,8 @@ void setup()
   Serial.println("setup complete");
   randomSeed(analogRead(0));
 
-  uint8_t data_buffer[5] = {0};
-  WacomRegister0 *wacom = new WacomRegister0(data_buffer);
-  wacom->DumpData();
+  WacomRegister0::SelfTest();
 
-  wacom->SetPosY(0xFFFF);
-  // Serial.print("Previous: ");
-  // wacom->DumpData();
-  wacom->SetPosX(1);
-  // // Serial.print(" X: ");
-  // // Serial.print(wacom->GetPosX());
-  // wacom->DumpData();
-  CHECKIF(wacom->GetPosX() == 0x0001)
-  wacom->SetPosX(0);
-  CHECKIF(wacom->GetPosX() == 0x0000)
-  wacom->SetPosX(0xFFFF);
-  CHECKIF(wacom->GetPosX() == 0xFFFF)
-  wacom->SetPosX(0x1000);
-  CHECKIF(wacom->GetPosX() == 0x1000)
-  wacom->SetPosX(0x8000);
-  CHECKIF(wacom->GetPosX() == 0x8000)
-  CHECKIF(wacom->GetPosY() == 0xFFFF)
-  wacom->SetPosX(0xFFFF);
-
-  wacom->SetPosY(1);
-  CHECKIF(wacom->GetPosY() == 0x0001)
-  wacom->SetPosY(0);
-  CHECKIF(wacom->GetPosY() == 0x0000)
-  wacom->SetPosY(0xFFFF);
-  CHECKIF(wacom->GetPosY() == 0xFFFF)
-  wacom->SetPosY(0x1000);
-  CHECKIF(wacom->GetPosY() == 0x1000)
-  wacom->SetPosY(0x8000);
-  CHECKIF(wacom->GetPosY() == 0x8000)
-
-  wacom->SetPosX(0x0);
-  wacom->SetPosY(1);
-  CHECKIF(wacom->GetPosY() == 0x0001)
-  wacom->SetPosY(0);
-  CHECKIF(wacom->GetPosY() == 0x0000)
-  wacom->SetPosY(0xFFFF);
-  CHECKIF(wacom->GetPosY() == 0xFFFF)
-  wacom->SetPosY(0x1000);
-  CHECKIF(wacom->GetPosY() == 0x1000)
-  wacom->SetPosY(0x8000);
-  CHECKIF(wacom->GetPosY() == 0x8000)
-
-  for(uint32_t x=0; x<=0xFFFF; x+=random(1,5000)){
-    Serial.print("X:");
-    Serial.println(x,HEX);
-    wacom->SetPosX(x);
-    for(uint32_t y=0; y<=0xFFFF; y+=random(1,5000)){
-      wacom->SetPosY(y);
-
-      for(uint32_t p=0; p<=0x1F; p+=random(1,200)){
-        wacom->SetPressure(p);
-        CHECKIF(wacom->GetPosY() == y)
-        CHECKIF(wacom->GetPosX() == x)
-        CHECKIF(wacom->GetPressure() == p)
-      }
-    }
-  }
-
-  wacom->SetIsTouching(true);
-  CHECKIF(wacom->GetIsTouching() == true);
-  wacom->DumpData();
-
-  wacom->SetIsTouching(false);
-  CHECKIF(wacom->GetIsTouching() == false);
-  wacom->DumpData();
-
-  wacom->SetIsTouching(true);
-  CHECKIF(wacom->GetIsTouching() == true);
-  wacom->DumpData();
-
-  Serial.println("Done Testing!");
 
 
 }
@@ -391,51 +317,10 @@ void loop()
         WacomRegister0 *wacom = new WacomRegister0(data_buffer);
 
         sprintf(data_str, "X= %u [%4X] Y= %u [%4X] Pressure = %u Touching = %u | ",wacom->GetPosX(), wacom->GetPosX(), wacom->GetPosY(), wacom->GetPosY(), wacom->GetPressure(), (int)wacom->GetIsTouching());
-        Serial.print(data_str);
+        // Serial.print(data_str);
+        // wacom->DumpData();
         
         free(wacom);
-        // uint16_t pos_x_a = ((((uint16_t)data_buffer[0])& 0x1F)<<8) + ((uint16_t)data_buffer[1]);
-        // pos_x_a = pos_x_a << 3;
-        // uint16_t pos_x_b = (uint16_t)(data_buffer[2] >> 5);
-        // // sprintf(data_str,"%02X %02X %02X = %04X (%u) + %04X (%u) = %04X (%u)",data_buffer[0], data_buffer[1], data_buffer[2], pos_x_a, pos_x_a, pos_x_b, pos_x_b, pos_x_a +pos_x_b,pos_x_a +pos_x_b);
-        // sprintf(data_str,"X = %d [%04X] ", pos_x_a +pos_x_b,pos_x_a +pos_x_b);
-        // Serial.print(data_str);
-        // uint16_t pos_x_1 = ((uint16_t)(data_buffer[0] & 0x10))<< (3+8);
-        //   //         sprintf(data_str, " %02X", data_buffer[i]);
-        //   // Serial.print(data_str);
-        //   //           sprintf(data_str, " %02X", data_buffer[i]);
-        //   // Serial.print(data_str);
-        //   //           sprintf(data_str, " %02X", data_buffer[i]);
-        //   // Serial.print(data_str);
-
-        // uint16_t pressure = data_buffer[4] & 0x1F;
-        // sprintf(data_str,"Pressure = %d [%04X] ", pressure, pressure);
-        // Serial.print(data_str);
-
-
-        // uint16_t pos_y_a = ((uint16_t)data_buffer[2] & 0x1F) << (8 + 3);
-        // uint16_t pos_y_b = ((uint16_t)data_buffer[3]) << 3;
-        // uint16_t pos_y_c = ((uint16_t)data_buffer[4] & 0x00E0) >> 5;
-
-        // sprintf(data_str,"%02X %02X %02X = %04X %04X %04X = %04X (%u)",data_buffer[2], data_buffer[3], data_buffer[4], pos_y_a, pos_y_b, pos_y_c, pos_y_a + pos_y_b + pos_y_c, pos_y_a + pos_y_b + pos_y_c);
-        // // a, pos_x_b, pos_x_b, pos_x_a +pos_x_b,pos_x_a +pos_x_b);
-        // Serial.print(data_str);
-
-
-        
-        // uint16_t pos_x_2 = ((uint16_t)(data_buffer[1]) << 7);
-        // uint16_t pos_x_3 = ((uint16_t)(data_buffer[2]) >> 1);
-        // uint16_t pos_x = pos_x_1 + pos_x_2 + pos_x_3;
-        // sprintf(data_str, "%04X + %04X + %04X = %u, %04X",pos_x_1, pos_x_2, pos_x_3, pos_x, pos_x);
-        // Serial.print(data_str);
-        Serial.print("  |   ");
-        for (int i = 0; i < blk_size; i++)
-        {
-          sprintf(data_str, " %02X", data_buffer[i]);
-          Serial.print(data_str);
-        }
-        Serial.println("");
-
 
       }
       else if (blk_size > 0)
@@ -461,7 +346,9 @@ void loop()
       }
       break;
     case SendReset:
+      Serial.println("Got Send Reset");
     case Flush:
+      Serial.println("Got Flush");
     default:
       break;
     }
