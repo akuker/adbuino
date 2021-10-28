@@ -17,6 +17,7 @@
                 "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                 "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
                 "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "/home/akuker/.platformio/packages/tool-unity",
                 ""
             ],
             "browse": {
@@ -31,11 +32,12 @@
                     "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                     "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
                     "/home/akuker/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    "/home/akuker/.platformio/packages/tool-unity",
                     ""
                 ]
             },
             "defines": [
-                "PLATFORMIO=50101",
+                "PLATFORMIO=50202",
                 "ARDUINO_AVR_UNO",
                 "F_CPU=16000000L",
                 "ARDUINO_ARCH_AVR",
