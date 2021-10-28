@@ -20,8 +20,11 @@ Reported data:
 
 | Action              | Register | Data               |Raw |
 |---------------------|----|--------------------------|---------------------------------------------------------------------|
-|Hover Top Right    | 4  | BC 1A 19 00 12 C0 02 09  |ADB Command:4C (Talk) addr:4 reg:0 Data[8]:  BC 1A 19 00 12 C0 02 09 | 
-|Hover Top Left     | 4  | BC 1A 19 00 12 C0 02 09  |ADB Command:4C (Talk) addr:4 reg:0 Data[8]:  BC 1A 19 00 12 C0 02 09 |
-|Hover Bottom Right | 4  | BC 1A 19 00 12 C0 02 09  |ADB Command:4C (Talk) addr:4 reg:0 Data[8]:  BC 1A 19 00 12 C0 02 09 |
-|Hover Bottom Left  | 4  | BC 1A 19 00 12 C0 02 09  |ADB Command:4C (Talk) addr:4 reg:0 Data[8]:  BC 1A 19 00 12 C0 02 09 |
-
+|Hover Bottom Left  | 4  | E0 4F 92 37 00  |ADB Command:4C (Talk) addr:4 reg:0 Data[5]:  E0 4F 92 37 00
+|"                  | 4  | E0 57 12 3F 00  |ADB Command:4C (Talk) addr:4 reg:0 Data[5]:  E0 57 12 3F 00
+|"                  | 4  | E0 64 12 3F 00  |ADB Command:4C (Talk) addr:4 reg:0 Data[5]:  E0 64 12 3F 00
+|"                  | 4  | E0 6B 92 36 80  |ADB Command:4C (Talk) addr:4 reg:0 Data[5]:  E0 6B 92 36 80
+|"                  | 4  | E0 70 92 29 00  |ADB Command:4C (Talk) addr:4 reg:0 Data[5]:  E0 70 92 29 00
+|"                  | 4  | E0 70 92 14 80  |ADB Command:4C (Talk) addr:4 reg:0 Data[5]:  E0 70 92 14 80
+|"                  | 4  | E0 68 12 06 00  |ADB Command:4C (Talk) addr:4 reg:0 Data[5]:  E0 68 12 06 00
+|"                  | 4  | E0 5C 92 06 00  |ADB Command:4C (Talk) addr:4 reg:0 Data[5]:  E0 5C 92 06 00
