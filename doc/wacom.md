@@ -347,3 +347,21 @@ ADB Command:4D (Talk) addr:4 reg:1 Data[8]:  9C 24 19 00 12 C0 02 09
 ADB Command:49 (Listen) addr:4 reg:1 Data[2]:  9C 24
 ADB Command:4C (Talk) addr:4 reg:0 Data[8]:  BC 1A 19 00 12 C0 02 09
 ```
+# ADB Mouse initialization
+```
+ADB Command:3F (Talk) addr:3 reg:3 Data[2]:  B3 80
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]:  87 FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]:  81 FF
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]:  87 FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]:  81 FF
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]:  87 FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]:  81 FF
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]:  87 FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]:  81 FF
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]:  87 FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]:  81 FF
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]:  87 FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]:  81 FF
+ADB Command:3B (Listen) addr:3 reg:3 Data[2]:  87 FF
+ADB Command:FB (Listen) addr:F reg:3 Data[2]:  81 FF
+```
