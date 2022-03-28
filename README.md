@@ -34,3 +34,5 @@ Note: The [BMOW "Wombat"](https://www.bigmessowires.com/usb-wombat/) is an AWESO
 [Apple ADB Manager Documenation](https://developer.apple.com/library/archive/documentation/mac/pdf/Devices/ADB_Manager.pdf)
 
 https://www.mouser.com/ProductDetail/TE-Connectivity/5749181-1?qs=XlZqES4cpWbRcAMR%2FcJqkQ%3D%3D
+
+[MiSTER adb hardware emulation](https://github.com/mist-devel/plus_too/blob/master/adb.v)
