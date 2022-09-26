@@ -1,0 +1,11 @@
+{
+    "name": "Simple-Circular-Queue",
+    "version": "1.0.0",
+    "description": "A circular queue for the RP2040 SDK",
+    "keywords": "queue circular rp2040 pico",
+    "build": {
+        "includeDir": "src"
+    },
+    "frameworks": "*",
+    "platforms": "*"
+  }

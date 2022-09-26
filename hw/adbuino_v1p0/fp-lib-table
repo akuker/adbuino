@@ -1,4 +1,0 @@
-(fp_lib_table
-  (lib (name SamacSys_Parts)(type KiCad)(uri ${KIPRJMOD}/SamacSys_Parts.pretty)(options "")(descr ""))
-  (lib (name adbuino_v0p9p1)(type KiCad)(uri ${KIPRJMOD})(options "")(descr ""))
-)
