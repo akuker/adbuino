@@ -1,3 +1,0 @@
-(sym_lib_table
-  (lib (name ARDUINO_PRO_MINI)(type Legacy)(uri ${KIPRJMOD}/ARDUINO_PRO_MINI.lib)(options "")(descr ""))
-)
