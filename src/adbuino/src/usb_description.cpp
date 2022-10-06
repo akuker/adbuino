@@ -1,16 +1,25 @@
-// Functions for printing out USB device information
-// Based upon the USB_Desc Arduino example sketch, which is
-// part of the USB Host Shield 2.0 library:
+//---------------------------------------------------------------------------
 //
-// Revision 2.0 of MAX3421E-based USB Host Shield Library.
-// Supports HID devices, FTDI, ADK, ACM, PL2303, Bluetooth HID 
-// devices, SPP communication and mass storage devices. 
-// Furthermore it supports PS3, PS4, PS5, PS Buzz, Wii, Switch 
-// Pro and Xbox controllers.
+//	ADBuino ADB keyboard and mouse adapter
 //
-// Author: Oleg Mazurov (Circuits@Home)
+//	   Copyright (C) 2021-2022 akuker
 //
-// Maintainer: Oleg Mazurov (Circuits@Home)  
+//  This file is part of ADBuino.
+//
+//  ADBuino is free software: you can redistribute it and/or modify it under 
+//  the terms of the GNU General Public License as published by the Free 
+//  Software Foundation, either version 3 of the License, or (at your option) 
+// any later version.
+//
+//  ADBuino is distributed in the hope that it will be useful, but WITHOUT ANY 
+//  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+//  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+//  details.
+//
+//  You should have received a copy of the GNU General Public License along 
+//  with ADBuino. If not, see <https://www.gnu.org/licenses/>.
+//---------------------------------------------------------------------------
+
 
 
 #include "usb_description.h"
