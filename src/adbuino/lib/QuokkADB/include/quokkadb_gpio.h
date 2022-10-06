@@ -30,6 +30,8 @@
 #include "stdlib.h"
 #include "hardware/structs/sio.h"
 #include "hardware/gpio.h"
+#include "hardware/uart.h"
+
 
 // Status LED GPIOs
 #define LED_GPIO     12
@@ -42,10 +44,12 @@
 #define ADB_OUT_GPIO  18
 #define ADB_OUT_HIGH() sio_hw->gpio_set = 1 << ADB_OUT_GPIO
 #define ADB_OUT_LOW()  sio_hw->gpio_clr = 1 << ADB_OUT_GPIO
-
-
 #define ADB_IN_GET() (gpio_get(ADB_IN_GPIO))
 
+// UART out messaging
+#define UART_TX_GPIO    16
+#define UART_TX_BAUD    115200
+#define UART_PORT       uart0
 
 void adb_gpio_init(void);
 void led_gpio_init(void);

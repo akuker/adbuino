@@ -26,8 +26,8 @@
 
 
 #include "quokkadb_gpio.h"
-#include "hardware/gpio.h"
-#include "pico/stdlib.h" 
+//#include "pico/stdlib.h" 
+
 void adb_gpio_init(void) {
     gpio_init(ADB_OUT_GPIO);
     gpio_set_function(ADB_OUT_GPIO, GPIO_FUNC_SIO);
@@ -44,6 +44,15 @@ void led_gpio_init(void) {
     gpio_set_dir(LED_GPIO, GPIO_OUT);
     LED_OFF();
 }
+
+void uart_gpio_init(void) {
+    gpio_set_function(UART_TX_GPIO, GPIO_FUNC_UART);
+    uart_init(UART_PORT, UART_TX_BAUD);
+
+}
+    
+
+
 // Blink the led n times
 void led_blink(uint8_t times) {
     for (uint8_t i = 0; i < times; i++) {
