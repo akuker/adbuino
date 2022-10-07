@@ -4,6 +4,10 @@ This is a fork of Difegue's version of the [adbuino](https://github.com/Difegue/
 
 ![ADBuino picture](images/adbuino_0p9.png)
 
+# QuokkADB
+
+QuokkADB is a modified version of [adbuino](https://github.com/akuker/adbuino). It is targeted to the Rabbit Hole Computing's QuokkADB device. QuokkADB is a Raspberry Pi RP2040 based device that takes in USB inputs from a keyboard and/or mouse and outputs Apple's ADB (Apple Desktop Bus).  
+
 # Hack-y Alternative
 The USB ADBuino is essentially a "value-engineered" version of a bunch of off-the-shelf components. 
 
@@ -12,17 +16,24 @@ The USB ADBuino is essentially a "value-engineered" version of a bunch of off-th
 
 <img src="images/hacky_adbuino.png" width="600"/>
 
+# How to build and flash an adbuino
+
+Note: This software is intended to be compiled in an Ubuntu Linux environment.
+
+Any dependencies that are configured in the PlatformIO project (such as TinyUSB) will automatically be downloaded. Make sure you are connected to the Internet the first time you build this software.
+
+- Install [Visual Studio Code](https://code.visualstudio.com/)
+- Install [Platform IO](https://platformio.org/install)
+- Open Visual studio Code and open the directory ./src/adbuino
+- Select the PlatformIO icon on the left
+- Execute the `Build` project task
+- Execute the `Upload` project task to flash your device
+
 # What's this repo for?
 
-The intent of this repository is to add "USB Host" support to the design. This will allow a USB keyboard and/or mouse to be used to drive an ADB host, as well as PS/2. 
+The intent of this repository is to add "USB Host" support to the original ADB design. This will allow a USB keyboard and/or mouse to be used to drive an ADB host, as well as PS/2. 
 
-The long term goal is to add "absolute" positioning capability to allow this to integrate better with the [pikvm](https://github.com/pikvm/pikvm) project for controlling vintage Macintosh computers. Currently, the [BMOW "Wombat"](https://www.bigmessowires.com/usb-wombat/) works to connect a Mac to a PiKVM. However, the Wombat only supports relative cursor positioning. This makes the user experience less than desireable. 
-
-> ![Wombat discussion](images/wombat_discussion.png)
-
-I'm a stubborn SOB, so I'm hoping to prove him wrong. :) Since Wombat is closed source, I'm starting off with Difegue's / BBraun's project as a starting point.
-
-Note: The [BMOW "Wombat"](https://www.bigmessowires.com/usb-wombat/) is an AWESOME project. It works fantastic for everything except interfacing with a PiKVM. I highly recommend picking one up!
+The [BMOW "Wombat"](https://www.bigmessowires.com/usb-wombat/) is a closed-source alternative to adbuino. The [BMOW "Wombat"](https://www.bigmessowires.com/usb-wombat/) is an AWESOME project, but doesn't allow external contributors. 
 
 # References
 ![ADB Pinout](images/adb_pinout.png)

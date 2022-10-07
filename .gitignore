@@ -23,3 +23,7 @@ fp-info-cache
 # Exported BOM files
 *.xml
 *.csv
+
+# Auto-generated directories by VS Code
+.vscode
+.pio
