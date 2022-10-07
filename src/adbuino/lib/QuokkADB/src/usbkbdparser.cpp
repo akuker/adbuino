@@ -22,8 +22,6 @@
 //
 //----------------------------------------------------------------------------
 
-
-
 #include "usbkbdparser.h"
 #include "bithacks.h"
 #include "adbregisters.h"
@@ -282,3 +280,4 @@ void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
         B_SET(m_custom_mod_keys, DeleteFlag);
     }
 }
+

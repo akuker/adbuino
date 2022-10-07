@@ -29,6 +29,7 @@
 #include "adbregisters.h"
 #include "usbkbdparser.h"
 #include "usb_hid_keys.h"
+#include "hidinputclasses.h"
 #include "usbmouseparser.h"
 
 #define kModCmd 1
@@ -104,7 +105,7 @@ static inline bool find_key_in_report(hid_keyboard_report_t const *report, uint8
 
   return false;
 }
-
+/*
 static void process_modifier_key(hid_keyboard_modifier_bm_t mod_key, hid_keyboard_report_t const *report, 
                                   const uint8_t hid_key, bool* key_up, const uint8_t adb_flag, uint16_t* modifiers ) {
   if (mod_key & report->modifier) {
@@ -121,9 +122,11 @@ static void process_modifier_key(hid_keyboard_modifier_bm_t mod_key, hid_keyboar
     }
   }
 }
-
+*/
 static void process_kbd_report(uint8_t dev_addr, hid_keyboard_report_t const *report)
 {
+  KeyboardPrs.Parse(dev_addr, report);
+  /*
   (void) dev_addr;
   static hid_keyboard_report_t prev_report = { 0, 0, {0} }; // previous report to check key released
   bool flush = false;
@@ -219,42 +222,15 @@ static void process_kbd_report(uint8_t dev_addr, hid_keyboard_report_t const *re
 
   modifierkeys = ~adb_modifiers;
   prev_report = *report;
+  */
 }
 
 static void process_mouse_report(uint8_t dev_addr, hid_mouse_report_t const * report)
 {
-  static bool last_left_button_down_status = false;
-  static bool last_right_button_down_status = false;
-  MOUSEINFO mouse_info;
+    MousePrs.Parse(report);
+/*
 
-  mouse_info.bmLeftButton = !!(report->buttons & MOUSE_BUTTON_LEFT);
-  mouse_info.bmRightButton = !!(report->buttons & MOUSE_BUTTON_RIGHT);
-  mouse_info.dX = report->x;
-  mouse_info.dY = report->y;
-
-  MousePrs.OnMouseMove(&mouse_info);
-
-  // change to mouse left button down
-  if (!last_left_button_down_status && mouse_info.bmLeftButton) {
-    last_left_button_down_status = true;
-    MousePrs.OnLeftButtonDown(&mouse_info);
-  }
-
-  // change to mouse left button up
-  if (last_left_button_down_status && !mouse_info.bmLeftButton) {
-    last_left_button_down_status = false;
-    MousePrs.OnLeftButtonUp(&mouse_info);
-  }
-
-  if (!last_right_button_down_status && mouse_info.bmRightButton) {
-    last_right_button_down_status = true;
-    MousePrs.OnRightButtonDown(&mouse_info);
-  }
-
-  if (last_right_button_down_status && !mouse_info.bmRightButton) {
-    last_right_button_down_status = false;
-    MousePrs.OnRightButtonUp(&mouse_info);
-  }
+*/
 }
 
 // Invoked when received report from device via interrupt endpoint

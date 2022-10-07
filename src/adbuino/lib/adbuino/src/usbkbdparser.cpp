@@ -20,7 +20,7 @@
 //  with ADBuino. If not, see <https://www.gnu.org/licenses/>.
 //---------------------------------------------------------------------------
 
-#include "usbinterface.h"
+#include "usbkbdparser.h"
 #include "bithacks.h"
 #include "adbregisters.h"
 #include "usb_hid_keys.h"

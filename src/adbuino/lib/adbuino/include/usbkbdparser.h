@@ -1,48 +1,7 @@
-//----------------------------------------------------------------------------
-//
-//  QuokkADB ADB keyboard and mouse adapter
-//	   Copyright (C) 2021-2022 akuker
-//     Copyright (C) 2007 Peter H Anderson
-//     Copyright (C) 2022 Rabbit Hole Computing LLC
-//
-//  This file is part of QuokkADB.
-//
-//  This file is free software: you can redistribute it and/or modify it under 
-//  the terms of the GNU General Public License as published by the Free 
-//  Software Foundation, either version 3 of the License, or (at your option) 
-// any later version.
-//
-//  This file is distributed in the hope that it will be useful, but WITHOUT ANY 
-//  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
-//  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
-//  details.
-//
-//  You should have received a copy of the GNU General Public License along 
-//  with this file. If not, see <https://www.gnu.org/licenses/>.
-//----------------------------------------------------------------------------
-
-#pragma once
-
-#include "hidinputclasses.h"
-#include "scqueue.h"
-
-using simple_circular_queue::SCQueue;
-
-#define KEYBOARD_QUEUE_CAPACITY (20)
+#include <hidboot.h>
+#include <ArduinoQueue.h>
 
 extern uint8_t usb_keycode_to_adb_code(uint8_t usb_code);
-
-
-struct MODIFIERKEYS {
-        uint8_t bmLeftCtrl : 1;
-        uint8_t bmLeftShift : 1;
-        uint8_t bmLeftAlt : 1;
-        uint8_t bmLeftGUI : 1;
-        uint8_t bmRightCtrl : 1;
-        uint8_t bmRightShift : 1;
-        uint8_t bmRightAlt : 1;
-        uint8_t bmRightGUI : 1;
-};
 
 class KeyEvent
 {
@@ -81,6 +40,7 @@ protected:
 
     void OnKeyDown(uint8_t mod, uint8_t key);
     void OnKeyUp(uint8_t mod, uint8_t key);
+    void OnKeyPressed(uint8_t key);
     
     uint8_t m_last_key_pressed;
     uint8_t m_last_key_up_or_down;
@@ -105,6 +65,6 @@ protected:
     static const int Led2CapsLockFlag = 6;
     static const int Led1NumLockFlag = 7;
 
-    SCQueue<KeyEvent*, KEYBOARD_QUEUE_CAPACITY> m_keyboard_events;
+    ArduinoQueue<KeyEvent*> *m_keyboard_events;
 
 };

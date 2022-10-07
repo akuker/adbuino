@@ -63,7 +63,10 @@ uint8_t mousesrq = 0;
 uint16_t modifierkeys = 0xFFFF;
 uint32_t kbskiptimer = 0;
 
+bool global_debug = false;
+
 AdbInterface adb;
+
 KbdRptParser KeyboardPrs;
 MouseRptParser MousePrs;
 

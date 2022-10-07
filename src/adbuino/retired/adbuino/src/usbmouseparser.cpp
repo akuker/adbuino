@@ -1,27 +1,24 @@
 //---------------------------------------------------------------------------
 //
-//	QuokkaADB ADB keyboard and mouse adapter
+//	ADBuino ADB keyboard and mouse adapter
 //
 //	   Copyright (C) 2021-2022 akuker
-//     Copyright (C) 2022 Rabbit Hole Computing LLC
 //
-//  This file is part of QuokkaADB.
+//  This file is part of ADBuino.
 //
-//  This file is free software: you can redistribute it and/or modify it under 
+//  ADBuino is free software: you can redistribute it and/or modify it under 
 //  the terms of the GNU General Public License as published by the Free 
 //  Software Foundation, either version 3 of the License, or (at your option) 
-//  any later version.
+// any later version.
 //
-//  This file is distributed in the hope that it will be useful, but WITHOUT ANY 
+//  ADBuino is distributed in the hope that it will be useful, but WITHOUT ANY 
 //  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
 //  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
 //  details.
 //
 //  You should have received a copy of the GNU General Public License along 
-//  with file. If not, see <https://www.gnu.org/licenses/>.
-//
-//----------------------------------------------------------------------------
-
+//  with ADBuino. If not, see <https://www.gnu.org/licenses/>.
+//---------------------------------------------------------------------------
 
 #include "usbmouseparser.h"
 
@@ -47,7 +44,7 @@ void MouseRptParser::ResetMouseMovement()
 }
 bool MouseRptParser::MouseButtonIsPressed()
 {
-    return m_mouse_left_button_is_pressed || m_mouse_right_button_is_pressed;
+    return m_mouse_button_is_pressed;
 }
 
 uint32_t MouseRptParser::EightBitToSevenBitSigned(int8_t value)
@@ -62,17 +59,11 @@ uint32_t MouseRptParser::EightBitToSevenBitSigned(int8_t value)
 uint16_t MouseRptParser::GetAdbRegister0()
 {
     uint16_t reg_value = 0;
-    // Bit 15 = Left Button Status; 0=down
-    if (!m_mouse_left_button_is_pressed)
+    // Bit 15 = Button Status; 0=down
+    if (!MouseButtonIsPressed())
     {
         reg_value |= (1 << 15);
     }
-
-    if (!m_mouse_right_button_is_pressed)
-    {
-        reg_value |= (1 << 7);
-    }
-    
     // Bit 7 = Not used. Always 1
     reg_value |= (1 << 7);
     // Bits 14-8 = Y move Counts (Two's compliment. Negative = up, positive = down)
@@ -88,28 +79,59 @@ uint16_t MouseRptParser::GetAdbRegister0()
 
 void MouseRptParser::OnMouseMove(MOUSEINFO *mi)
 {
+    if (global_debug)
+    {
+        Serial.print("dx=");
+        Serial.print(mi->dX, DEC);
+        Serial.print(" dy=");
+        Serial.println(mi->dY, DEC);
+    }
     m_movedy = mi->dY;
     m_movedx = mi->dX;
 };
 void MouseRptParser::OnLeftButtonUp(MOUSEINFO *mi)
 {
-    m_mouse_left_button_is_pressed = false;
+    if (global_debug)
+    {
+        Serial.println("L Butt Up");
+    }
+    m_mouse_button_is_pressed = false;
     m_mouse_button_changed = true;
 };
 void MouseRptParser::OnLeftButtonDown(MOUSEINFO *mi)
 {
-    m_mouse_left_button_is_pressed = true;
+    if (global_debug)
+    {
+        Serial.println("L Butt Dn");
+    }
+    m_mouse_button_is_pressed = true;
     m_mouse_button_changed = true;
 };
 void MouseRptParser::OnRightButtonUp(MOUSEINFO *mi)
 {
+    if (global_debug)
+    {
+        Serial.println("R Butt Up");
+    }
 };
 void MouseRptParser::OnRightButtonDown(MOUSEINFO *mi)
 {
+    if (global_debug)
+    {
+        Serial.println("R Butt Dn");
+    }
 };
 void MouseRptParser::OnMiddleButtonUp(MOUSEINFO *mi)
 {
+    if (global_debug)
+    {
+        Serial.println("M Butt Up");
+    }
 };
 void MouseRptParser::OnMiddleButtonDown(MOUSEINFO *mi)
 {
+    if (global_debug)
+    {
+        Serial.println("M Butt Dn");
+    }
 };
