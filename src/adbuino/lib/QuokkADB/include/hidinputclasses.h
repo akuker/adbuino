@@ -58,7 +58,6 @@ class MouseReportParser {
         } prevState;
 
 public:
-        //void Parse(hid_mouse_report_t const * report);
         void Parse(const hid_mouse_report_t* report);
 protected:
 
@@ -97,6 +96,7 @@ protected:
 #define UHS_HID_BOOT_KEY_PERIOD         0x63
 
 
+
 struct KBDINFO {
 
         struct {
@@ -122,7 +122,19 @@ struct KBDLEDS {
         uint8_t bmReserved : 3;
 };
 
+struct MODIFIERKEYS {
+        uint8_t bmLeftCtrl : 1;
+        uint8_t bmLeftShift : 1;
+        uint8_t bmLeftAlt : 1;
+        uint8_t bmLeftGUI : 1;
+        uint8_t bmRightCtrl : 1;
+        uint8_t bmRightShift : 1;
+        uint8_t bmRightAlt : 1;
+        uint8_t bmRightGUI : 1;
+};
+
 class KeyboardReportParser {
+        
         static const uint8_t numKeys[10];
         static const uint8_t symKeysUp[12];
         static const uint8_t symKeysLo[12];
@@ -148,11 +160,11 @@ public:
                 kbdLockingKeys.bLeds = 0;
         };
 
-        void Parse(uint8_t dev_addr, hid_keyboard_report_t const *report);
+        void Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_report_t const *report);
 
 protected:
 
-        virtual uint8_t HandleLockingKeys(uint8_t dev_addr, uint8_t key) {
+        virtual uint8_t HandleLockingKeys(uint8_t dev_addr, uint8_t instance, uint8_t key) {
                 uint8_t old_keys = kbdLockingKeys.bLeds;
 
                 switch(key) {
@@ -167,8 +179,9 @@ protected:
                                 break;
                 }
 
-                if(old_keys != kbdLockingKeys.bLeds /* && hid */) {
+                if(old_keys != kbdLockingKeys.bLeds ) {
                         uint8_t lockLeds = kbdLockingKeys.bLeds;
+
                         // return (hid->SetReport(0, 0/*hid->GetIface()*/, 2, 0, 1, &lockLeds));
                         return 1;
                 }

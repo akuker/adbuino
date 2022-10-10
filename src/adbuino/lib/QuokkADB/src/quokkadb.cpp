@@ -60,7 +60,7 @@ uint16_t mousereg0 = 0;
 uint16_t kbdreg0 = 0;
 uint8_t kbdsrq = 0;
 uint8_t mousesrq = 0;
-uint16_t modifierkeys = 0xFFFF;
+uint8_t modifierkeys = 0xFF;
 uint32_t kbskiptimer = 0;
 
 bool global_debug = false;

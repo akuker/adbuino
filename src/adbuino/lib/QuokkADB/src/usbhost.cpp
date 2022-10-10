@@ -123,9 +123,9 @@ static void process_modifier_key(hid_keyboard_modifier_bm_t mod_key, hid_keyboar
   }
 }
 */
-static void process_kbd_report(uint8_t dev_addr, hid_keyboard_report_t const *report)
+static void process_kbd_report(uint8_t dev_addr, uint8_t instance, hid_keyboard_report_t const *report)
 {
-  KeyboardPrs.Parse(dev_addr, report);
+  KeyboardPrs.Parse(dev_addr, instance, report);
   /*
   (void) dev_addr;
   static hid_keyboard_report_t prev_report = { 0, 0, {0} }; // previous report to check key released
@@ -243,7 +243,7 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
   switch(itf_protocol)
   {
     case HID_ITF_PROTOCOL_KEYBOARD:
-      process_kbd_report(dev_addr, (hid_keyboard_report_t const*) report );  
+      process_kbd_report(dev_addr, instance, (hid_keyboard_report_t const*) report );  
       // set LEDs on the keyboard
       tu_leds = 0;
       if (capslock_status)   tu_leds |= KEYBOARD_LED_CAPSLOCK;

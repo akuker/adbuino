@@ -20,12 +20,13 @@
 //  with ADBuino. If not, see <https://www.gnu.org/licenses/>.
 //----------------------------------------------------------------------------
 
+#pragma once
+
 #include "Arduino.h"
 
 // Example code from: https://platformio.org/lib/show/59/USB-Host-Shield-20
 #include <hidboot.h>
 #include <usbhub.h>
-#include <ArduinoQueue.h>
 #include "usbmouseparser.h"
 #include "usbkbdparser.h"
 
