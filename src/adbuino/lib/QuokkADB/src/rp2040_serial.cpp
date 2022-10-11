@@ -14,13 +14,13 @@ namespace rp2040_serial {
         switch (type)
         {
         case DEC :
-            return printf_("%d", number);
+            return printf("%d", number);
 //        case BIN :
-//            return printf_("%b", number);
+//            return printf("%b", number);
         case OCT :
-            return printf_("%o", number);
+            return printf("%o", number);
         case HEX :
-            return printf_("%X", number);
+            return printf("%X", number);
         default:
             return 0;
             break;
@@ -28,7 +28,7 @@ namespace rp2040_serial {
     }
     
     size_t RPSerial::print(const char* string) {
-        return printf_("%s", string);
+        return printf("%s", string);
 
     }
     
@@ -40,20 +40,20 @@ namespace rp2040_serial {
         switch (type)
         {
         case DEC :
-            return printf_("%d/n", number);
+            return printf("%d/n", number);
 //        case BIN :
-//            return printf_("%b/n", number);
+//            return printf("%b/n", number);
         case OCT :
-            return printf_("%o/n", number);
+            return printf("%o/n", number);
         case HEX :
-            return printf_("%X/n", number);
+            return printf("%X/n", number);
         default:
             return 0;
         }
     }
     
     size_t RPSerial::println(const char* string) {
-        return printf_("%s\n", string);
+        return printf("%s\n", string);
 
     }
 }

@@ -26,9 +26,6 @@ void KeyboardReportParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboar
         memcpy(cur_kbd_info->Keys, report->keycode, 6);
         cur_kbd_info->bReserved =  report->reserved;
         
-
-        // @TODO - test if this actually works as intended ctrl keys are bytes 0-7
-        //   this seems to test byte 0, which is Left Ctrl 
         // provide event for changed control key state
         if (prevState.bInfo[0x00] != current_state.bInfo[0x00]) {
                 OnControlKeysChanged(prevState.bInfo[0x00], current_state.bInfo[0x00]);
@@ -45,13 +42,12 @@ void KeyboardReportParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboar
                                 up = true;
                 }
                 if (!down) {
-                        HandleLockingKeys(dev_addr, instance, current_state.bInfo[i]);
-                        // @TODO, again. It looks like the mods key in KBDINFO
-                        //  collapse into a single uint8.     
-                        OnKeyDown(current_state.bInfo[0], prevState.bInfo[i]);
+                        HandleLockingKeys(dev_addr, instance, current_state.bInfo[i]);  
+                        OnKeyDown(current_state.bInfo[0], current_state.bInfo[i]);
                 }
-                if (!up)
+                if (!up) {
                         OnKeyUp(prevState.bInfo[0], prevState.bInfo[i]);
+                }
         }
         for (uint8_t i = 0; i < 8; i++)
                 prevState.bInfo[i] = current_state.bInfo[i];

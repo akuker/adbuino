@@ -30,15 +30,14 @@
 //----------------------------------------------------------------------------
 
 #include "adb.h"
-#include <stdio.h>
 #include "bithacks.h"
 
-
-#ifdef QUOKKADB
-#include <string.h>
-#include <stdlib.h>
+#ifdef ADBUINO
+#include <stdio.h>
+#elif QUOKKADB
 #include <time.h>
 #include "rp2040_serial.h"
+#include "printf/printf.h"
 using rp2040_serial::Serial;
 #endif
 

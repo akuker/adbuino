@@ -32,20 +32,15 @@
 //  See LICENSE in the root of this repository for more info.
 //----------------------------------------------------------------------------
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+//#include <stdlib.h>
 
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
 #include "pico/bootrom.h"
-#include "pico/mutex.h"
-
 
 #include "tusb.h"
-
+#include "printf/printf.h"
 #include "adb.h"
-
 #include "quokkadb_gpio.h"
 #include "usbkbdparser.h"
 #include "usbmouseparser.h"
@@ -86,6 +81,8 @@ void core1_main() {
 // core0: handle device events
 int quokkadb(void) {
   set_sys_clock_khz(125000, true);
+
+  uart_gpio_init();
   adb_gpio_init();
   led_gpio_init();
   sleep_ms(10);

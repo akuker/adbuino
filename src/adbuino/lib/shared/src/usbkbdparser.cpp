@@ -38,8 +38,8 @@ KbdRptParser::KbdRptParser()
 {
     if (global_debug)
     {
-
-        Serial.println("Running KbdRptParser::KbdRptParser()");
+        // Disabled println - prints before uart is setup for QuokkADB
+        // Serial.println("Running KbdRptParser::KbdRptParser()");
     }
 }
 
@@ -217,14 +217,6 @@ void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
         if (B_IS_SET(m_custom_mod_keys, Led3ScrollLockFlag))
         {
             B_TOGGLE(m_custom_mod_keys, Led3ScrollLockFlag);
-        }
-    }
-    if (key == USB_KEY_CAPSLOCK)
-    {
-        B_UNSET(m_custom_mod_keys, CapsLockFlag);
-        if (B_IS_SET(m_custom_mod_keys, Led2CapsLockFlag))
-        {
-            B_UNSET(m_custom_mod_keys, Led2CapsLockFlag);
         }
     }
     if (key == USB_KEY_NUMLOCK)

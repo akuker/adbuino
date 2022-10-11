@@ -46,8 +46,9 @@ void led_gpio_init(void) {
 }
 
 void uart_gpio_init(void) {
-    gpio_set_function(UART_TX_GPIO, GPIO_FUNC_UART);
+
     uart_init(UART_PORT, UART_TX_BAUD);
+    gpio_set_function(UART_TX_GPIO, GPIO_FUNC_UART);
 
 }
     

@@ -69,6 +69,7 @@ static bool shift_right_keyup = true;
 // therefore report_desc = NULL, desc_len = 0
 void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_report, uint16_t desc_len)
 {
+  led_blink(3);
   (void)desc_report;
   (void)desc_len;
 
@@ -245,11 +246,11 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
     case HID_ITF_PROTOCOL_KEYBOARD:
       process_kbd_report(dev_addr, instance, (hid_keyboard_report_t const*) report );  
       // set LEDs on the keyboard
-      tu_leds = 0;
-      if (capslock_status)   tu_leds |= KEYBOARD_LED_CAPSLOCK;
-      if (numlock_status)    tu_leds |= KEYBOARD_LED_NUMLOCK;
-      if (scrolllock_status) tu_leds |= KEYBOARD_LED_SCROLLLOCK;
-      tuh_hid_set_report(dev_addr, instance,  0 , HID_REPORT_TYPE_OUTPUT, &tu_leds, sizeof(tu_leds));
+      // tu_leds = 0;
+      // if (capslock_status)   tu_leds |= KEYBOARD_LED_CAPSLOCK;
+      // if (numlock_status)    tu_leds |= KEYBOARD_LED_NUMLOCK;
+      // if (scrolllock_status) tu_leds |= KEYBOARD_LED_SCROLLLOCK;
+      // tuh_hid_set_report(dev_addr, instance,  0 , HID_REPORT_TYPE_OUTPUT, &tu_leds, sizeof(tu_leds));
     
     break;
 
