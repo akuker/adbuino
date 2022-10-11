@@ -180,10 +180,8 @@ protected:
                 }
 
                 if(old_keys != kbdLockingKeys.bLeds ) {
-                        uint8_t lockLeds = kbdLockingKeys.bLeds;
-
-                        // return (hid->SetReport(0, 0/*hid->GetIface()*/, 2, 0, 1, &lockLeds));
-                        return 1;
+                        return tuh_hid_set_report(dev_addr, instance,  0 , HID_REPORT_TYPE_OUTPUT, &(kbdLockingKeys.bLeds), sizeof(kbdLockingKeys.bLeds));
+                        
                 }
 
                 return 0;

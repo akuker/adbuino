@@ -8,11 +8,12 @@ uint8_t inline findModifierKey(hid_keyboard_report_t const *report, const hid_ke
 }
 
 void KeyboardReportParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_report_t const *report) {
+        static bool caps_on = false;
         union {
                 KBDINFO kbdInfo;
                 uint8_t bInfo[sizeof (KBDINFO)];
         } current_state;
-
+        
         KBDINFO *cur_kbd_info  = &(current_state.kbdInfo); 
 
         cur_kbd_info->bmLeftCtrl =   findModifierKey(report, KEYBOARD_MODIFIER_LEFTCTRL);
@@ -42,11 +43,25 @@ void KeyboardReportParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboar
                                 up = true;
                 }
                 if (!down) {
-                        HandleLockingKeys(dev_addr, instance, current_state.bInfo[i]);  
-                        OnKeyDown(current_state.bInfo[0], current_state.bInfo[i]);
+                        HandleLockingKeys(dev_addr, instance, current_state.bInfo[i]); 
+                        // This if statement is handling locking/unlocking the caps lock key
+                        if (current_state.bInfo[i] == UHS_HID_BOOT_KEY_CAPS_LOCK ) {
+                                if (kbdLockingKeys.kbdLeds.bmCapsLock == 1) {
+                                        OnKeyDown(current_state.bInfo[0], current_state.bInfo[i]);
+                                }
+                                else {
+                                        OnKeyUp(current_state.bInfo[0], current_state.bInfo[i]);
+                                }
+                        }
+                        else {
+                                OnKeyDown(current_state.bInfo[0], current_state.bInfo[i]);
+                        }
                 }
                 if (!up) {
-                        OnKeyUp(prevState.bInfo[0], prevState.bInfo[i]);
+                        // Ignore key up on caps lock
+                        if (prevState.bInfo[i] != UHS_HID_BOOT_KEY_CAPS_LOCK) {
+                                OnKeyUp(current_state.bInfo[0], prevState.bInfo[i]);
+                        }
                 }
         }
         for (uint8_t i = 0; i < 8; i++)
