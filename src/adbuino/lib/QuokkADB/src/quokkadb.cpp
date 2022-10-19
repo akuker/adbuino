@@ -93,7 +93,7 @@ int quokkadb(void) {
 
   adb.Init();
 
-  led_blink(2);
+  led_blink(1);
 
 /*------------ Core0 main loop ------------*/
   while (true) {

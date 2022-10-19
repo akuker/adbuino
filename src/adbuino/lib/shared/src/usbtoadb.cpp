@@ -240,21 +240,19 @@ uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
     case USB_KEY_F1:
         return 0x7A;
 
+    case USB_KEY_RIGHTCTRL:
     case USB_KEY_LEFTCTRL:
         return 0x36;
+    case USB_KEY_RIGHTSHIFT:
     case USB_KEY_LEFTSHIFT:
         return 0x38;
+    case USB_KEY_RIGHTALT:
     case USB_KEY_LEFTALT:
         return 0x3A;
     case USB_KEY_RIGHTMETA: // fall through to LEFTMETA
     case USB_KEY_LEFTMETA:
         return 0x37;
-    case USB_KEY_RIGHTCTRL:
-        return 0x7D;
-    case USB_KEY_RIGHTSHIFT:
-        return 0x7B;
-    case USB_KEY_RIGHTALT:
-        return 0x7C;
+
 
     default:
         Serial.print("Unknown keycode found: ");
@@ -266,5 +264,9 @@ uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
         // 0x39        USB_KEY_CAPSLOCK
         // 0x3A        USB_KEY_Option
         // 0x3B        USB_KEY_Control
+        // 0x7D        Extended Keyboard Right Control
+        // 0x7B        Extended Keyboard Right Shift
+        // 0x7C        Extended Keyboard Right Option
+
     }
 }

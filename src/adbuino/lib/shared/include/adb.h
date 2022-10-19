@@ -30,7 +30,7 @@
 #include <adb_platform.h>
 
 #ifndef ADB_START_BIT_DELAY
-#define ADB_START_BIT_DELAY 10000
+#define ADB_START_BIT_DELAY 100000
 #endif
 
 class AdbInterface : public AdbInterfacePlatform {

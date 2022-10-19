@@ -40,13 +40,13 @@ namespace rp2040_serial {
         switch (type)
         {
         case DEC :
-            return printf("%d/n", number);
+            return printf("%d\n", number);
 //        case BIN :
-//            return printf("%b/n", number);
+//            return printf("%b\n", number);
         case OCT :
-            return printf("%o/n", number);
+            return printf("%o\n", number);
         case HEX :
-            return printf("%X/n", number);
+            return printf("%X\n", number);
         default:
             return 0;
         }
