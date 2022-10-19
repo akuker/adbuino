@@ -20,7 +20,8 @@
 //  with ADBuino. If not, see <https://www.gnu.org/licenses/>.
 //---------------------------------------------------------------------------
 
-#include "usbinterface.h"
+#include "usbmouseparser.h"
+
 extern bool global_debug;
 
 bool MouseRptParser::MouseChanged()

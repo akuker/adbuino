@@ -1,46 +1,41 @@
 //---------------------------------------------------------------------------
 //
-//	ADBuino ADB keyboard and mouse adapter
+//	QuokkaADB ADB keyboard and mouse adapter
 //
 //	   Copyright (C) 2021-2022 akuker
+//     Copyright (C) 2022 Rabbit Hole Computing LLC
 //
-//  This file is part of ADBuino.
+//  This file is part of QuokkaADB.
 //
-//  ADBuino is free software: you can redistribute it and/or modify it under 
+//  This file is free software: you can redistribute it and/or modify it under 
 //  the terms of the GNU General Public License as published by the Free 
 //  Software Foundation, either version 3 of the License, or (at your option) 
-// any later version.
+//  any later version.
 //
-//  ADBuino is distributed in the hope that it will be useful, but WITHOUT ANY 
+//  This file is distributed in the hope that it will be useful, but WITHOUT ANY 
 //  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
 //  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
 //  details.
 //
 //  You should have received a copy of the GNU General Public License along 
-//  with ADBuino. If not, see <https://www.gnu.org/licenses/>.
-//---------------------------------------------------------------------------
+//  with file. If not, see <https://www.gnu.org/licenses/>.
+//
+//----------------------------------------------------------------------------
 
-#include "usbinterface.h"
+#include "usbkbdparser.h"
 #include "bithacks.h"
 #include "adbregisters.h"
 #include "usb_hid_keys.h"
-#include "ArduinoQueue.h"
-
-extern bool global_debug;
+#include "tusb.h"
 
 KbdRptParser::KbdRptParser()
 {
-    if (global_debug)
-    {
-
-        Serial.println("Running KbdRptParser::KbdRptParser()");
-    }
-    m_keyboard_events = new ArduinoQueue<KeyEvent *>(20);
+    // maybe init something later
 }
 
 bool KbdRptParser::PendingKeyboardEvent()
 {
-    return !m_keyboard_events->isEmpty();
+    return !m_keyboard_events.isEmpty();
 }
 
 uint16_t KbdRptParser::GetAdbRegister0()
@@ -50,9 +45,9 @@ uint16_t KbdRptParser::GetAdbRegister0()
     uint8_t adb_keycode = 0;
 
     // Pack the first key event
-    if (!m_keyboard_events->isEmpty())
+    if (!m_keyboard_events.isEmpty())
     {
-        event = m_keyboard_events->dequeue();
+        event = m_keyboard_events.dequeue();
         if (event->IsKeyUp())
         {
             B_SET(kbdreg0, ADB_REG_0_KEY_1_STATUS_BIT);
@@ -67,9 +62,9 @@ uint16_t KbdRptParser::GetAdbRegister0()
     }
 
     // Pack the second key event
-    if (!m_keyboard_events->isEmpty())
+    if (!m_keyboard_events.isEmpty())
     {
-        event = m_keyboard_events->dequeue();
+        event = m_keyboard_events.dequeue();
         if (event->IsKeyUp())
         {
             B_SET(kbdreg0, ADB_REG_0_KEY_2_STATUS_BIT);
@@ -81,12 +76,6 @@ uint16_t KbdRptParser::GetAdbRegister0()
     else
     {
         kbdreg0 |= (ADB_REG_0_NO_KEY << ADB_REG_0_KEY_2_KEY_CODE);
-    }
-    if (global_debug)
-    {
-
-        Serial.print("Keyboard Register 0 = ");
-        Serial.println(kbdreg0, HEX);
     }
     return kbdreg0;
 }
@@ -155,50 +144,15 @@ uint16_t KbdRptParser::GetAdbRegister2()
     {
         B_UNSET(kbdreg2, ADB_REG_2_FLAG_NUM_LOCK_LED);
     }
-    if (global_debug)
-    {
-        Serial.print("Kbdreg2 is ");
-        Serial.println(kbdreg2, HEX);
-    }
     return kbdreg2;
 }
 
-void KbdRptParser::PrintKey(uint8_t m, uint8_t key)
-{
-    MODIFIERKEYS mod;
-    *((uint8_t *)&mod) = m;
-    Serial.print((mod.bmLeftCtrl == 1) ? "C" : " ");
-    Serial.print((mod.bmLeftShift == 1) ? "S" : " ");
-    Serial.print((mod.bmLeftAlt == 1) ? "A" : " ");
-    Serial.print((mod.bmLeftGUI == 1) ? "G" : " ");
-
-    Serial.print(" >");
-    PrintHex<uint8_t>(key, 0x80);
-    Serial.print("< ");
-
-    Serial.print((mod.bmRightCtrl == 1) ? "C" : " ");
-    Serial.print((mod.bmRightShift == 1) ? "S" : " ");
-    Serial.print((mod.bmRightAlt == 1) ? "A" : " ");
-    Serial.println((mod.bmRightGUI == 1) ? "G" : " ");
-};
 
 void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
 {
-    if (global_debug)
+    if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyDown)))
     {
-        Serial.print("DN ");
-        PrintKey(mod, key);
-    }
-    uint8_t c = OemToAscii(mod, key);
-    // m_last_key_pressed = key;
-    // m_last_key_up_or_down = KeyEvent::KeyDown;
-
-    if (c)
-        OnKeyPressed(c);
-
-    if (!m_keyboard_events->enqueue(new KeyEvent(key, KeyEvent::KeyDown)))
-    {
-        Serial.println("Warning! unable to enqueue new KeyDown");
+        // failed to add to queue
     }
 
     if (key == USB_KEY_SCROLLLOCK)
@@ -242,21 +196,8 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
 
     m_modifier_keys = *((MODIFIERKEYS *)&after);
 
-    if (global_debug)
-    {
-        Serial.print("Before: ");
-        Serial.print(before, HEX);
-        Serial.print(" after: ");
-        Serial.print(after, HEX);
-        Serial.print(" ");
-        Serial.print(*((uint8_t *)&m_modifier_keys), HEX);
-    }
     if (beforeMod.bmLeftCtrl != afterMod.bmLeftCtrl)
     {
-        if (global_debug)
-        {
-            Serial.println("LeftCtrl changed");
-        }
         if (afterMod.bmLeftCtrl)
         {
             OnKeyDown(0, USB_KEY_LEFTCTRL);
@@ -268,10 +209,6 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
     }
     if (beforeMod.bmLeftShift != afterMod.bmLeftShift)
     {
-        if (global_debug)
-        {
-            Serial.println("LeftShift changed");
-        }
         if (afterMod.bmLeftShift)
         {
             OnKeyDown(0, USB_KEY_LEFTSHIFT);
@@ -283,10 +220,6 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
     }
     if (beforeMod.bmLeftAlt != afterMod.bmLeftAlt)
     {
-        if (global_debug)
-        {
-            Serial.println("LeftAlt changed");
-        }
         if (afterMod.bmLeftAlt)
         {
             OnKeyDown(0, USB_KEY_LEFTALT);
@@ -298,10 +231,6 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
     }
     if (beforeMod.bmLeftGUI != afterMod.bmLeftGUI)
     {
-        if (global_debug)
-        {
-            Serial.println("LeftGUI changed");
-        }
         if (afterMod.bmLeftGUI)
         {
             OnKeyDown(0, USB_KEY_LEFTMETA);
@@ -311,48 +240,15 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
             OnKeyUp(0, USB_KEY_LEFTMETA);
         }
     }
-
-    if (beforeMod.bmRightCtrl != afterMod.bmRightCtrl)
-    {
-        if (global_debug)
-        {
-            Serial.println("RightCtrl changed");
-        }
-    }
-    if (beforeMod.bmRightShift != afterMod.bmRightShift)
-    {
-        if (global_debug)
-        {
-            Serial.println("RightShift changed");
-        }
-    }
-    if (beforeMod.bmRightAlt != afterMod.bmRightAlt)
-    {
-        if (global_debug)
-        {
-            Serial.println("RightAlt changed");
-        }
-    }
-    if (beforeMod.bmRightGUI != afterMod.bmRightGUI)
-    {
-        if (global_debug)
-        {
-            Serial.println("RightGUI changed");
-        }
-    }
 }
 
 void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
 {
-    if (global_debug)
-    {
-        Serial.print("UP ");
-        PrintKey(mod, key);
-    }
 
-    if (!m_keyboard_events->enqueue(new KeyEvent(key, KeyEvent::KeyUp)))
+
+    if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyUp)))
     {
-        Serial.println("Warning! unable to enqueue new KeyDown");
+        // Queue full
     }
 
     if (key == USB_KEY_SCROLLLOCK)
@@ -385,12 +281,3 @@ void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
     }
 }
 
-void KbdRptParser::OnKeyPressed(uint8_t key)
-{
-    if (global_debug)
-    {
-
-        Serial.print("ASCII: ");
-        Serial.println((char)key);
-    }
-};
