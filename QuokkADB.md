@@ -7,6 +7,8 @@ The firmware is based upon the ADBuino and is in a unified repository [https://g
  - Normal Apple mouse emulation working (extended mouse not implemented)
  - Normal Apple US keyboard emulation working  (extended keyboard and international keyboard not implemented)
  - Logitech Unifying receiver works
+ - Right mouse click works on Mac OSes that support it
+ - SysRq/Print Screen, Scroll Lock, Pause/Break work as F13, F14, and F15 respectively 
  - Rear facing and front facing ADB can be connected to host (Mac)
  or used to connected to another ADB device
  - Mouse and keyboard readdressing not implemented (meaning if a USB mouse or keyboard is a attached along with the ADB version of the device, the devices may or may not work)
