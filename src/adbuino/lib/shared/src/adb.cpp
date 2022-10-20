@@ -148,6 +148,21 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
   {
     switch (cmd & 0x0F)
     {
+    case 0x1:
+      Serial.println("MOUSE: Got FLUSH request");
+      break;
+    case 0x8:
+      Serial.println("MOUSE: Got LISTEN request for register 0");
+      break;
+    case 0x9:
+      Serial.println("MOUSE: Got LISTEN request for register 1");
+      break;
+    case 0xA:
+      Serial.println("MOUSE: Got LISTEN request for register 2");
+      break;
+    case 0xB:
+      Serial.println("MOUSE: Got LISTEN request for register 3");
+      break;
     case 0xC: // talk register 0
       if (mousepending)
       {
@@ -163,13 +178,13 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
       }
       break;
     case 0xD: // talk register 1
-      Serial.println("MOUSE: Got request for register 1");
+      Serial.println("MOUSE: Got TALK request for register 1");
       break;
     case 0xE: // talk register 2
-      Serial.println("MOUSE Got request for register 2");
+      Serial.println("MOUSE Got TALK request for register 2");
       break;
     case 0xF: // talk register 3
-      Serial.println("MOUSE: Got request for register 3");
+      Serial.println("MOUSE: Got TALK request for register 3");
       // // sets device address
       // mousereg3 = GetAdbRegister3Mouse();
       // adb_delay_us(180); // stop to start time / interframe delay
@@ -183,7 +198,7 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
       // adb_pin_in();
       break;
     default:
-      printf("MOUSE: Unknown cmd: %02X", cmd);
+      printf("MOUSE: Unknown cmd: %02X\n", cmd);
       break;
     }
   }
@@ -198,6 +213,21 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
     uint8_t adbleds;
     switch (cmd & 0x0F)
     {
+    case 0x1:
+      Serial.println("KBD: Got FLUSH request");
+      break;
+    case 0x8:
+      Serial.println("KBD: Got LISTEN request for register 0");
+      break;
+    case 0x9:
+      Serial.println("KBD: Got LISTEN request for register 1");
+      break;
+    case 0xA:
+      Serial.println("KBD: Got LISTEN request for register 2");
+      break;
+    case 0xB:
+      Serial.println("KBD: Got LISTEN request for register 3");
+      break;
     case 0xC: // talk register 0
       if (kbdpending)
       {
@@ -234,11 +264,11 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
       }
       break;
     case 0xD: // talk register 1
-      Serial.println("KBD: Got request for register 1");
+      Serial.println("KBD: Got TALK request for register 1");
       break;
     case 0xE: // talk register 2
-      Serial.println("KBD Got request for register 2");
-      adbleds = 0xFF; // we should get the actual value
+      Serial.println("KBD Got TALK request for register 2");
+      adbleds = 0xFF; // Fine for normal keyboard (not extended)
       // if(!(ps2ledstate & kPS2LEDCaps)) adbleds &= ~2;
       // if(!(ps2ledstate & kPS2LEDScroll)) adbleds &= ~4;
       // if(!(ps2ledstate & kPS2LEDNum)) adbleds &= ~1;
@@ -252,7 +282,7 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
       adb_pin_in();
       break;
     case 0xF: // talk register 3
-      Serial.println("KBD: Got request for register 3");
+      Serial.println("KBD: Got TALK request for register 3");
       // sets device address
       kbdreg3 = GetAdbRegister3Keyboard();
       adb_delay_us(180); // stop to start time / interframe delay
@@ -290,7 +320,8 @@ uint16_t AdbInterface::GetAdbRegister3Keyboard()
   // 11-8      Device address
   kbdreg3 |= (0x02 << 8);
   // 7-0       Device Handler ID
-
+  kbdreg3 |= 0x02;
+  
   return kbdreg3;
 }
 uint16_t AdbInterface::GetAdbRegister3Mouse()
@@ -308,6 +339,7 @@ uint16_t AdbInterface::GetAdbRegister3Mouse()
   // 11-8      Device address
   mousereg3 |= (0x03 << 8);
   // 7-0       Device Handler ID
+  mousereg3 |= 0x01;
 
   return mousereg3;
 }

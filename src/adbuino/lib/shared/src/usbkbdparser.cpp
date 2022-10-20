@@ -320,12 +320,28 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
         {
             Serial.println("RightCtrl changed");
         }
+        if (afterMod.bmRightCtrl)
+        {
+            OnKeyDown(0, USB_KEY_RIGHTCTRL);
+        }
+        else
+        {
+            OnKeyUp(0, USB_KEY_RIGHTCTRL);
+        }
     }
     if (beforeMod.bmRightShift != afterMod.bmRightShift)
     {
         if (global_debug)
         {
             Serial.println("RightShift changed");
+        }
+        if (afterMod.bmRightShift)
+        {
+            OnKeyDown(0, USB_KEY_RIGHTSHIFT);
+        }
+        else
+        {
+            OnKeyUp(0, USB_KEY_RIGHTSHIFT);
         }
     }
     if (beforeMod.bmRightAlt != afterMod.bmRightAlt)
@@ -334,12 +350,28 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
         {
             Serial.println("RightAlt changed");
         }
+        if (afterMod.bmRightAlt)
+        {
+            OnKeyDown(0, USB_KEY_RIGHTALT);
+        }
+        else
+        {
+            OnKeyUp(0, USB_KEY_RIGHTALT);
+        }
     }
     if (beforeMod.bmRightGUI != afterMod.bmRightGUI)
     {
         if (global_debug)
         {
             Serial.println("RightGUI changed");
+        }
+        if (afterMod.bmRightGUI)
+        {
+            OnKeyDown(0, USB_KEY_RIGHTMETA);
+        }
+        else
+        {
+            OnKeyUp(0, USB_KEY_RIGHTMETA);
         }
     }
 }
