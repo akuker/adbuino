@@ -4,7 +4,7 @@
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 
 uint8_t inline findModifierKey(hid_keyboard_report_t const *report, const hid_keyboard_modifier_bm_t mod ) {
-        return (mod == report->modifier) ? 1 : 0;
+        return (mod & report->modifier) ? 1 : 0;
 }
 
 void KeyboardReportParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_report_t const *report) {
