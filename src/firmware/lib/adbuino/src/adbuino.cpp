@@ -49,16 +49,18 @@
 #define kModReset 16
 #define kModCaps 32
 #define kModDelete 64
-uint8_t mousepending = 0;
-uint8_t kbdpending = 0;
-uint8_t kbdskip = 0;
-uint16_t kbdprev0 = 0;
-uint16_t mousereg0 = 0;
-uint16_t kbdreg0 = 0;
-uint8_t kbdsrq = 0;
-uint8_t mousesrq = 0;
-uint8_t modifierkeys = 0xFF;
-uint32_t kbskiptimer = 0;
+
+extern uint8_t mousepending;
+extern uint8_t kbdpending;
+extern uint8_t kbdskip;
+extern uint16_t kbdprev0;
+extern uint16_t mousereg0;
+extern uint16_t kbdreg0;
+extern uint8_t kbdsrq;
+extern uint8_t mousesrq;
+extern uint8_t modifierkeys;
+extern uint32_t kbskiptimer;
+extern bool adbcollision;
 
 bool global_debug = false;
 

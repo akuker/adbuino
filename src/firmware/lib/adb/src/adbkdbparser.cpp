@@ -36,11 +36,11 @@ extern bool global_debug;
 
 ADBKbdRptParser::ADBKbdRptParser()
 {
-    if (global_debug)
-    {
-        Serial.println("Running ADBKbdRptParser::ADBKbdRptParser()");
-        KbdRptParser();
-    }
+    // if (global_debug)
+    // {
+    //     Serial.println("Running ADBKbdRptParser::ADBKbdRptParser()");
+    //     KbdRptParser();
+    // }
 }
 
 uint16_t ADBKbdRptParser::GetAdbRegister0()

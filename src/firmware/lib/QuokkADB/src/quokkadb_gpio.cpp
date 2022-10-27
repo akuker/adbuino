@@ -27,10 +27,15 @@
 
 #include "quokkadb_gpio.h"
 #include "pico/mutex.h"
+#include "hardware/gpio.h"
 #include "printf/printf.h"
 
 mutex_t led_mutex;
 
+extern bool adb_collision;
+extern bool collision_detection;
+
+extern bool global_debug;
 void adb_gpio_init(void) {
     gpio_init(ADB_OUT_GPIO);
     gpio_set_function(ADB_OUT_GPIO, GPIO_FUNC_SIO);
@@ -40,6 +45,23 @@ void adb_gpio_init(void) {
     gpio_init(ADB_IN_GPIO);
     gpio_set_dir(ADB_IN_GPIO, GPIO_IN);
 }
+
+static void adb_in_irq_callback(uint gpio, uint32_t event_mask) {
+    // a possible collision occurs when ABD is meant to be high
+    // but the the bus is set low by another device
+    volatile bool gpio_out_high = gpio_get(ADB_OUT_GPIO);
+    volatile bool gpio_in_low = !gpio_get(ADB_IN_GPIO);
+    if (collision_detection && gpio == ADB_IN_GPIO  && gpio_out_high && gpio_in_low) {
+        adb_collision = true;
+    } 
+}
+
+void adb_irq_init(void) {
+    gpio_set_irq_enabled_with_callback(ADB_IN_GPIO, GPIO_IRQ_EDGE_FALL, true, &adb_in_irq_callback);
+}
+
+
+
 
 void led_gpio_init(void) {
     gpio_init(LED_GPIO);

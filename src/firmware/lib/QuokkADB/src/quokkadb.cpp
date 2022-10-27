@@ -47,18 +47,19 @@
 
 
 // Globals
-uint8_t mousepending = 0;
-uint8_t kbdpending = 0;
-uint8_t kbdskip = 0;
-uint16_t kbdprev0 = 0;
-uint16_t mousereg0 = 0;
-uint16_t kbdreg0 = 0;
-uint8_t kbdsrq = 0;
-uint8_t mousesrq = 0;
-uint8_t modifierkeys = 0xFF;
-uint32_t kbskiptimer = 0;
+extern uint8_t mousepending;
+extern uint8_t kbdpending;
+extern uint8_t kbdskip;
+extern uint16_t kbdprev0;
+extern uint16_t mousereg0;
+extern uint16_t kbdreg0;
+extern uint8_t kbdsrq;
+extern uint8_t mousesrq;
+extern uint8_t modifierkeys;
+extern uint32_t kbskiptimer;
+extern bool adb_collision;
 
-bool global_debug = false;
+bool global_debug = true;
 
 AdbInterface adb;
 
@@ -86,7 +87,8 @@ int quokkadb(void) {
   adb_gpio_init();
   led_gpio_init();
   sleep_ms(10);
-
+  adb_irq_init();
+  
   multicore_reset_core1();
   // all USB task run in core1
   multicore_launch_core1(core1_main);

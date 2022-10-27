@@ -27,7 +27,7 @@
 
 #include <stdint.h>
 #include "quokkadb_gpio.h"
-
+extern bool adb_collision;
 class AdbInterfacePlatform {
   public:
     void Init();
@@ -42,9 +42,9 @@ class AdbInterfacePlatform {
     uint8_t data_in();
     uint16_t wait_data_lo(uint32_t us);
     uint16_t wait_data_hi(uint32_t us);
-    
-    void adb_delay_us(uint32_t delay);
-    void adb_delay_ms(uint32_t delay);
+    // delay for set amount unless a collision is detected then return false
+    // otherwise return true
+    bool adb_delay_us(uint32_t delay);
 
 };
 
@@ -52,7 +52,7 @@ class AdbInterfacePlatform {
 
 inline void AdbInterfacePlatform::data_lo()
 {
-        ADB_OUT_LOW();
+    ADB_OUT_LOW();
 }
 
 inline void AdbInterfacePlatform::data_hi()
@@ -104,12 +104,19 @@ inline uint16_t AdbInterfacePlatform::wait_data_hi(uint32_t us)
   return us >= diff ? us - diff : 0;
 }
 
-inline void AdbInterfacePlatform::adb_delay_us(uint32_t delay) 
+inline bool AdbInterfacePlatform::adb_delay_us(uint32_t delay) 
 {
-    busy_wait_us_32(delay);
-}
-
-inline void AdbInterfacePlatform::adb_delay_ms(uint32_t delay)
-{  
-    sleep_ms(delay);
+  uint64_t start = time_us_64();
+  uint64_t time;
+  bool collision_free = true;
+  do
+  {
+    if (adb_collision) {
+      collision_free = false;
+      break;
+    }
+    time = time_us_64();
+  } while (delay >= time - start);
+  
+  return collision_free;
 }

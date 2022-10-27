@@ -27,9 +27,6 @@
 #include "Arduino.h"
 #include <stdint.h>
 
-// _delay_us's parameter must be a compile time integer, and thus cannot be a inline class method
-#define adb_delay_us(delay) (_delay_us(delay))
-
 class AdbInterfacePlatform {
   public:
     void Init();
@@ -48,8 +45,11 @@ class AdbInterfacePlatform {
     void adb_pin_in();
     uint8_t data_in();
 
+    
     uint16_t wait_data_lo(uint32_t us);
     uint16_t wait_data_hi(uint32_t us);
+    
+    bool adb_delay_us(double delay);
 
 };
 
@@ -100,4 +100,11 @@ inline uint16_t AdbInterfacePlatform::wait_data_hi(uint32_t us)
   return us;
 }
 
-
+inline bool AdbInterfacePlatform::adb_delay_us(double delay)
+{
+    // for this _delay_us to compile "__DELAY_BACKWARD_COMPATIBLE__" 
+    // must be defined in the platformio.ini file. Otherwise
+    // it can only be delayed with compile time computations
+    _delay_us(delay);
+    return true; 
+}

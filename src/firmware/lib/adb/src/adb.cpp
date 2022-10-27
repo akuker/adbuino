@@ -31,6 +31,7 @@
 
 #include "adb.h"
 #include "bithacks.h"
+#include "math.h"
 
 #ifdef ADBUINO
 #include <stdio.h>
@@ -42,46 +43,63 @@ using rp2040_serial::Serial;
 #endif
 
 
-extern uint8_t mousepending;
-extern uint8_t kbdpending;
-extern uint8_t kbdskip;
-extern uint16_t kbdprev0;
-extern uint16_t mousereg0;
-extern uint16_t kbdreg0;
-extern uint8_t kbdsrq;
-extern uint8_t mousesrq;
-extern uint8_t modifierkeys;
-extern uint32_t kbskiptimer;
+
+uint8_t mouse_addr = 0x03;
+uint8_t kbd_addr = 0x02;
+uint8_t mouse_handler_id = 0x01;
+uint8_t kbd_handler_id = 0x02;
+uint8_t mousepending = 0;
+uint8_t kbdpending = 0;
+uint8_t kbdskip = 0;
+uint16_t kbdprev0 = 0;
+uint16_t mousereg0 = 0;
+uint16_t kbdreg0 = 0;
+uint8_t kbdsrq = 0;
+uint8_t mousesrq = 0;
+uint8_t modifierkeys = 0xFF;
+uint32_t kbskiptimer = 0;
+bool adb_collision = false; 
+bool collision_detection = false;
+bool mouse_skip_next_listen_reg3 = false;
+bool kbd_skip_next_listen_reg3 = false;
+
+
 extern bool global_debug;
+
 // The original data_lo code would just set the bit as an output
 // That works for a host, since the host is doing the pullup on the ADB line,
 // but for a device, it won't reliably pull the line low.  We need to actually
 // set it.
 
 
-inline void AdbInterface::place_bit0(void)
+inline bool AdbInterface::place_bit0(void)
 {
   data_lo();
   adb_delay_us(65);
   data_hi();
-  adb_delay_us(35);
+  return adb_delay_us(35);
 }
-inline void AdbInterface::place_bit1(void)
+inline bool AdbInterface::place_bit1(void)
 {
   data_lo();
   adb_delay_us(35);
   data_hi();
-  adb_delay_us(65);
+  return adb_delay_us(65);
 }
-inline void AdbInterface::send_byte(uint8_t data)
+inline bool AdbInterface::send_byte(uint8_t data)
 {
   for (int i = 0; i < 8; i++)
   {
     if (data & (0x80 >> i))
-      place_bit1();
+    {
+      if(!place_bit1()) return false;
+    }
     else
-      place_bit0();
+    {
+      if(!place_bit0()) return false;
+    }
   }
+  return true;
 }
 uint8_t AdbInterface::ReceiveCommand(uint8_t srq)
 {
@@ -136,15 +154,14 @@ out:
   return 0;
 }
 
-bool first_mouse = true;
-bool first_keybd = true;
+
 void AdbInterface::ProcessCommand(uint8_t cmd)
 {
 
   uint16_t mousereg3, kbdreg3;
 
   // see if it is addressed to us
-  if (((cmd >> 4) & 0x0F) == 3)
+  if (((cmd >> 4) & 0x0F) == mouse_addr)
   {
     switch (cmd & 0x0F)
     {
@@ -164,17 +181,27 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
       Serial.println("MOUSE: Got LISTEN request for register 3");
       break;
     case 0xC: // talk register 0
+      if (global_debug) 
+
       if (mousepending)
       {
-        adb_delay_us(180); // stop to start time / interframe delay
-        adb_pin_out();
-        place_bit1(); // start bit
-        send_byte((mousereg0 >> 8) & 0x00FF);
-        send_byte(mousereg0 & 0x00FF);
-        place_bit0(); // stop bit
-        adb_pin_in();
-        mousepending = 0;
-        mousesrq = 0;
+        DetectCollision();
+        if (Send16bitRegister(mousereg0))
+        {
+          ResetCollision();
+          mousepending = 0;
+          mousesrq = 0;
+        }
+        else{
+          ResetCollision();          
+          mousesrq = 1;
+          if (global_debug) 
+          {
+            Serial.println("MOUSE: Collision detected on sending register 0 on TALK request");
+          }  
+        }
+
+        break;
       }
       break;
     case 0xD: // talk register 1
@@ -184,18 +211,26 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
       Serial.println("MOUSE Got TALK request for register 2");
       break;
     case 0xF: // talk register 3
-      Serial.println("MOUSE: Got TALK request for register 3");
-      // // sets device address
-      // mousereg3 = GetAdbRegister3Mouse();
-      // adb_delay_us(180); // stop to start time / interframe delay
-      // //   ADB_DDR |= 1<<ADB_DATA_BIT;  // set output
-      // adb_pin_out();
-      // place_bit1(); // start bit
-      // send_byte((mousereg3 >> 8) & 0x00FF);
-      // send_byte(mousereg3 & 0x00FF);
-      // place_bit0(); // stop bit
-      // //   ADB_DDR &= ~(1<<ADB_DATA_BIT); // set input
-      // adb_pin_in();
+      if (global_debug) 
+      {
+        Serial.println("MOUSE: Got TALK request for register 3");
+      }
+      // sets device address
+      mousereg3 = GetAdbRegister3Mouse();
+      DetectCollision();
+      if( Send16bitRegister(mousereg3))
+      {
+        ResetCollision();
+      }
+      else
+      {
+        ResetCollision();
+        mouse_skip_next_listen_reg3 = true;
+          if (global_debug) 
+          {
+            Serial.println("MOUSE: Collision detected on sending register 3 on TALK request");
+          }  
+      }
       break;
     default:
       printf("MOUSE: Unknown cmd: %02X\n", cmd);
@@ -208,9 +243,10 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
       mousesrq = 1;
   }
 
-  if (((cmd >> 4) & 0x0F) == 2)
+  if (((cmd >> 4) & 0x0F) == kbd_addr)
   {
     uint8_t adbleds;
+    uint16_t kbdreg2;
     switch (cmd & 0x0F)
     {
     case 0x1:
@@ -252,46 +288,72 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
           kbdpending = 0;
           break;
         }
-        kbdsrq = 0;
-        adb_delay_us(180); // stop to start time / interframe delay
-        adb_pin_out();
-        place_bit1(); // start bit
-        send_byte((kbdreg0 >> 8) & 0x00FF);
-        send_byte(kbdreg0 & 0x00FF);
-        place_bit0(); // stop bit
-        adb_pin_in();
-        kbdpending = 0;
+        DetectCollision();
+        if (Send16bitRegister(kbdreg0))
+        {
+          ResetCollision();
+          kbdsrq = 0;
+          kbdpending = 0;
+
+        }
+        else
+        {
+          ResetCollision();
+          kbdsrq = 1;
+          if (global_debug)
+          {
+            Serial.println("KBD: Collision detected on sending register 0 on TALK request");
+          }
+
+        }
       }
       break;
     case 0xD: // talk register 1
       Serial.println("KBD: Got TALK request for register 1");
       break;
     case 0xE: // talk register 2
-      Serial.println("KBD Got TALK request for register 2");
+      if (global_debug)
+        Serial.println("KBD Got TALK request for register 2");
+  
       adbleds = 0xFF; // Fine for normal keyboard (not extended)
       // if(!(ps2ledstate & kPS2LEDCaps)) adbleds &= ~2;
       // if(!(ps2ledstate & kPS2LEDScroll)) adbleds &= ~4;
       // if(!(ps2ledstate & kPS2LEDNum)) adbleds &= ~1;
-
-      adb_delay_us(180); // stop to start time / interframe delay
-      adb_pin_out();
-      place_bit1(); // start bit
-      send_byte(modifierkeys);
-      send_byte(adbleds);
-      place_bit0(); // stop bit
-      adb_pin_in();
+      kbdreg2 = modifierkeys << 8;
+      kbdreg2 |= adbleds;
+      DetectCollision();
+      if (Send16bitRegister(kbdreg2))
+      {
+        ResetCollision();
+      }
+      else
+      {
+        ResetCollision();
+        if (global_debug)
+        {
+          Serial.println("KBD: Collision detected on sending register 2 on TALK request");
+        }
+      }
+      
       break;
     case 0xF: // talk register 3
       Serial.println("KBD: Got TALK request for register 3");
       // sets device address
       kbdreg3 = GetAdbRegister3Keyboard();
-      adb_delay_us(180); // stop to start time / interframe delay
-      adb_pin_out();
-      place_bit1(); // start bit
-      send_byte((kbdreg3 >> 8) & 0x00FF);
-      send_byte(kbdreg3 & 0x00FF);
-      place_bit0(); // stop bit
-      adb_pin_in();
+      DetectCollision();
+      if (Send16bitRegister(kbdreg3))
+      {
+          ResetCollision();
+      }
+      else
+      {
+        ResetCollision();
+        kbd_skip_next_listen_reg3 = true;
+        if (global_debug)
+        {
+          Serial.println("KBD: Collision detected on sending register 3 on TALK request");
+        }        
+      }
       break;
     default:
       printf("KBD: Unknown cmd: %02X\n", cmd);
@@ -318,9 +380,11 @@ uint16_t AdbInterface::GetAdbRegister3Keyboard()
   // 12      Reserved; must be 0
   B_UNSET(kbdreg3, 12);
   // 11-8      Device address
-  kbdreg3 |= (0x02 << 8);
+  // "ADB - The Untold Story: Space Aliens Ate My Mouse"
+  // specifies that a random value should be returned as the address for register 3
+kbdreg3 |= ((0x0F & rand()) << 8); 
   // 7-0       Device Handler ID
-  kbdreg3 |= 0x02;
+  kbdreg3 |= kbd_handler_id;
   
   return kbdreg3;
 }
@@ -336,10 +400,12 @@ uint16_t AdbInterface::GetAdbRegister3Mouse()
   B_UNSET(mousereg3, 13);
   // 12      Reserved; must be 0
   B_UNSET(mousereg3, 12);
-  // 11-8      Device address
-  mousereg3 |= (0x03 << 8);
+  // 11-8      Device address 
+  // "ADB - The Untold Story: Space Aliens Ate My Mouse"
+  // specifies that a random value should be returned as the address for register 3
+  mousereg3 |= ((0x0F & rand()) << 8); 
   // 7-0       Device Handler ID
-  mousereg3 |= 0x01;
+  mousereg3 |= mouse_handler_id;
 
   return mousereg3;
 }

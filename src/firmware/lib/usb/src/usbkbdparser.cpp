@@ -36,10 +36,10 @@ extern bool global_debug;
 
 KbdRptParser::KbdRptParser()
 {
-    if (global_debug)
-    {
-        Serial.println("Running KbdRptParser::KbdRptParser()");
-    }
+    // if (global_debug)
+    // {
+    //     Serial.println("Running KbdRptParser::KbdRptParser()");
+    // }
 }
 
 bool KbdRptParser::PendingKeyboardEvent()
