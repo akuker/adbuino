@@ -30,3 +30,20 @@ void AdbInterfacePlatform::Init()
   // Set ADB line as input
   adb_gpio_init();
 }
+
+bool AdbInterfacePlatform::adb_delay_us(uint32_t delay) 
+{
+  uint64_t start = time_us_64();
+  uint64_t time;
+  bool collision_free = true;
+  do
+  {
+    if (adb_collision) {
+      collision_free = false;
+      break;
+    }
+    time = time_us_64();
+  } while (delay >= time - start);
+  
+  return collision_free;
+}

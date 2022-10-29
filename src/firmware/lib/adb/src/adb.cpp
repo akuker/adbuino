@@ -157,8 +157,10 @@ out:
 
 void AdbInterface::ProcessCommand(uint8_t cmd)
 {
-
+  uint8_t  listen_addr, listen_handler_id;
   uint16_t mousereg3, kbdreg3;
+  int32_t listen_register;
+
 
   // see if it is addressed to us
   if (((cmd >> 4) & 0x0F) == mouse_addr)
@@ -178,10 +180,42 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
       Serial.println("MOUSE: Got LISTEN request for register 2");
       break;
     case 0xB:
+      listen_register = Receive16bitRegister();
+      
       Serial.println("MOUSE: Got LISTEN request for register 3");
+      printf("Listen mouse Register 3 value is 0x%lX\n", listen_register);
+
+      if (listen_register >= 0)
+      {
+        listen_addr = (listen_register >> 8) & 0x0F;
+        listen_handler_id = listen_register & 0xFF;
+        // self-test
+        if (0xFF == listen_handler_id)
+        {
+          break;
+        }
+        // Change of address 
+        if (0xFE == listen_handler_id )
+        {
+
+            if (mouse_skip_next_listen_reg3)
+            {
+              mouse_skip_next_listen_reg3 = false;
+              break;
+            }
+            mouse_addr = listen_addr;
+            printf("Mouse address change to 0x%hhX\n", mouse_addr);
+        }
+        else
+        {
+          // Don't change handler id for mouse 
+          // mouse_addr = listen_addr;
+          // mouse_handler_id = listen_handler_id;
+          printf("Mouse address change to 0x%hhX, handler id change to  0x%hhX\n", mouse_addr, mouse_handler_id);
+        }
+      }   
       break;
     case 0xC: // talk register 0
-      if (global_debug) 
 
       if (mousepending)
       {
@@ -254,6 +288,7 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
       break;
     case 0x8:
       Serial.println("KBD: Got LISTEN request for register 0");
+      
       break;
     case 0x9:
       Serial.println("KBD: Got LISTEN request for register 1");
@@ -262,7 +297,45 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
       Serial.println("KBD: Got LISTEN request for register 2");
       break;
     case 0xB:
+      listen_register = Receive16bitRegister();
+
       Serial.println("KBD: Got LISTEN request for register 3");
+      printf("Listen keyboard Register 3 value is 0x%lX\n", listen_register);
+      
+      if (listen_register >= 0)
+      {
+        listen_addr = (listen_register >> 8) & 0x0F;
+        listen_handler_id = listen_register & 0xFF;
+        // self-test
+        if (0xFF == listen_handler_id)
+        {
+          break;
+        }
+        // Change of address 
+        if (0xFE == listen_handler_id)
+        {
+
+            if (kbd_skip_next_listen_reg3)
+            {
+              kbd_skip_next_listen_reg3 = false;
+              break;
+            }
+            kbd_addr = listen_addr;
+            printf("Keyboard address change to 0x%hhX\n", kbd_addr);
+
+        }
+        else
+        {
+          kbd_addr = listen_addr;
+          if (0x03 == listen_handler_id || 0x02 == listen_handler_id)
+          { 
+            kbd_handler_id = listen_handler_id;
+          }
+          printf("Keyboard address change to 0x%hhX, handler id change to 0x%hhX\n", kbd_addr, kbd_handler_id);
+
+        }
+      }  
+      
       break;
     case 0xC: // talk register 0
       if (kbdpending)
@@ -312,9 +385,10 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
       Serial.println("KBD: Got TALK request for register 1");
       break;
     case 0xE: // talk register 2
-      if (global_debug)
+      if (global_debug) 
+      {
         Serial.println("KBD Got TALK request for register 2");
-  
+      }
       adbleds = 0xFF; // Fine for normal keyboard (not extended)
       // if(!(ps2ledstate & kPS2LEDCaps)) adbleds &= ~2;
       // if(!(ps2ledstate & kPS2LEDScroll)) adbleds &= ~4;
@@ -337,7 +411,10 @@ void AdbInterface::ProcessCommand(uint8_t cmd)
       
       break;
     case 0xF: // talk register 3
-      Serial.println("KBD: Got TALK request for register 3");
+      if (global_debug) 
+      { 
+        Serial.println("KBD: Got TALK request for register 3");
+      }
       // sets device address
       kbdreg3 = GetAdbRegister3Keyboard();
       DetectCollision();

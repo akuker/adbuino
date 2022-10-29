@@ -46,6 +46,8 @@
 #define ADB_OUT_LOW()  sio_hw->gpio_clr = 1 << ADB_OUT_GPIO
 #define ADB_IN_GET() (gpio_get(ADB_IN_GPIO))
 
+#define GPIO_TEST 20
+
 // UART out messaging
 #define UART_TX_GPIO    16
 #define UART_TX_BAUD    115200

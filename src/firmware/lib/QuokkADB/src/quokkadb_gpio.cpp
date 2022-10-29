@@ -44,14 +44,22 @@ void adb_gpio_init(void) {
 
     gpio_init(ADB_IN_GPIO);
     gpio_set_dir(ADB_IN_GPIO, GPIO_IN);
+
+    // @DEBUG - get rid of me when done
+    gpio_init(GPIO_TEST);
+    gpio_set_function(GPIO_TEST, GPIO_FUNC_SIO);
+    gpio_set_dir(GPIO_TEST, GPIO_OUT);
+    gpio_put(GPIO_TEST, false);
+
+
 }
 
 static void adb_in_irq_callback(uint gpio, uint32_t event_mask) {
     // a possible collision occurs when ABD is meant to be high
     // but the the bus is set low by another device
-    volatile bool gpio_out_high = gpio_get(ADB_OUT_GPIO);
     volatile bool gpio_in_low = !gpio_get(ADB_IN_GPIO);
-    if (collision_detection && gpio == ADB_IN_GPIO  && gpio_out_high && gpio_in_low) {
+    volatile bool gpio_out_high = gpio_get(ADB_OUT_GPIO);
+    if (collision_detection && gpio == ADB_IN_GPIO  && gpio_out_high && gpio_in_low && (event_mask & GPIO_IRQ_EDGE_FALL) ) {
         adb_collision = true;
     } 
 }

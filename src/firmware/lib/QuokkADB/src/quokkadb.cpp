@@ -59,7 +59,7 @@ extern uint8_t modifierkeys;
 extern uint32_t kbskiptimer;
 extern bool adb_collision;
 
-bool global_debug = true;
+bool global_debug = false;
 
 AdbInterface adb;
 
