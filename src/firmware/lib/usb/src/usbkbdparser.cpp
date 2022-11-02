@@ -34,17 +34,17 @@ using rp2040_serial::Serial;
 
 extern bool global_debug;
 
-KbdRptParser::KbdRptParser()
-{
-    // if (global_debug)
-    // {
-    //     Serial.println("Running KbdRptParser::KbdRptParser()");
-    // }
-}
-
 bool KbdRptParser::PendingKeyboardEvent()
 {
     return !m_keyboard_events.isEmpty();
+}
+
+void KbdRptParser::Reset(void)
+{
+    while(PendingKeyboardEvent())
+    {
+        free(m_keyboard_events.dequeue());
+    }
 }
 
 void KbdRptParser::PrintKey(uint8_t m, uint8_t key)

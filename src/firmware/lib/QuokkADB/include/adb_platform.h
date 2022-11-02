@@ -84,8 +84,8 @@ inline uint16_t AdbInterfacePlatform::wait_data_lo(uint32_t us)
     }
     time = time_us_64();
   } while (us >= time - start);
-  uint32_t diff = static_cast<uint32_t>(time - start);
-  return us >= diff ? us - (time - start) : 0;
+  uint16_t diff = static_cast<uint16_t>(time - start);
+  return us >= diff ? diff : 0;
 }
 
 inline uint16_t AdbInterfacePlatform::wait_data_hi(uint32_t us)
@@ -100,8 +100,8 @@ inline uint16_t AdbInterfacePlatform::wait_data_hi(uint32_t us)
     }
     time = time_us_64();
   } while (us >= time - start);
-  uint32_t diff = static_cast<uint32_t>(time - start);
-  return us >= diff ? us - diff : 0;
+  uint16_t diff = static_cast<uint16_t>(time - start);
+  return us >= diff ? diff : 0;
 }
 
 

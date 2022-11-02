@@ -57,8 +57,10 @@ extern uint8_t kbdsrq;
 extern uint8_t mousesrq;
 extern uint8_t modifierkeys;
 extern uint32_t kbskiptimer;
+extern bool adb_reset;
 extern bool adb_collision;
 
+bool usb_reset = false;
 bool global_debug = false;
 
 AdbInterface adb;
@@ -76,6 +78,11 @@ void core1_main() {
   /*------------ Core1 main loop ------------*/
   while (true) {
     tuh_task(); // tinyusb host task
+    if (true == usb_reset)
+    {
+      KeyboardPrs.Reset();
+      usb_reset = false;
+    }
   }
 }
 
@@ -96,10 +103,10 @@ int quokkadb(void) {
   adb.Init();
 
   led_blink(1);
-
+  srand(time_us_32());
 /*------------ Core0 main loop ------------*/
   while (true) {
-    uint8_t cmd = 0;
+    int16_t cmd = 0;
 
     if (!kbdpending)
     {
@@ -123,6 +130,13 @@ int quokkadb(void) {
     cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
 
     adb.ProcessCommand(cmd);
+
+    if (adb_reset)
+    {
+      adb.Reset();
+      adb_reset = false;
+      usb_reset = true;
+    }
   }
   return 0;
 }

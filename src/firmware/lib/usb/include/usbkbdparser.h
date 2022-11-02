@@ -58,11 +58,11 @@ protected:
 class KbdRptParser : public KeyboardReportParser
 {
 public:
-    KbdRptParser();
     void PrintKey(uint8_t mod, uint8_t key);
 
     KeyEvent GetKeyEvent();
     bool PendingKeyboardEvent();
+    void Reset(void);
 
 protected:
     void OnControlKeysChanged(uint8_t before, uint8_t after);
