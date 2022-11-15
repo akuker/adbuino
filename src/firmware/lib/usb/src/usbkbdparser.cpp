@@ -89,6 +89,15 @@ void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
     {
         Serial.println("Warning! unable to enqueue new KeyDown");
     }
+    // If power button replacement queue key twice
+    else if (key == USB_KEY_PAUSE || key == USB_KEY_F15)
+    {
+        if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyDown)))
+        {
+            Serial.println("Warning! unable to enqueue new Power Button KeyDown");
+        }
+    }
+
 
     if (key == USB_KEY_SCROLLLOCK)
     {
@@ -266,6 +275,14 @@ void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
     if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyUp)))
     {
         Serial.println("Warning! unable to enqueue new KeyDown");
+    }
+    // If power button replacement queue key twice
+    else if (key == USB_KEY_PAUSE || key == USB_KEY_F15)
+    {
+        if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyUp)))
+        {
+            Serial.println("Warning! unable to enqueue new Power Button KeyUp");
+        }
     }
 
     if (key == USB_KEY_SCROLLLOCK)

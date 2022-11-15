@@ -216,9 +216,6 @@ uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
         return 0x6D;
     case USB_KEY_F12:
         return 0x6F;
-    case USB_KEY_PAUSE: // fall through to F15
-    case USB_KEY_F15:
-        return 0x71;
     case USB_KEY_INSERT: // fall through to Help
     case USB_KEY_HELP:
         return 0x72;
@@ -238,7 +235,10 @@ uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
         return 0x79;
     case USB_KEY_F1:
         return 0x7A;
-
+    // Use Pause key or F15 key as Apple Power key
+    case USB_KEY_F15:
+    case USB_KEY_PAUSE:
+        return 0x7F;
     case USB_KEY_RIGHTCTRL:
     case USB_KEY_LEFTCTRL:
         return 0x36;

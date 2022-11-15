@@ -8,12 +8,11 @@ The firmware is based upon the ADBuino and is in a unified repository [https://g
  - Normal Apple US keyboard emulation working  (extended keyboard and international keyboard not implemented)
  - Logitech Unifying receiver works
  - Right mouse click works on Mac OSes that support it
- - SysRq/Print Screen, Scroll Lock, Pause/Break work as F13, F14, and F15 respectively 
+ - Pause/Break and F15 work as the Apple Power key (keycode 0x7F, separate from ADB power on button on the QuokkADB)
+ - SysRq/Print Screen, Scroll Lock as F13, and F14 respectively 
  - Rear facing and front facing ADB can be connected to host (Mac)
  or used to connected to another ADB device
- - Mouse and keyboard readdressing not implemented (meaning if a USB mouse or keyboard is a attached along with the ADB version of the device, the devices may or may not work)
- - "Listen" ADB protocols not implemented
- - Rewriting handler ID value not implemented, because of the "Listen" protocol not being implemented which in turn means the keyboard and mouse can not be used as extended devices
+ - Mouse and keyboard readdressing implemented so multiple QuokkADBs other ADB keyboards and/or mice can be used also 
  - Multiple USB keyboards or mice can be attached and will work. Known issue: Caps lock led is limited to changing on the keyboard which it was pressed.
  - Limitations with USB Host support in TinyUSB mean only one level of USB hubs may be attached and some USB composite keyboard have been found not to work.
 

@@ -33,6 +33,7 @@ namespace simple_circular_queue
             SCQueue(void);
             bool enqueue(T item);
             T dequeue(void);
+            T peek(void);
             bool isEmpty(void);
 
         private:

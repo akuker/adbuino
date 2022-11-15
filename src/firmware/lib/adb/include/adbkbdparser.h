@@ -32,6 +32,8 @@
 
 #include "scqueue.h"
 
+#define ADB_POWER_KEYCODE 0x7f
+
 using simple_circular_queue::SCQueue;
 
 extern uint8_t usb_keycode_to_adb_code(uint8_t usb_code);
