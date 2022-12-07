@@ -27,7 +27,6 @@
 
 #include <stdint.h>
 #include <adb_platform.h>
-#include <printf/printf.h>
 
 #ifndef ADB_START_BIT_DELAY
 #define ADB_START_BIT_DELAY 100000

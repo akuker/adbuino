@@ -63,6 +63,7 @@ bool mouse_skip_next_listen_reg3 = false;
 bool kbd_skip_next_listen_reg3 = false;
 
 
+
 extern bool global_debug;
 
 // The original data_lo code would just set the bit as an output
@@ -297,9 +298,9 @@ void AdbInterface::ProcessCommand(int16_t cmd)
           //   4 - extended mouse 
           // mouse_handler_id = listen_handler_id;
           // @DEBUG
-          printf("MSE: LSTN Reg3 val is 0x%lX@0x%hhX\n", listen_register, mouse_addr);
           if (global_debug)
           {
+            printf("MOUSE: LSTN Reg3 val is 0x%lX@0x%hhX\n", listen_register, mouse_addr);
             printf("MOUSE: handler id change to  0x%hhX\n", mouse_handler_id);
           }
         }
@@ -430,7 +431,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
               break;
             }
             // @DEBUG
-            // printf("KBD: LSTN Reg3 val is 0x%lX@0x%hhX\n", listen_register, kbd_addr);
+            printf("KBD: LSTN Reg3 val is 0x%lX@0x%hhX\n", listen_register, kbd_addr);
             kbd_addr = listen_addr;
             if (global_debug)
             {
@@ -441,7 +442,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
         else
         {
           // @DEBUG
-            printf("KBD: LSTN Reg3 val is 0x%lX@0x%hhX\n", listen_register, kbd_addr);
+          printf("KBD: LSTN Reg3 val is 0x%lX@0x%hhX\n", listen_register, kbd_addr);
           if (0x03 == listen_handler_id || 0x02 == listen_handler_id)
           { 
             kbd_handler_id = listen_handler_id;
@@ -572,8 +573,8 @@ void AdbInterface::ProcessCommand(int16_t cmd)
 uint16_t AdbInterface::GetAdbRegister3Keyboard()
 {
   uint16_t kbdreg3 = 0;
-  // using random address in 0x8 to 0xE addresses
-  uint8_t random_address = rand() % 0xF;
+  // using random address 
+  uint8_t random_address = rand() & 0xF;
   // Bit 15 Reserved; must be 0
   B_UNSET(kbdreg3, 15);
   // 14      Exceptional event, device specific; always 1 if not used
@@ -595,7 +596,7 @@ uint16_t AdbInterface::GetAdbRegister3Mouse()
 {
   uint16_t mousereg3 = 0;
   // using random address in 0x8 to 0xE addresses
-  uint8_t random_address =  rand() % 0xF;
+  uint8_t random_address =  rand() & 0xF;
   // Bit 15 Reserved; must be 0
   B_UNSET(mousereg3, 15);
   // 14      Exceptional event, device specific; always 1 if not used
@@ -607,7 +608,7 @@ uint16_t AdbInterface::GetAdbRegister3Mouse()
   // 11-8      Device address 
   // "ADB - The Untold Story: Space Aliens Ate My Mouse"
   // specifies that a random value should be returned as the address for register 3
-  mousereg3 |= random_address;  
+  mousereg3 |= random_address << 8;  
   // 7-0       Device Handler ID
   mousereg3 |= mouse_handler_id;
 
