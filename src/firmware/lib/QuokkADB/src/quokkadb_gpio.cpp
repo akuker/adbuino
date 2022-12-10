@@ -45,12 +45,6 @@ void adb_gpio_init(void) {
     gpio_init(ADB_IN_GPIO);
     gpio_set_dir(ADB_IN_GPIO, GPIO_IN);
 
-    // @DEBUG - get rid of me when done
-    gpio_init(GPIO_TEST);
-    gpio_set_function(GPIO_TEST, GPIO_FUNC_SIO);
-    gpio_set_dir(GPIO_TEST, GPIO_OUT);
-    gpio_put(GPIO_TEST, false);
-
 
 }
 

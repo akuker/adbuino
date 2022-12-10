@@ -278,11 +278,12 @@ void AdbInterface::ProcessCommand(int16_t cmd)
             if (mouse_skip_next_listen_reg3)
             {
               mouse_skip_next_listen_reg3 = false;
-              printf("MOUSE: TALK reg 3 had a collision at 0x%hhX\n", mouse_addr);
+              if (global_debug)
+              {
+                printf("MOUSE: TALK reg 3 had a collision at 0x%hhX\n", mouse_addr);
+              }
               break;
             }
-            // @DEBUG
-            // printf("MSE: LSTN Reg3 val is 0x%lX@0x%hhX\n", listen_register, mouse_addr);
             mouse_addr = listen_addr;
             if (global_debug)
             {
@@ -297,7 +298,6 @@ void AdbInterface::ProcessCommand(int16_t cmd)
           //   2 - standard mouse with extra sensitivity
           //   4 - extended mouse 
           // mouse_handler_id = listen_handler_id;
-          // @DEBUG
           if (global_debug)
           {
             printf("MOUSE: LSTN Reg3 val is 0x%lX@0x%hhX\n", listen_register, mouse_addr);
@@ -430,8 +430,6 @@ void AdbInterface::ProcessCommand(int16_t cmd)
               printf("KDB: had a collision reg 3 at 0x%hhX\n", kbd_addr);
               break;
             }
-            // @DEBUG
-            printf("KBD: LSTN Reg3 val is 0x%lX@0x%hhX\n", listen_register, kbd_addr);
             kbd_addr = listen_addr;
             if (global_debug)
             {
@@ -441,8 +439,6 @@ void AdbInterface::ProcessCommand(int16_t cmd)
         }
         else
         {
-          // @DEBUG
-          printf("KBD: LSTN Reg3 val is 0x%lX@0x%hhX\n", listen_register, kbd_addr);
           if (0x03 == listen_handler_id || 0x02 == listen_handler_id)
           { 
             kbd_handler_id = listen_handler_id;
