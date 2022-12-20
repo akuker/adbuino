@@ -27,7 +27,7 @@
 #ifdef ADBUINO
 #include <hidboot.h>
 #elif QUOKKADB
-#include "hidinputclasses.h"
+#include "keyboardrptparser.h"
 #endif
 
 #include "scqueue.h"

@@ -52,9 +52,10 @@ uint8_t kbdskip = 0;
 uint16_t kbdprev0 = 0;
 uint16_t mousereg0 = 0;
 uint16_t kbdreg0 = 0;
+uint16_t kbdreg2 = 0xFFFF;
 uint8_t kbdsrq = 0;
 uint8_t mousesrq = 0;
-uint8_t modifierkeys = 0xFF;
+uint16_t modifierkeys = 0xFFFF;
 uint32_t kbskiptimer = 0;
 bool adb_reset = false;
 bool adb_collision = false; 
@@ -129,9 +130,11 @@ int16_t AdbInterface::ReceiveCommand(uint8_t srq)
         if (global_debug)
         {
           printf("ALL: Error in attention low time,  wait time was %dus\n", lo);
+
         }
       }
-      continue;
+      return -1;
+
     }
     else
     {
@@ -297,7 +300,12 @@ void AdbInterface::ProcessCommand(int16_t cmd)
           //   1 - standard mouse 
           //   2 - standard mouse with extra sensitivity
           //   4 - extended mouse 
-          // mouse_handler_id = listen_handler_id;
+          /*  Don't change mouse type from handler id 1 (default)
+          if (listen_handler_id == 1 || listen_handler_id == 2)
+          {
+            mouse_handler_id  = listen_handler_id;
+          }
+          */
           if (global_debug)
           {
             printf("MOUSE: LSTN Reg3 val is 0x%lX@0x%hhX\n", listen_register, mouse_addr);
@@ -325,7 +333,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
           mousesrq = 0;
         }
         else{
-          ResetCollision();          
+          ResetCollision();      
           mousesrq = 1;
           if (global_debug) 
           {
@@ -381,8 +389,6 @@ void AdbInterface::ProcessCommand(int16_t cmd)
 
   if (((cmd >> 4) & 0x0F) == kbd_addr)
   {
-    uint8_t adbleds;
-    uint16_t kbdreg2;
     switch (cmd & 0x0F)
     {
     case 0x1:
@@ -399,7 +405,28 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       Serial.println("KBD: Got LISTEN request for register 1");
       break;
     case 0xA:
-      Serial.println("KBD: Got LISTEN request for register 2");
+      if (global_debug)
+      {
+        Serial.println("KBD: Got LISTEN request for register 2");
+      }
+      listen_register = Receive16bitRegister();
+      printf("KBD: Listen Reg2: 0x%hX\n", (uint16_t)listen_register);
+      if (!(0x1 & listen_register))
+      {
+        Serial.println("Numlock LED ON");
+      }
+      if (!(0x2 & listen_register))
+      {
+        Serial.println("Caps LED ON");
+      }
+      if (!(0x4 & listen_register))
+      {
+        Serial.println("Scroll lock LED ON");
+      }
+      if (KDB_EXTENDED_HANDLER_ID == kbd_handler_id)
+      {
+        adb_set_leds(listen_register);
+      }
       break;
     case 0xB:
       listen_register = Receive16bitRegister();
@@ -411,7 +438,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       {
         listen_addr = (listen_register >> 8) & 0x0F;
         listen_handler_id = listen_register & 0xFF;
-        if (global_debug)
+        if (global_debug)             
         {
           printf("KBD: Listen Register 3 value is 0x%lX\n", listen_register);
         }
@@ -427,7 +454,10 @@ void AdbInterface::ProcessCommand(int16_t cmd)
             if (kbd_skip_next_listen_reg3)
             {
               kbd_skip_next_listen_reg3 = false;
-              printf("KDB: had a collision reg 3 at 0x%hhX\n", kbd_addr);
+              if (global_debug)
+              {
+                printf("KDB: had a collision reg 3 at 0x%hhX\n", kbd_addr);
+              }
               break;
             }
             kbd_addr = listen_addr;
@@ -439,7 +469,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
         }
         else
         {
-          if (0x03 == listen_handler_id || 0x02 == listen_handler_id)
+          if (KDB_EXTENDED_HANDLER_ID == listen_handler_id || KBD_DEFAULT_HANDLER_ID == listen_handler_id)
           { 
             kbd_handler_id = listen_handler_id;
           }
@@ -499,7 +529,6 @@ void AdbInterface::ProcessCommand(int16_t cmd)
           {
             Serial.println("KBD: Collision detected on sending register 0 on TALK request");
           }
-
         }
       }
       break;
@@ -511,16 +540,12 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       {
         Serial.println("KBD Got TALK request for register 2");
       }
-      adbleds = 0xFF; // Fine for normal keyboard (not extended)
-      // if(!(ps2ledstate & kPS2LEDCaps)) adbleds &= ~2;
-      // if(!(ps2ledstate & kPS2LEDScroll)) adbleds &= ~4;
-      // if(!(ps2ledstate & kPS2LEDNum)) adbleds &= ~1;
-      kbdreg2 = modifierkeys << 8;
-      kbdreg2 |= adbleds;
       DetectCollision();
       if (Send16bitRegister(kbdreg2))
       {
         ResetCollision();
+        // @DEBUG
+        printf("KDB: Reg2 talk value: %hX\n", kbdreg2);
       }
       else
       {
@@ -617,4 +642,5 @@ void AdbInterface::Reset(void)
   kbd_addr = KBD_DEFAULT_ADDR;
   mouse_handler_id = MOUSE_DEFAULT_HANDLER_ID;
   kbd_handler_id = KBD_DEFAULT_HANDLER_ID;
+  kbdreg2 = 0xFFFF;
 }

@@ -27,11 +27,10 @@
 
 #include <stdint.h>
 #include "quokkadb_gpio.h"
-extern bool adb_collision;
-class AdbInterfacePlatform {
-  public:
-    void Init();
 
+extern bool adb_collision;
+
+class AdbInterfacePlatform {
   protected:
 
     void data_lo();
@@ -45,6 +44,10 @@ class AdbInterfacePlatform {
     // delay for set amount unless a collision is detected then return false
     // otherwise return true
     bool adb_delay_us(uint32_t delay);
+
+    void adb_irq_init(void);
+    void adb_irq_disable(void);
+    void adb_set_leds(uint16_t reg2);
 
 };
 
@@ -101,7 +104,7 @@ inline uint16_t AdbInterfacePlatform::wait_data_hi(uint32_t us)
     time = time_us_64();
   } while (us >= time - start);
   uint16_t diff = static_cast<uint16_t>(time - start);
-  return us >= diff ? diff : 0;
+  return diff;
 }
 
 

@@ -36,6 +36,7 @@
 #define KBD_DEFAULT_HANDLER_ID 0x02
 #define MOUSE_DEFAULT_ADDR 0x03
 #define MOUSE_DEFAULT_HANDLER_ID 0x01
+#define KDB_EXTENDED_HANDLER_ID 0x3
 
 extern bool adb_collision;
 extern bool collision_detection;
@@ -148,11 +149,13 @@ out:
 
 inline void AdbInterface::DetectCollision(void)
 {
+  adb_irq_init();
   collision_detection = true;
 }
 
 inline void AdbInterface::ResetCollision(void)
 {
+  adb_irq_disable();
   collision_detection = false;
   adb_collision = false;
 }

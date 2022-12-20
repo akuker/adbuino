@@ -54,10 +54,10 @@
 #define UART_PORT       uart0
 
 void adb_gpio_init(void);
-void adb_irq_init(void);
 void uart_gpio_init(void);
 void led_gpio_init(void);
 void led_blink(uint8_t times);
+
 
 inline void led_on(void) {
     LED_ON();

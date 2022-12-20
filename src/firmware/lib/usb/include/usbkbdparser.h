@@ -26,7 +26,7 @@
 #ifdef ADBUINO
 #include <hidboot.h>
 #elif QUOKKADB
-#include "hidinputclasses.h"
+#include "keyboardrptparser.h"
 #endif
 
 #include "scqueue.h"
@@ -65,7 +65,7 @@ public:
     void Reset(void);
 
 protected:
-    void OnControlKeysChanged(uint8_t before, uint8_t after);
+    void OnModifierKeysChanged(uint8_t before, uint8_t after);
 
     void OnKeyDown(uint8_t mod, uint8_t key);
     void OnKeyUp(uint8_t mod, uint8_t key);

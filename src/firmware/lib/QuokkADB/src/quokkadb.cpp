@@ -40,11 +40,14 @@
 
 #include "tusb.h"
 #include "printf/printf.h"
+#include "rp2040_serial.h"
 #include "adb.h"
 #include "quokkadb_gpio.h"
 #include "adbkbdparser.h"
 #include "adbmouseparser.h"
+#include "quokkadb_config.h"
 
+using rp2040_serial::Serial;
 
 // Globals
 extern uint8_t mousepending;
@@ -53,13 +56,12 @@ extern uint8_t kbdskip;
 extern uint16_t kbdprev0;
 extern uint16_t mousereg0;
 extern uint16_t kbdreg0;
+extern uint16_t kbdreg2;
 extern uint8_t kbdsrq;
 extern uint8_t mousesrq;
-extern uint8_t modifierkeys;
 extern uint32_t kbskiptimer;
+extern uint16_t modifierkeys;
 extern bool adb_reset;
-extern bool adb_collision;
-
 bool usb_reset = false;
 bool global_debug = false;
 
@@ -78,6 +80,9 @@ void core1_main() {
   /*------------ Core1 main loop ------------*/
   while (true) {
     tuh_task(); // tinyusb host task
+
+    KeyboardPrs.ChangeUSBKeyboardLEDs();
+    
     if (true == usb_reset)
     {
       KeyboardPrs.Reset();
@@ -94,15 +99,14 @@ int quokkadb(void) {
   adb_gpio_init();
   led_gpio_init();
   sleep_ms(10);
-  adb_irq_init();
   
+
   multicore_reset_core1();
   // all USB task run in core1
   multicore_launch_core1(core1_main);
 
-  adb.Init();
-
   led_blink(1);
+  printf("QuokkADB firmware: %s\n", QUOKKADB_FW_VERSION);
   srand(time_us_32());
 /*------------ Core0 main loop ------------*/
   while (true) {
@@ -113,6 +117,7 @@ int quokkadb(void) {
       if (KeyboardPrs.PendingKeyboardEvent())
       {
         kbdreg0 = KeyboardPrs.GetAdbRegister0();
+        kbdreg2 = KeyboardPrs.GetAdbRegister2();
         kbdpending = 1;
 
       }
@@ -127,8 +132,9 @@ int quokkadb(void) {
       }
     }
 
+    led_off();
     cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
-
+    led_on();
     adb.ProcessCommand(cmd);
 
     if (adb_reset)
@@ -136,7 +142,8 @@ int quokkadb(void) {
       adb.Reset();
       adb_reset = false;
       usb_reset = true;
-    }
+      Serial.println("ALL: Resetting devices");
+    } 
   }
   return 0;
 }

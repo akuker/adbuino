@@ -58,7 +58,7 @@ extern uint16_t mousereg0;
 extern uint16_t kbdreg0;
 extern uint8_t kbdsrq;
 extern uint8_t mousesrq;
-extern uint8_t modifierkeys;
+extern uint16_t modifierkeys;
 extern uint32_t kbskiptimer;
 extern bool adbcollision;
 

@@ -25,7 +25,7 @@
 #include <hidboot.h>
 #elif QUOKKADB
 #include <stdlib.h>
-#include "hidinputclasses.h"
+#include "mouserptparser.h"
 #endif
 
 class MouseRptParser : public MouseReportParser

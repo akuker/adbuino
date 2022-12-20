@@ -25,6 +25,7 @@
 
 #include "adbmouseparser.h"
 #ifdef QUOKKADB
+#include "quokkadb_gpio.h"
 #include "rp2040_serial.h"
 using rp2040_serial::Serial;
 #endif
@@ -53,9 +54,6 @@ uint16_t ADBMouseRptParser::GetAdbRegister0()
     {
         reg_value |= (1 << 7);
     }
-    
-    // maps to right mouse button // Bit 7 = Not used. Always 1
-    // reg_value |= (1 << 7);
 
     // // Bits 14-8 = Y move Counts (Two's compliment. Negative = up, positive = down)
     reg_value |= (EightBitToSevenBitSigned(GetDeltaY()) << 8);

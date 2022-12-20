@@ -25,8 +25,9 @@
 //
 //---------------------------------------------------------------------------
 
-#include "hidinputclasses.h"
+#include "mouserptparser.h"
 #include "tusb.h"
+
 // @TODO add mutexes around mouse info
 void MouseReportParser::Parse(const hid_mouse_report_t *report){
     static MOUSEINFO mouse_info;
