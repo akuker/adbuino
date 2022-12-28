@@ -410,19 +410,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
         Serial.println("KBD: Got LISTEN request for register 2");
       }
       listen_register = Receive16bitRegister();
-      printf("KBD: Listen Reg2: 0x%hX\n", (uint16_t)listen_register);
-      if (!(0x1 & listen_register))
-      {
-        Serial.println("Numlock LED ON");
-      }
-      if (!(0x2 & listen_register))
-      {
-        Serial.println("Caps LED ON");
-      }
-      if (!(0x4 & listen_register))
-      {
-        Serial.println("Scroll lock LED ON");
-      }
+      
       if (KDB_EXTENDED_HANDLER_ID == kbd_handler_id)
       {
         adb_set_leds(listen_register);
@@ -544,8 +532,6 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       if (Send16bitRegister(kbdreg2))
       {
         ResetCollision();
-        // @DEBUG
-        printf("KDB: Reg2 talk value: %hX\n", kbdreg2);
       }
       else
       {

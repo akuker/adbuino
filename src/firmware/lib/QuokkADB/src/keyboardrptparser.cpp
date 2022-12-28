@@ -158,7 +158,7 @@ void KeyboardReportParser::ChangeUSBKeyboardLEDs(void)
                         &(usb_kbd_leds), 
                         sizeof(usb_kbd_leds)
                 )) {
-                     printf("KBD: tuh_hid_set_report failed, dev addr: %hhx, instance: %hhx",
+                     printf("KBD: tuh_hid_set_report failed, dev addr: %hhx, instance: %hhx\n",
                         keyboards_list[i].device_addr, 
                         keyboards_list[i].instance);   
                 }        
@@ -192,7 +192,7 @@ uint8_t KeyboardReportParser::OemToAscii(uint8_t mod, uint8_t key) {
         }// Numbers
         else if (VALUE_WITHIN(key, 0x1e, 0x27)) {
                 if (shift)
-                        return ((uint8_t)pgm_read_byte(&getNumKeys()[key - 0x1e])); // @TODO get this to compile
+                        return ((uint8_t)pgm_read_byte(&getNumKeys()[key - 0x1e])); 
                 else
                         return ((key == UHS_HID_BOOT_KEY_ZERO) ? '0' : key - 0x1e + '1');
         }// Keypad Numbers

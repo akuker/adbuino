@@ -41,7 +41,7 @@
 //--------------------------------------------------------------------
 // COMMON CONFIGURATION
 //--------------------------------------------------------------------
-
+#define CFG_TUSB_DEBUG 3
 #define CFG_TUSB_OS               OPT_OS_PICO
 #define CFG_TUSB_MCU              OPT_MCU_RP2040 
 
