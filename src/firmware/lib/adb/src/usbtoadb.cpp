@@ -209,9 +209,6 @@ uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
         return 0x65;
     case USB_KEY_F11:
         return 0x67;
-    case USB_KEY_SYSRQ: // fall through to F13
-    case USB_KEY_F13:
-        return 0x69;
     case USB_KEY_SCROLLLOCK: // fall through to F14
     case USB_KEY_F14:
         return 0x6B;
@@ -219,6 +216,9 @@ uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
         return 0x6D;
     case USB_KEY_F12:
         return 0x6F;
+    case USB_KEY_F15:
+    case USB_KEY_PAUSE:
+        return 0x71;
     case USB_KEY_INSERT: // fall through to Help
     case USB_KEY_HELP:
         return 0x72;
@@ -238,9 +238,10 @@ uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
         return 0x79;
     case USB_KEY_F1:
         return 0x7A;
-    // Use Pause key or F15 key as Apple Power key
-    case USB_KEY_F15:
-    case USB_KEY_PAUSE:
+
+    // Use PrntScr/Sysrq key or F13 key as Apple Power key
+    case USB_KEY_SYSRQ: // fall through to F13
+    case USB_KEY_F13:
         return 0x7F;
     case USB_KEY_RIGHTCTRL:
         if (IS_EXTENDED_KEYBOARD())

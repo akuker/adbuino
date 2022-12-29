@@ -43,12 +43,13 @@ uint16_t ADBKbdRptParser::GetAdbRegister0()
     KeyEvent *event;
     uint16_t kbdreg0 = 0;
     uint8_t adb_keycode = 0;
-
+    bool isKeyUp;
     // Pack the first key event
     if (!m_keyboard_events.isEmpty())
     {
         event = m_keyboard_events.dequeue();
-        if (event->IsKeyUp())
+        isKeyUp = event->IsKeyUp();
+        if (isKeyUp)
         {
             B_SET(kbdreg0, ADB_REG_0_KEY_1_STATUS_BIT);
         }
@@ -60,30 +61,38 @@ uint16_t ADBKbdRptParser::GetAdbRegister0()
     {
         kbdreg0 |= (ADB_REG_0_NO_KEY << ADB_REG_0_KEY_1_KEY_CODE);
     }
-    event = m_keyboard_events.peek();
-    // Pack the second key event unless, the 
-    if (!m_keyboard_events.isEmpty()) {
-        // if the first key wasn't the power key but the second one is, skip the second key packing
-        // so on the next cycle the power key will be packed as both the first and second key
-        if (adb_keycode == ADB_POWER_KEYCODE ||  
-                (event != NULL && 
-                    usb_keycode_to_adb_code(event->GetKeycode()) != ADB_POWER_KEYCODE
-                )
-           )
+
+    if (adb_keycode == ADB_POWER_KEYCODE) {
+        if (isKeyUp)
         {
-        event = m_keyboard_events.dequeue();
-        if (event->IsKeyUp())
-        {
-            B_SET(kbdreg0, ADB_REG_0_KEY_2_STATUS_BIT); 
+            B_SET(kbdreg0, ADB_REG_0_KEY_1_STATUS_BIT);
         }
-        adb_keycode = usb_keycode_to_adb_code(event->GetKeycode());
         kbdreg0 |= (adb_keycode << ADB_REG_0_KEY_2_KEY_CODE);
-        free(event);
-        }
     }
-    else
-    {
-        kbdreg0 |= (ADB_REG_0_NO_KEY << ADB_REG_0_KEY_2_KEY_CODE);
+    else{
+        if (!m_keyboard_events.isEmpty()) {
+            event = m_keyboard_events.peek();
+            // if the first key wasn't the power key but the second one is, skip the second key packing
+            // so on the next cycle the power key will be packed as both the first and second key
+            if (event != NULL && usb_keycode_to_adb_code(event->GetKeycode()) != ADB_POWER_KEYCODE)
+            {
+                event = m_keyboard_events.dequeue();
+                if (event->IsKeyUp())
+                {
+                    B_SET(kbdreg0, ADB_REG_0_KEY_2_STATUS_BIT); 
+                }
+                adb_keycode = usb_keycode_to_adb_code(event->GetKeycode());
+                kbdreg0 |= (adb_keycode << ADB_REG_0_KEY_2_KEY_CODE);
+                free(event);
+            }
+            else
+            {
+                kbdreg0 |= (ADB_REG_0_NO_KEY << ADB_REG_0_KEY_2_KEY_CODE);
+            }
+        }
+        else   {
+            kbdreg0 |= (ADB_REG_0_NO_KEY << ADB_REG_0_KEY_2_KEY_CODE);
+        }
     }
     if (global_debug)
     {
