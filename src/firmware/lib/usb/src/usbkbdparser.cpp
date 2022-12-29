@@ -220,7 +220,6 @@ void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
     }
 }
 
-
 void KbdRptParser::OnModifierKeysChanged(uint8_t before, uint8_t after)
 {
 

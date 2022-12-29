@@ -27,3 +27,5 @@
 #define FW_VER_NUM      "1.0.0"
 #define FW_VER_SUFFIX   "release"
 #define QUOKKADB_FW_VERSION FW_VER_NUM "-" FW_VER_SUFFIX
+#define PRODUCT_NAME "QuokkADB"
+#define QUOKKADB_FW_VER_STRING PRODUCT_NAME " firmware: " QUOKKADB_FW_VERSION

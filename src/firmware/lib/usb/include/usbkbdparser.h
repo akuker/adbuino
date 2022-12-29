@@ -63,6 +63,7 @@ public:
     KeyEvent GetKeyEvent();
     bool PendingKeyboardEvent();
     void Reset(void);
+    
 
 protected:
     void OnModifierKeysChanged(uint8_t before, uint8_t after);
@@ -70,7 +71,7 @@ protected:
     void OnKeyDown(uint8_t mod, uint8_t key);
     void OnKeyUp(uint8_t mod, uint8_t key);
     void OnKeyPressed(uint8_t key);
-    
+
     uint8_t m_last_key_pressed;
     uint8_t m_last_key_up_or_down;
 

@@ -123,12 +123,16 @@ public:
         };
 
         void Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_report_t const *report);
+        bool SpecialKeyCombo(KBDINFO *cur_kbd_info);
+        void SendString(const char* message);
         void AddKeyboard(uint8_t dev_addr, uint8_t instance);
         void RemoveKeyboard(uint8_t dev_addr, uint8_t instance);
         // Sets the LEDs to shared memory
         void SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrolllock);
         // Executes the LED changes from shared memory (meant to be run on the same core as tuh_task)
         void ChangeUSBKeyboardLEDs(void);
+
+        virtual bool PendingKeyboardEvent(void);
 
 
 protected:
