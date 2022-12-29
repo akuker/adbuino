@@ -134,6 +134,12 @@ public:
 
         virtual bool PendingKeyboardEvent(void);
 
+        virtual void OnKeyDown(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) {
+        };
+
+        virtual void OnKeyUp(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) {
+        };
+
 
 protected:
 
@@ -165,11 +171,7 @@ protected:
         virtual void OnModifierKeysChanged(uint8_t before __attribute__((unused)), uint8_t after __attribute__((unused))) {
         };
 
-        virtual void OnKeyDown(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) {
-        };
 
-        virtual void OnKeyUp(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) {
-        };
 
         virtual const uint8_t *getNumKeys() {
                 return numKeys;

@@ -68,7 +68,7 @@ bool global_debug = false;
 AdbInterface adb;
 
 ADBKbdRptParser KeyboardPrs;
-ADBMouseRptParser MousePrs;
+ADBMouseRptParser MousePrs(KeyboardPrs);
 
 
 /*------------- MAIN -------------*/

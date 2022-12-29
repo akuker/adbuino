@@ -28,6 +28,12 @@
 #include "mouserptparser.h"
 #endif
 
+enum class MouseRightBtnMode {
+    ctrl_click,
+    right_click
+};
+
+
 class MouseRptParser : public MouseReportParser
 {
 public:
@@ -54,4 +60,7 @@ private:
     bool m_mouse_left_button_is_pressed = false;
     bool m_mouse_right_button_is_pressed = false;
     bool m_mouse_button_changed = false;
+    MouseRightBtnMode m_right_btn_mode = MouseRightBtnMode::ctrl_click;
+    
+
 };

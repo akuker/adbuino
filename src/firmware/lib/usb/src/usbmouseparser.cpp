@@ -24,6 +24,7 @@
 
 
 #include "usbmouseparser.h"
+#include "usb_hid_keys.h"
 #ifdef QUOKKADB
 #include "rp2040_serial.h"
 using rp2040_serial::Serial;
@@ -91,8 +92,24 @@ void MouseRptParser::OnRightButtonUp(MOUSEINFO *mi)
     {
         Serial.println("R Butt Up");
     }
-    m_mouse_right_button_is_pressed = false;
-    m_mouse_button_changed = true;
+    switch (m_right_btn_mode)
+    {
+        case MouseRightBtnMode::ctrl_click :
+
+            m_mouse_left_button_is_pressed = false;
+            m_mouse_button_changed = true;
+            sleep_ms(100);
+            while(m_keyboard->PendingKeyboardEvent());
+            m_keyboard->OnKeyUp(0, USB_KEY_LEFTCTRL);
+            while(m_keyboard->PendingKeyboardEvent());
+
+        break;
+        case MouseRightBtnMode::right_click :
+            m_mouse_right_button_is_pressed = false;
+            m_mouse_button_changed = true;
+        break;
+    }
+
 };
 void MouseRptParser::OnRightButtonDown(MOUSEINFO *mi)
 {
@@ -100,8 +117,22 @@ void MouseRptParser::OnRightButtonDown(MOUSEINFO *mi)
     {
         Serial.println("R Butt Dn");
     }
-    m_mouse_right_button_is_pressed = true;
-    m_mouse_button_changed = true;
+    switch (m_right_btn_mode)
+    {
+        case MouseRightBtnMode::ctrl_click :
+            while(m_keyboard->PendingKeyboardEvent());
+            m_keyboard->OnKeyDown(0, USB_KEY_LEFTCTRL);
+            while(m_keyboard->PendingKeyboardEvent());
+            sleep_ms(200);
+            m_mouse_left_button_is_pressed = true;
+            m_mouse_button_changed = true;
+
+        break;
+        case MouseRightBtnMode::right_click :
+            m_mouse_right_button_is_pressed = true;
+            m_mouse_button_changed = true;
+        break;
+    }
 };
 void MouseRptParser::OnMiddleButtonUp(MOUSEINFO *mi)
 {
@@ -109,11 +140,22 @@ void MouseRptParser::OnMiddleButtonUp(MOUSEINFO *mi)
     {
         Serial.println("M Butt Up");
     }
+
 };
 void MouseRptParser::OnMiddleButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
         Serial.println("M Butt Dn");
+    }
+    switch (m_right_btn_mode)
+    {
+        case MouseRightBtnMode::ctrl_click :
+            m_right_btn_mode = MouseRightBtnMode::right_click; 
+        break;
+        case MouseRightBtnMode::right_click :
+            m_right_btn_mode = MouseRightBtnMode::ctrl_click;
+        break;
+        
     }
 };

@@ -33,6 +33,7 @@
 
 #include <stdint.h>
 #include "tusb.h"
+#include "keyboardrptparser.h"
 
 //----------------------------------------------------------------------------
 // Mouse handler
@@ -81,4 +82,6 @@ protected:
 
         virtual void OnMiddleButtonDown(MOUSEINFO *mi __attribute__((unused))) {
         };
+
+        KeyboardReportParser* m_keyboard;
 };

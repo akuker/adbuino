@@ -32,6 +32,11 @@ using rp2040_serial::Serial;
 
 extern bool global_debug;
 
+ADBMouseRptParser::ADBMouseRptParser(ADBKbdRptParser &kbd_parser)
+{
+    m_keyboard = &kbd_parser;
+}
+
 uint32_t ADBMouseRptParser::EightBitToSevenBitSigned(int8_t value)
 {
     // Dividing the value by 2 has 2 benefits:
