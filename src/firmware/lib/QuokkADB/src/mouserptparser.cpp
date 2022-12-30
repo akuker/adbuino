@@ -25,14 +25,15 @@
 //
 //---------------------------------------------------------------------------
 
-#include "hidinputclasses.h"
+#include "mouserptparser.h"
 #include "tusb.h"
-// @TODO add mutexes around mouse info
+
 void MouseReportParser::Parse(const hid_mouse_report_t *report){
     static MOUSEINFO mouse_info;
 
     mouse_info.bmLeftButton = !!(report->buttons & MOUSE_BUTTON_LEFT);
     mouse_info.bmRightButton = !!(report->buttons & MOUSE_BUTTON_RIGHT);
+    mouse_info.bmMiddleButton = !!(report->buttons & MOUSE_BUTTON_MIDDLE);
     mouse_info.dX = report->x;
     mouse_info.dY = report->y;
 
@@ -57,6 +58,14 @@ void MouseReportParser::Parse(const hid_mouse_report_t *report){
     if (prevState.mouseInfo.bmRightButton && !mouse_info.bmRightButton) {
         OnRightButtonUp(&mouse_info);
     }
+
+    if (!prevState.mouseInfo.bmMiddleButton && mouse_info.bmMiddleButton) {
+        OnMiddleButtonDown(&mouse_info);
+    }
+    if (!prevState.mouseInfo.bmMiddleButton && mouse_info.bmMiddleButton) {
+        OnMiddleButtonUp(&mouse_info);
+    }
+
 
     prevState.mouseInfo = mouse_info;
 }

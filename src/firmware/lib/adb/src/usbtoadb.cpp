@@ -36,6 +36,9 @@
 using rp2040_serial::Serial;
 #endif
 
+extern uint8_t kbd_handler_id;
+#define IS_EXTENDED_KEYBOARD() (0x3 == kbd_handler_id)
+
 // Virtual Keycodes for the Mac QWERTY Layout
 // Keycodes are in hexadecimal.
 uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
@@ -206,9 +209,6 @@ uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
         return 0x65;
     case USB_KEY_F11:
         return 0x67;
-    case USB_KEY_SYSRQ: // fall through to F13
-    case USB_KEY_F13:
-        return 0x69;
     case USB_KEY_SCROLLLOCK: // fall through to F14
     case USB_KEY_F14:
         return 0x6B;
@@ -216,8 +216,8 @@ uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
         return 0x6D;
     case USB_KEY_F12:
         return 0x6F;
-    case USB_KEY_PAUSE: // fall through to F15
     case USB_KEY_F15:
+    case USB_KEY_PAUSE:
         return 0x71;
     case USB_KEY_INSERT: // fall through to Help
     case USB_KEY_HELP:
@@ -239,13 +239,41 @@ uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
     case USB_KEY_F1:
         return 0x7A;
 
+    // Use PrntScr/Sysrq key or F13 key as Apple Power key
+    case USB_KEY_SYSRQ: // fall through to F13
+    case USB_KEY_F13:
+        return 0x7F;
     case USB_KEY_RIGHTCTRL:
+        if (IS_EXTENDED_KEYBOARD())
+        {
+            return 0x7D;
+        }
+        else 
+        {
+            return 0x36;    
+        }        
     case USB_KEY_LEFTCTRL:
         return 0x36;
     case USB_KEY_RIGHTSHIFT:
+        if (IS_EXTENDED_KEYBOARD())
+        {
+            return 0x7B;
+        }
+        else 
+        {
+            return 0x38;    
+        }
     case USB_KEY_LEFTSHIFT:
         return 0x38;
     case USB_KEY_RIGHTALT:
+        if (IS_EXTENDED_KEYBOARD())
+        {
+            return 0x7C;
+        }
+        else 
+        {
+            return 0x3A;    
+        }    
     case USB_KEY_LEFTALT:
         return 0x3A;
     case USB_KEY_RIGHTMETA: // fall through to LEFTMETA

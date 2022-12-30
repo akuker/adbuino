@@ -27,10 +27,14 @@
 
 #include "quokkadb_gpio.h"
 #include "pico/mutex.h"
+#include "hardware/gpio.h"
 #include "printf/printf.h"
 
 mutex_t led_mutex;
 
+
+
+extern bool global_debug;
 void adb_gpio_init(void) {
     gpio_init(ADB_OUT_GPIO);
     gpio_set_function(ADB_OUT_GPIO, GPIO_FUNC_SIO);
@@ -39,7 +43,11 @@ void adb_gpio_init(void) {
 
     gpio_init(ADB_IN_GPIO);
     gpio_set_dir(ADB_IN_GPIO, GPIO_IN);
+
+
 }
+
+
 
 void led_gpio_init(void) {
     gpio_init(LED_GPIO);

@@ -46,6 +46,8 @@
 #define ADB_OUT_LOW()  sio_hw->gpio_clr = 1 << ADB_OUT_GPIO
 #define ADB_IN_GET() (gpio_get(ADB_IN_GPIO))
 
+#define GPIO_TEST 20
+
 // UART out messaging
 #define UART_TX_GPIO    16
 #define UART_TX_BAUD    115200
@@ -55,6 +57,7 @@ void adb_gpio_init(void);
 void uart_gpio_init(void);
 void led_gpio_init(void);
 void led_blink(uint8_t times);
+
 
 inline void led_on(void) {
     LED_ON();

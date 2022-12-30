@@ -76,6 +76,17 @@ namespace simple_circular_queue {
     }
    
     template <typename T, size_t allocation_size> 
+    T SCQueue<T, allocation_size>::peek(void) {
+        T peek_value = NULL;
+        mutexLock();
+        if (!is_empty_) {
+            peek_value = queue_[first_]; 
+        }
+        mutexUnlock();
+        return peek_value;
+    }
+
+    template <typename T, size_t allocation_size> 
     bool SCQueue<T, allocation_size>::isEmpty(void) {
         mutexLock();
         volatile bool is_e = is_empty_; 

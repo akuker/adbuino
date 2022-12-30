@@ -27,10 +27,12 @@
 #ifdef ADBUINO
 #include <hidboot.h>
 #elif QUOKKADB
-#include "hidinputclasses.h"
+#include "keyboardrptparser.h"
 #endif
 
 #include "scqueue.h"
+
+#define ADB_POWER_KEYCODE 0x7f
 
 using simple_circular_queue::SCQueue;
 
