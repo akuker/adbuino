@@ -35,6 +35,7 @@
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 
 extern uint16_t modifierkeys;
+extern bool set_hid_report_ready;
 
 uint8_t inline findModifierKey(hid_keyboard_report_t const *report, const hid_keyboard_modifier_bm_t mod ) {
         return (mod & report->modifier) ? 1 : 0;
@@ -243,9 +244,10 @@ void KeyboardReportParser::ChangeUSBKeyboardLEDs(void)
         usb_kbd_leds |=  kbdLockingKeys.kbdLeds.bmCapsLock ? 0x2 : 0;
         usb_kbd_leds |= kbdLockingKeys.kbdLeds.bmScrollLock ? 0x4 : 0;
 
-        bool device_ready = false;
-        if (keyboards_list[i].in_use) {
-                device_ready = tuh_ready(keyboards_list[i].device_addr);
+        bool try_again = true;
+        if (set_hid_report_ready && keyboards_list[i].in_use) {
+                set_hid_report_ready = false;
+                try_again = false;
                 if (!tuh_hid_set_report(
                         keyboards_list[i].device_addr, 
                         keyboards_list[i].instance,  
@@ -255,27 +257,15 @@ void KeyboardReportParser::ChangeUSBKeyboardLEDs(void)
                         sizeof(usb_kbd_leds)
                 )) 
                 {
+                        set_hid_report_ready = true;
                         printf("KBD: tuh_hid_set_report failed, dev addr: %hhx, instance: %hhx\n",
                                 keyboards_list[i].device_addr, 
                                 keyboards_list[i].instance);  
-/*
-                        if (usbh_control_stage_force_idle())
-                        {
-                                tuh_hid_set_report(
-                                        keyboards_list[i].device_addr, 
-                                        keyboards_list[i].instance,  
-                                        0, 
-                                        HID_REPORT_TYPE_OUTPUT, 
-                                        &(usb_kbd_leds), 
-                                        sizeof(usb_kbd_leds)
-                                );
-                        }
-                        */
                         
                 }        
         }
 
-        if (!keyboards_list[i].in_use || device_ready)
+        if (!keyboards_list[i].in_use || !try_again)
         {
                 i++;
         } 

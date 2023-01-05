@@ -44,6 +44,7 @@ extern uint16_t modifierkeys;
 extern KbdRptParser KeyboardPrs;
 extern MouseRptParser MousePrs;
 
+bool set_hid_report_ready = true;
 
 //--------------------------------------------------------------------+
 // Host HID
@@ -144,5 +145,7 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
   }
 }
 
-
-
+void tuh_hid_set_report_complete_cb(uint8_t dev_addr, uint8_t instance, uint8_t report_id, uint8_t report_type, uint16_t len)
+{
+  set_hid_report_ready = true;
+}
