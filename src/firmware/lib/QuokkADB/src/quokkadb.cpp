@@ -45,6 +45,7 @@
 #include "quokkadb_gpio.h"
 #include "adbkbdparser.h"
 #include "adbmouseparser.h"
+#include "flashsettings.h"
 #include "quokkadb_config.h"
 
 using rp2040_serial::Serial;
@@ -69,7 +70,7 @@ AdbInterface adb;
 
 ADBKbdRptParser KeyboardPrs;
 ADBMouseRptParser MousePrs(KeyboardPrs);
-
+FlashSettings setting_storage;
 
 /*------------- MAIN -------------*/
 
@@ -100,11 +101,15 @@ int quokkadb(void) {
   led_gpio_init();
   sleep_ms(10);
   
+  setting_storage.init();
+  
+  //  Block this core when the core1 is writing to flash 
+
 
   multicore_reset_core1();
   // all USB task run in core1
   multicore_launch_core1(core1_main);
-
+  multicore_lockout_victim_init();
   led_blink(1);
   printf("QuokkADB firmware: %s\n", QUOKKADB_FW_VERSION);
   srand(time_us_32());
@@ -134,7 +139,10 @@ int quokkadb(void) {
 
     led_off();
     cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
-    led_on();
+    if(setting_storage.settings()->led_on)
+    {
+      led_on();
+    }  
     adb.ProcessCommand(cmd);
 
     if (adb_reset)

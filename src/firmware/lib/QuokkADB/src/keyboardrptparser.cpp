@@ -29,6 +29,7 @@
 #include "usb_hid_keys.h"
 #include "quokkadb_config.h"
 #include "char2usbkeycode.h"
+#include "flashsettings.h"
 #include <tusb.h>
 
 #define VALUE_WITHIN(v,l,h) (((v)>=(l)) && ((v)<=(h)))
@@ -36,6 +37,7 @@
 
 extern uint16_t modifierkeys;
 extern bool set_hid_report_ready;
+extern FlashSettings setting_storage;
 
 uint8_t inline findModifierKey(hid_keyboard_report_t const *report, const hid_keyboard_modifier_bm_t mod ) {
         return (mod & report->modifier) ? 1 : 0;
@@ -154,10 +156,10 @@ void KeyboardReportParser::SetUSBkeyboardLEDs(bool capslock, bool numlock, bool 
 bool KeyboardReportParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
 {
         uint8_t keys_down[6] = {};
-                // Special keycombo actions
+        // Special keycombo actions
         uint8_t special_key_count = 0;
         uint8_t special_key = 0;
-        uint8_t special_keys[] = { USB_KEY_V, USB_KEY_I};
+        uint8_t special_keys[] = { USB_KEY_V, USB_KEY_L};
         uint8_t caps_lock_down = false;
         
         for (uint8_t i = 0; i < 6; i++)
@@ -187,6 +189,18 @@ bool KeyboardReportParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
                 {
                 case USB_KEY_V:
                         SendString(QUOKKADB_FW_VER_STRING);
+                break;
+                case USB_KEY_L:
+                        setting_storage.settings()->led_on = ~setting_storage.settings()->led_on;
+                        setting_storage.save();
+                        if (setting_storage.settings()->led_on) 
+                        {
+                                SendString("Busy LED is on");
+                        }   
+                        else
+                        {
+                                SendString("Busy LED is off");
+                        }                 
                 break;        
                 }
                 
