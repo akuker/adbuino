@@ -22,10 +22,12 @@
 //  with the file. If not, see <https://www.gnu.org/licenses/>.
 //
 //---------------------------------------------------------------------------
+#pragma once
 
-// Use variables for version number
-#define FW_VER_NUM      "0.1.1"
+// Use macros for version number
+#define FW_VER_NUM      "0.1.2"
 #define FW_VER_SUFFIX   "beta"
 #define QUOKKADB_FW_VERSION FW_VER_NUM "-" FW_VER_SUFFIX
 #define PRODUCT_NAME "QuokkADB"
 #define QUOKKADB_FW_VER_STRING PRODUCT_NAME " firmware: " QUOKKADB_FW_VERSION
+

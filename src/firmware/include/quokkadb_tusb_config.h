@@ -41,7 +41,7 @@
 //--------------------------------------------------------------------
 // COMMON CONFIGURATION
 //--------------------------------------------------------------------
-// #define CFG_TUSB_DEBUG 3
+
 #define CFG_TUSB_OS               OPT_OS_PICO
 #define CFG_TUSB_MCU              OPT_MCU_RP2040 
 
@@ -49,7 +49,9 @@
 #define CFG_TUH_ENABLED     1
 
 // CFG_TUSB_DEBUG is defined by compiler in DEBUG build
-// #define CFG_TUSB_DEBUG           0
+#define CFG_TUSB_DEBUG           0
+//#define CFG_TUSB_DEBUG 3
+
 #undef PICO_DEFAULT_UART
 #undef PICO_DEFAULT_UART_TX_PIN
 #undef PICO_DEFAULT_UART_RX_PIN
@@ -78,11 +80,11 @@
 //--------------------------------------------------------------------
 
 // Size of buffer to hold descriptors and other data used for enumeration
-#define CFG_TUH_ENUMERATION_BUFSIZE 256
+#define CFG_TUH_ENUMERATION_BUFSIZE 512
 
-#define CFG_TUH_HUB                 1
+#define CFG_TUH_HUB                 4
 // max device support (excluding hub device)
-#define CFG_TUH_DEVICE_MAX          (CFG_TUH_HUB ? 4 : 1) // hub typically has 4 ports
+#define CFG_TUH_DEVICE_MAX          16 // hub typically has 4 ports
 #define CFG_TUH_HID                 4 // typical keyboard + mouse device can have 3-4 HID interfaces
 #define CFG_TUH_MSC                 0
 

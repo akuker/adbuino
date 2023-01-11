@@ -24,6 +24,11 @@ The stack port carries all four ADB signals.
 
 ![QuokkADB picture](images/quokkadb.jpg)
 
+## Special Key-combos
+The special keyboad commands start with `CTRL + SHIFT + CAPLOCK` and a letter key.  Example: `CTRL + SHIFT + CAPLOCK + V` ghost types the firmware version.
+ - `V` - Ghost types firmware version
+ - `L` - Ghost types the busy LED status (ON/OFF) and saves the new status to flash and will be used when the board powers on again. This controls
+ whether the LED blinks when accessing the ADB bus or remains off for light sensitive situations.
 
 ## Programming 
 The firmware version can be found by opening up a empty text document or program that allows typing. 
@@ -53,8 +58,7 @@ disconnected).
  - Rear facing and front facing ADB can be connected to host (Mac)
  or used to connected to another ADB device
  - Mouse and keyboard readdressing implemented so multiple QuokkADBs, other ADB keyboards, and/or mice can be used 
- - Multiple USB keyboards or mice can be attached and will work. Known issue: Caps lock led is limited to changing on the keyboard which it was pressed.
- - Limitations with USB Host support in TinyUSB mean only one level of USB hubs may be attached and some USB composite keyboard have been found not to work.
+ - Multiple USB keyboards or mice can be attached and will work.
 
 ## Parity with USB Wombat
  - Context menu for Mac OS 8.1 and above - middle mouse button switches right click mode
