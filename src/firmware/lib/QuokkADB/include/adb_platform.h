@@ -27,6 +27,7 @@
 
 #include <stdint.h>
 #include "quokkadb_gpio.h"
+#include <hardware/timer.h>
 
 extern bool adb_collision;
 

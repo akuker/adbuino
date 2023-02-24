@@ -38,7 +38,7 @@
 #elif QUOKKADB
 #include <time.h>
 #include "rp2040_serial.h"
-#include "printf/printf.h"
+#include <pico/printf.h>
 using rp2040_serial::Serial;
 #endif
 
@@ -56,7 +56,7 @@ uint16_t kbdreg2 = 0xFFFF;
 uint8_t kbdsrq = 0;
 uint8_t mousesrq = 0;
 uint16_t modifierkeys = 0xFFFF;
-uint32_t kbskiptimer = 0;
+uint64_t kbskiptimer = 0;
 bool adb_reset = false;
 bool adb_collision = false; 
 bool collision_detection = false;
@@ -491,9 +491,12 @@ void AdbInterface::ProcessCommand(int16_t cmd)
           kbdreg0 = (kbdprev0 << 8) | 0xFF;
 
           // Save timestamp
-          kbskiptimer = millis();
+// @DEBUG switch back after getting cmake to compile QuokkADB
+//          kbskiptimer = millis();
+            kbskiptimer = (time_us_64() / 1000);
         }
-        else if (millis() - kbskiptimer < 90)
+//        else if (millis() - kbskiptimer < 90)
+        else if (time_us_64() / 1000 - kbskiptimer  < 90)
         {
           // Check timestamp and don't process the key event if it came right after a 255
           // This is meant to avoid a glitch where releasing a key sends 255->keydown instead
