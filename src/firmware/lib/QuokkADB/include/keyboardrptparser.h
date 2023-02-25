@@ -35,55 +35,6 @@
 #include "tusb.h"
 
 //----------------------------------------------------------------------------
-// Mouse handler
-//----------------------------------------------------------------------------
-
-struct MOUSEINFO {
-
-        struct {
-                uint8_t bmLeftButton : 1;
-                uint8_t bmRightButton : 1;
-                uint8_t bmMiddleButton : 1;
-                uint8_t bmDummy : 5;
-        };
-        int8_t dX;
-        int8_t dY;
-};
-
-class MouseReportParser {
-
-        union {
-                MOUSEINFO mouseInfo;
-                uint8_t bInfo[sizeof (MOUSEINFO)];
-        } prevState;
-
-public:
-        void Parse(const hid_mouse_report_t* report);
-protected:
-
-        virtual void OnMouseMove(MOUSEINFO *mi __attribute__((unused))) {
-        };
-
-        virtual void OnLeftButtonUp(MOUSEINFO *mi __attribute__((unused))) {
-        };
-
-        virtual void OnLeftButtonDown(MOUSEINFO *mi __attribute__((unused))) {
-        };
-
-        virtual void OnRightButtonUp(MOUSEINFO *mi __attribute__((unused))) {
-        };
-
-        virtual void OnRightButtonDown(MOUSEINFO *mi __attribute__((unused))) {
-        };
-
-        virtual void OnMiddleButtonUp(MOUSEINFO *mi __attribute__((unused))) {
-        };
-
-        virtual void OnMiddleButtonDown(MOUSEINFO *mi __attribute__((unused))) {
-        };
-};
-
-//----------------------------------------------------------------------------
 // Keyboard handler
 //----------------------------------------------------------------------------
 #define UHS_HID_BOOT_KEY_ZERO           0x27
@@ -95,7 +46,7 @@ protected:
 #define UHS_HID_BOOT_KEY_ZERO2          0x62
 #define UHS_HID_BOOT_KEY_PERIOD         0x63
 
-
+#define MAX_KEYBOARDS 32
 
 struct KBDINFO {
 
@@ -133,6 +84,13 @@ struct MODIFIERKEYS {
         uint8_t bmRightGUI : 1;
 };
 
+struct KeyboardDevices  
+{
+  uint8_t device_addr;
+  uint8_t instance;
+  bool in_use;
+};
+
 class KeyboardReportParser {
         
         static const uint8_t numKeys[10];
@@ -152,7 +110,11 @@ protected:
                 uint8_t bLeds;
         } kbdLockingKeys;
 
+        bool usb_set_leds = false;
+
         uint8_t OemToAscii(uint8_t mod, uint8_t key);
+
+        KeyboardDevices keyboards_list[MAX_KEYBOARDS] = {};
 
 public:
 
@@ -161,6 +123,23 @@ public:
         };
 
         void Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_report_t const *report);
+        bool SpecialKeyCombo(KBDINFO *cur_kbd_info);
+        void SendString(const char* message);
+        void AddKeyboard(uint8_t dev_addr, uint8_t instance);
+        void RemoveKeyboard(uint8_t dev_addr, uint8_t instance);
+        // Sets the LEDs to shared memory
+        void SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrolllock);
+        // Executes the LED changes from shared memory (meant to be run on the same core as tuh_task)
+        void ChangeUSBKeyboardLEDs(void);
+
+        virtual bool PendingKeyboardEvent(void);
+
+        virtual void OnKeyDown(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) {
+        };
+
+        virtual void OnKeyUp(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) {
+        };
+
 
 protected:
 
@@ -180,21 +159,19 @@ protected:
                 }
 
                 if(old_keys != kbdLockingKeys.bLeds ) {
-                        return tuh_hid_set_report(dev_addr, instance,  0 , HID_REPORT_TYPE_OUTPUT, &(kbdLockingKeys.bLeds), sizeof(kbdLockingKeys.bLeds));
-                        
+                        bool numlock = !!(kbdLockingKeys.kbdLeds.bmNumLock);
+                        bool capslock = !!(kbdLockingKeys.kbdLeds.bmCapsLock);
+                        bool scrolllock = !!(kbdLockingKeys.kbdLeds.bmScrollLock);
+                        SetUSBkeyboardLEDs(capslock, numlock, scrolllock);                        
                 }
 
                 return 0;
         };
 
-        virtual void OnControlKeysChanged(uint8_t before __attribute__((unused)), uint8_t after __attribute__((unused))) {
+        virtual void OnModifierKeysChanged(uint8_t before __attribute__((unused)), uint8_t after __attribute__((unused))) {
         };
 
-        virtual void OnKeyDown(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) {
-        };
 
-        virtual void OnKeyUp(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) {
-        };
 
         virtual const uint8_t *getNumKeys() {
                 return numKeys;

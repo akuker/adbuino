@@ -23,46 +23,31 @@
 //  License. See LICENSE in the root of this repository for more info.
 //
 //----------------------------------------------------------------------------
-
-
-
 #pragma once
-#include "stdlib.h"
-#include "hardware/structs/sio.h"
-#include "hardware/gpio.h"
-#include "hardware/uart.h"
+#include <stdint.h>
+#include <hardware/flash.h>
 
+#define QUOKKADB_SETTINGS_MAGIC_NUMBER 0x71DE
 
-// Status LED GPIOs
-#define LED_GPIO     12
-#define LED_ON()    sio_hw->gpio_set = 1 << LED_GPIO
-#define LED_OFF()   sio_hw->gpio_clr = 1 << LED_GPIO
-#define LED_SET(x)  (x ? sio_hw->gpio_set = 1 << LED_GPIO : sio_hw->gpio_clr = 1 << LED_GPIO)
+struct __attribute((packed)) QuokkADBSettings 
+{
+    uint16_t magic_number;
+    uint8_t led_on: 1;
+    uint8_t reserved_bits: 7;
+    uint8_t reserved_bytes[253];
+};
 
-// ADB GPIOs
-#define ADB_IN_GPIO   19
-#define ADB_OUT_GPIO  18
-#define ADB_OUT_HIGH() sio_hw->gpio_set = 1 << ADB_OUT_GPIO
-#define ADB_OUT_LOW()  sio_hw->gpio_clr = 1 << ADB_OUT_GPIO
-#define ADB_IN_GET() (gpio_get(ADB_IN_GPIO))
+class FlashSettings
+{
+public:
+    void init(void);
+    void write_settings_page(uint8_t *buf); 
+    uint8_t* read_settings_page(void);
+    void save(void);
+    inline QuokkADBSettings* settings() {return &_settings;}
+private:
+    uint32_t _capacity = 0;
+    uint32_t _last_sector = 0;
+    QuokkADBSettings _settings;
+};
 
-#define GPIO_TEST 20
-
-// UART out messaging
-#define UART_TX_GPIO    16
-#define UART_TX_BAUD    115200
-#define UART_PORT       uart0
-
-void adb_gpio_init(void);
-void uart_gpio_init(void);
-void led_gpio_init(void);
-void led_blink(uint8_t times);
-
-
-inline void led_on(void) {
-    LED_ON();
-}
-
-inline void led_off(void) {
-    LED_OFF();
-}

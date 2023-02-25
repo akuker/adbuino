@@ -34,17 +34,20 @@ using rp2040_serial::Serial;
 
 extern bool global_debug;
 
-KbdRptParser::KbdRptParser()
-{
-    if (global_debug)
-    {
-        Serial.println("Running KbdRptParser::KbdRptParser()");
-    }
-}
-
 bool KbdRptParser::PendingKeyboardEvent()
 {
     return !m_keyboard_events.isEmpty();
+}
+
+void KbdRptParser::Reset(void)
+{
+    while(PendingKeyboardEvent())
+    {
+        
+        free(m_keyboard_events.dequeue());
+    }
+    kbdLockingKeys.bLeds = 0x00;
+    SetUSBkeyboardLEDs(false, false, false);
 }
 
 void KbdRptParser::PrintKey(uint8_t m, uint8_t key)
@@ -72,6 +75,10 @@ void KbdRptParser::PrintKey(uint8_t m, uint8_t key)
 
 void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
 {
+
+    if (key == USB_KEY_NONE || key == USB_KEY_ERR_OVF)
+    return;
+
     if (global_debug)
     {
         Serial.print("DN ");
@@ -84,12 +91,35 @@ void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
     if (c)
         OnKeyPressed(c);
 
-
     if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyDown)))
     {
         Serial.println("Warning! unable to enqueue new KeyDown");
     }
+    // If power button replacement queue key twice
+    else if (key == USB_KEY_PAUSE || key == USB_KEY_F15)
+    {
+        if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyDown)))
+        {
+            Serial.println("Warning! unable to enqueue new Power Button KeyDown");
+        }
+    }
 
+    // Special handling of Caps Lock because of its held down nature
+    if (key == USB_KEY_CAPSLOCK)
+    {
+        if (kbdLockingKeys.kbdLeds.bmCapsLock == 1)
+        {
+            B_UNSET(m_custom_mod_keys, CapsLockFlag);
+            B_UNSET(m_custom_mod_keys, Led2CapsLockFlag);
+        }
+        else
+        {
+            B_SET(m_custom_mod_keys, CapsLockFlag);
+            B_SET(m_custom_mod_keys, Led2CapsLockFlag);
+        }        
+    }
+
+    /* @DEBUG original key status
     if (key == USB_KEY_SCROLLLOCK)
     {
         B_UNSET(m_custom_mod_keys, ScrollLockFlag);
@@ -106,13 +136,91 @@ void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
             B_UNSET(m_custom_mod_keys, Led1NumLockFlag);
         }
     }
-    if (key == USB_KEY_DELETE)
+    */
+    if (key == USB_KEY_NUMLOCK)
+    {
+        if (kbdLockingKeys.kbdLeds.bmNumLock == 1)
+        {
+            B_SET(m_custom_mod_keys, NumLockFlag);
+            B_SET(m_custom_mod_keys, Led1NumLockFlag);
+        }
+        else
+        {
+            B_UNSET(m_custom_mod_keys, NumLockFlag);
+            B_UNSET(m_custom_mod_keys, Led1NumLockFlag);
+        }        
+    }
+    if (key == USB_KEY_SCROLLLOCK)
+    {
+        if (kbdLockingKeys.kbdLeds.bmScrollLock == 1)
+        {
+            B_SET(m_custom_mod_keys, ScrollLockFlag);
+            B_SET(m_custom_mod_keys, Led3ScrollLockFlag);
+        }
+        else
+        {
+            B_UNSET(m_custom_mod_keys, ScrollLockFlag);
+            B_UNSET(m_custom_mod_keys, Led3ScrollLockFlag);
+        }        
+    }
+
+    if (key == USB_KEY_BACKSPACE)
+    {
+        B_SET(m_custom_mod_keys, DeleteFlag);
+    }
+}
+
+
+void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
+{
+    if (key == USB_KEY_NONE || key == USB_KEY_ERR_OVF)
+        return;
+
+    if (global_debug)
+    {
+        Serial.print("UP ");
+        PrintKey(mod, key);
+    }
+    if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyUp)))
+    {
+        Serial.println("Warning! unable to enqueue new KeyDown");
+    }
+    // If power button replacement queue key twice
+    else if (key == USB_KEY_PAUSE || key == USB_KEY_F15)
+    {
+        if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyUp)))
+        {
+            Serial.println("Warning! unable to enqueue new Power Button KeyUp");
+        }
+    }
+
+/* @DEBUG Num and scroll lock keys 
+
+    if (key == USB_KEY_SCROLLLOCK)
+    {
+        B_SET(m_custom_mod_keys, ScrollLockFlag);
+        if (!B_IS_SET(m_custom_mod_keys, Led3ScrollLockFlag))
+        {
+            B_SET(m_custom_mod_keys, Led3ScrollLockFlag);
+        }
+    }
+    if (key == USB_KEY_NUMLOCK)
+    {
+      B_SET(m_custom_mod_keys, NumLockFlag);
+       if (!B_IS_SET(m_custom_mod_keys, Led1NumLockFlag))
+        {
+            B_SET(m_custom_mod_keys, Led1NumLockFlag);
+        }
+    }
+ */
+
+    if (key == USB_KEY_BACKSPACE)
     {
         B_UNSET(m_custom_mod_keys, DeleteFlag);
     }
 }
 
-void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
+void KbdRptParser::OnModifierKeysChanged(uint8_t before, uint8_t after)
 {
 
     MODIFIERKEYS beforeMod;
@@ -252,49 +360,6 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
         {
             OnKeyUp(0, USB_KEY_RIGHTMETA);
         }
-    }
-}
-
-void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
-{
-    if (global_debug)
-    {
-        Serial.print("UP ");
-        PrintKey(mod, key);
-    }
-
-    if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyUp)))
-    {
-        Serial.println("Warning! unable to enqueue new KeyDown");
-    }
-
-    if (key == USB_KEY_SCROLLLOCK)
-    {
-        B_SET(m_custom_mod_keys, ScrollLockFlag);
-        if (!B_IS_SET(m_custom_mod_keys, Led3ScrollLockFlag))
-        {
-            B_SET(m_custom_mod_keys, Led3ScrollLockFlag);
-        }
-    }
-    if (key == USB_KEY_CAPSLOCK)
-    {
-        B_SET(m_custom_mod_keys, CapsLockFlag);
-        if (!B_IS_SET(m_custom_mod_keys, Led2CapsLockFlag))
-        {
-            B_SET(m_custom_mod_keys, Led2CapsLockFlag);
-        }
-    }
-    if (key == USB_KEY_NUMLOCK)
-    {
-        B_SET(m_custom_mod_keys, NumLockFlag);
-        if (!B_IS_SET(m_custom_mod_keys, Led1NumLockFlag))
-        {
-            B_SET(m_custom_mod_keys, Led1NumLockFlag);
-        }
-    }
-    if (key == USB_KEY_DELETE)
-    {
-        B_SET(m_custom_mod_keys, DeleteFlag);
     }
 }
 

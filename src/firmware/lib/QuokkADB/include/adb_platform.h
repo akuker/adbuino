@@ -28,10 +28,9 @@
 #include <stdint.h>
 #include "quokkadb_gpio.h"
 
-class AdbInterfacePlatform {
-  public:
-    void Init();
+extern bool adb_collision;
 
+class AdbInterfacePlatform {
   protected:
 
     void data_lo();
@@ -42,9 +41,13 @@ class AdbInterfacePlatform {
     uint8_t data_in();
     uint16_t wait_data_lo(uint32_t us);
     uint16_t wait_data_hi(uint32_t us);
-    
-    void adb_delay_us(uint32_t delay);
-    void adb_delay_ms(uint32_t delay);
+    // delay for set amount unless a collision is detected then return false
+    // otherwise return true
+    bool adb_delay_us(uint32_t delay);
+
+    void adb_irq_init(void);
+    void adb_irq_disable(void);
+    void adb_set_leds(uint16_t reg2);
 
 };
 
@@ -52,7 +55,7 @@ class AdbInterfacePlatform {
 
 inline void AdbInterfacePlatform::data_lo()
 {
-        ADB_OUT_LOW();
+    ADB_OUT_LOW();
 }
 
 inline void AdbInterfacePlatform::data_hi()
@@ -84,8 +87,8 @@ inline uint16_t AdbInterfacePlatform::wait_data_lo(uint32_t us)
     }
     time = time_us_64();
   } while (us >= time - start);
-  uint32_t diff = static_cast<uint32_t>(time - start);
-  return us >= diff ? us - (time - start) : 0;
+  uint16_t diff = static_cast<uint16_t>(time - start);
+  return us >= diff ? diff : 0;
 }
 
 inline uint16_t AdbInterfacePlatform::wait_data_hi(uint32_t us)
@@ -100,16 +103,8 @@ inline uint16_t AdbInterfacePlatform::wait_data_hi(uint32_t us)
     }
     time = time_us_64();
   } while (us >= time - start);
-  uint32_t diff = static_cast<uint32_t>(time - start);
-  return us >= diff ? us - diff : 0;
+  uint16_t diff = static_cast<uint16_t>(time - start);
+  return diff;
 }
 
-inline void AdbInterfacePlatform::adb_delay_us(uint32_t delay) 
-{
-    busy_wait_us_32(delay);
-}
 
-inline void AdbInterfacePlatform::adb_delay_ms(uint32_t delay)
-{  
-    sleep_ms(delay);
-}

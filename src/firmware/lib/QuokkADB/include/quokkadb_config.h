@@ -1,11 +1,12 @@
-//----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 //
-//  ADBuino & QuokkADB ADB keyboard and mouse adapter
+//	QuokkaADB ADB keyboard and mouse adapter
+//
+//	   Copyright (C) 2017 bbraun
 //	   Copyright (C) 2021-2022 akuker
-//     Copyright (C) 2007 Peter H Anderson
 //     Copyright (C) 2022 Rabbit Hole Computing LLC
 //
-//  This file is part of the ABDuino and the QuokkADB projects.
+//  This file is part of the QuokkaADB project.
 //
 //  This file is free software: you can redistribute it and/or modify it under 
 //  the terms of the GNU General Public License as published by the Free 
@@ -18,19 +19,15 @@
 //  details.
 //
 //  You should have received a copy of the GNU General Public License along 
-//  with this file. If not, see <https://www.gnu.org/licenses/>.
-//----------------------------------------------------------------------------
+//  with the file. If not, see <https://www.gnu.org/licenses/>.
+//
+//---------------------------------------------------------------------------
 #pragma once
-#include "adbkbdparser.h"
-#include "usbmouseparser.h"
 
-class ADBMouseRptParser : public MouseRptParser
-{
-public:
-    ADBMouseRptParser(ADBKbdRptParser& kbd_parser);
-    uint16_t GetAdbRegister0();
+// Use macros for version number
+#define FW_VER_NUM      "0.1.2"
+#define FW_VER_SUFFIX   "beta"
+#define QUOKKADB_FW_VERSION FW_VER_NUM "-" FW_VER_SUFFIX
+#define PRODUCT_NAME "QuokkADB"
+#define QUOKKADB_FW_VER_STRING PRODUCT_NAME " firmware: " QUOKKADB_FW_VERSION
 
-protected:
-    uint32_t EightBitToSevenBitSigned(int8_t value);
-
-};

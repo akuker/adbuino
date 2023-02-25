@@ -5,7 +5,7 @@
     "build": {
         "core": "RP2040",
         "cpu": "cortex-m0plus",
-        "f_cpu": "120000000L",
+        "f_cpu": "125000000L",
         "hwids": [
         [
             "0x2E8A",

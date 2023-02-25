@@ -29,7 +29,8 @@
 #include "adbregisters.h"
 #include "usbkbdparser.h"
 #include "usb_hid_keys.h"
-#include "hidinputclasses.h"
+#include "keyboardrptparser.h"
+#include "mouserptparser.h"
 #include "usbmouseparser.h"
 
 #define kModCmd 1
@@ -39,24 +40,11 @@
 #define kModReset 16
 #define kModCaps 32
 #define kModDelete 64
-
 extern uint16_t modifierkeys;
 extern KbdRptParser KeyboardPrs;
 extern MouseRptParser MousePrs;
 
-static bool capslock_status   = false;
-static bool numlock_status    = false;
-static bool scrolllock_status = false;
-static bool delete_status     = false;
-
-static bool ctrl_left_keyup   = true;
-static bool ctrl_right_keyup  = true;
-static bool alt_left_keyup    = true;
-static bool alt_right_keyup   = true;
-static bool os_left_keyup     = true;
-static bool os_right_keyup    = true;
-static bool shift_left_keyup  = true;
-static bool shift_right_keyup = true;
+bool set_hid_report_ready = true;
 
 //--------------------------------------------------------------------+
 // Host HID
@@ -91,6 +79,7 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_re
     {
       if(itf_protocol == HID_ITF_PROTOCOL_KEYBOARD) 
       {
+        KeyboardPrs.AddKeyboard(dev_addr, instance);
         led_blink(2);
       } 
       else // protocol is mouse
@@ -104,6 +93,7 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_re
 // Invoked when device with hid interface is un-mounted
 void tuh_hid_umount_cb(uint8_t dev_addr, uint8_t instance)
 {
+  KeyboardPrs.RemoveKeyboard(dev_addr, instance);
   led_blink(1);
 }
 
@@ -155,5 +145,7 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
   }
 }
 
-bool tuh_hid_set_report(uint8_t dev_addr, uint8_t instance, uint8_t report_id, uint8_t report_type, void* report, uint16_t len);
-
+void tuh_hid_set_report_complete_cb(uint8_t dev_addr, uint8_t instance, uint8_t report_id, uint8_t report_type, uint16_t len)
+{
+  set_hid_report_ready = true;
+}
