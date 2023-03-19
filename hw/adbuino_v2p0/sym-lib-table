@@ -1,0 +1,7 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "SamacSys_Parts")(type "Legacy")(uri "${KIPRJMOD}/SamacSys_Parts.lib")(options "")(descr ""))
+  (lib (name "MD2-40ST-SMT")(type "Legacy")(uri "${KIPRJMOD}/MD2-40ST-SMT.lib")(options "")(descr ""))
+  (lib (name "adbuino-rescue")(type "KiCad")(uri "${KIPRJMOD}/adbuino-rescue.kicad_sym")(options "")(descr ""))
+  (lib (name "MCU_RaspberryPi_and_Boards")(type "KiCad")(uri "${KIPRJMOD}/RP-Pico_Libraries/MCU_RaspberryPi_and_Boards.kicad_sym")(options "")(descr ""))
+)
