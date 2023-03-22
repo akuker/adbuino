@@ -39,7 +39,7 @@
 #include "pico/bootrom.h"
 
 #include "tusb.h"
-#include "printf/printf.h"
+#include <pico/printf.h>
 #include "rp2040_serial.h"
 #include "adb.h"
 #include "quokkadb_gpio.h"

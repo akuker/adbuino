@@ -38,6 +38,11 @@ ADBKbdRptParser::ADBKbdRptParser()
 {
 }
 
+ADBKbdRptParser::~ADBKbdRptParser()
+{
+
+}
+
 uint16_t ADBKbdRptParser::GetAdbRegister0()
 {
     KeyEvent *event;
