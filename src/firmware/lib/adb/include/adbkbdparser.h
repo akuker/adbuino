@@ -42,9 +42,9 @@ extern uint8_t usb_keycode_to_adb_code(uint8_t usb_code);
 class ADBKbdRptParser : public KbdRptParser
 {
 public:
-    ADBKbdRptParser();
-
     uint16_t GetAdbRegister0();
     uint16_t GetAdbRegister2();
+    ADBKbdRptParser();
+    virtual ~ADBKbdRptParser();
 
 };

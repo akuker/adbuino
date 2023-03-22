@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.24)
 
 set(PICO_BOARD_HEADER_DIRS ${CMAKE_SOURCE_DIR}/boards) 
 # initialize the SDK based on PICO_SDK_PATH

@@ -118,10 +118,8 @@ protected:
 
 public:
 
-        KeyboardReportParser() {
-                kbdLockingKeys.bLeds = 0;
-        };
-
+        KeyboardReportParser();
+        virtual ~KeyboardReportParser();
         void Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_report_t const *report);
         bool SpecialKeyCombo(KBDINFO *cur_kbd_info);
         void SendString(const char* message);
@@ -132,18 +130,16 @@ public:
         // Executes the LED changes from shared memory (meant to be run on the same core as tuh_task)
         void ChangeUSBKeyboardLEDs(void);
 
-        virtual bool PendingKeyboardEvent(void);
+        virtual bool PendingKeyboardEvent() = 0;
 
-        virtual void OnKeyDown(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) {
-        };
+        virtual void OnKeyDown(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) = 0;
 
-        virtual void OnKeyUp(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) {
-        };
+        virtual void OnKeyUp(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) = 0;
 
 
 protected:
 
-        virtual uint8_t HandleLockingKeys(uint8_t dev_addr, uint8_t instance, uint8_t key) {
+        uint8_t HandleLockingKeys(uint8_t dev_addr, uint8_t instance, uint8_t key) {
                 uint8_t old_keys = kbdLockingKeys.bLeds;
 
                 switch(key) {
@@ -168,24 +164,23 @@ protected:
                 return 0;
         };
 
-        virtual void OnModifierKeysChanged(uint8_t before __attribute__((unused)), uint8_t after __attribute__((unused))) {
-        };
+        virtual void OnModifierKeysChanged(uint8_t before __attribute__((unused)), uint8_t after __attribute__((unused))) = 0;
 
 
 
-        virtual const uint8_t *getNumKeys() {
+        const uint8_t *getNumKeys() {
                 return numKeys;
         };
 
-        virtual const uint8_t *getSymKeysUp() {
+        const uint8_t *getSymKeysUp() {
                 return symKeysUp;
         };
 
-        virtual const uint8_t *getSymKeysLo() {
+        const uint8_t *getSymKeysLo() {
                 return symKeysLo;
         };
 
-        virtual const uint8_t *getPadKeys() {
+        const uint8_t *getPadKeys() {
                 return padKeys;
         };
 };

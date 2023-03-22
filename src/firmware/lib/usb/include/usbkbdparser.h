@@ -58,18 +58,18 @@ protected:
 class KbdRptParser : public KeyboardReportParser
 {
 public:
+    KbdRptParser();
+    virtual ~KbdRptParser();
     void PrintKey(uint8_t mod, uint8_t key);
-
     KeyEvent GetKeyEvent();
-    bool PendingKeyboardEvent();
+    bool PendingKeyboardEvent() override;
     void Reset(void);
     
 
 protected:
-    void OnModifierKeysChanged(uint8_t before, uint8_t after);
-
-    void OnKeyDown(uint8_t mod, uint8_t key);
-    void OnKeyUp(uint8_t mod, uint8_t key);
+    void OnModifierKeysChanged(uint8_t before, uint8_t after) override;
+    void OnKeyDown(uint8_t mod, uint8_t key) override;
+    void OnKeyUp(uint8_t mod, uint8_t key) override;
     void OnKeyPressed(uint8_t key);
 
     uint8_t m_last_key_pressed;

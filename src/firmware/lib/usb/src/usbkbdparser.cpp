@@ -34,6 +34,12 @@ using rp2040_serial::Serial;
 
 extern bool global_debug;
 
+KbdRptParser::KbdRptParser()
+{
+}
+
+KbdRptParser::~KbdRptParser(){}
+
 bool KbdRptParser::PendingKeyboardEvent()
 {
     return !m_keyboard_events.isEmpty();
