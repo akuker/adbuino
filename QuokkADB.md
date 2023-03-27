@@ -92,3 +92,16 @@ Inserting a new mouse:
 ## Known Bugs
  - Pressing buttons that change the LEDs on the keyboard (Caps lock, num lock, scroll lock) stops changing the LEDs after many LED toggles. The keyboard functions normally and functions like caps lock still work but its LED status no longer changes.
  - Some USB hubs do not seem to work
+
+## Compiling
+Prereqs: arm cross compiling tools
+
+Steps:
+1. Download the pico sdk: https://github.com/raspberrypi/pico-sdk
+2. set `$PICO_SDK_PATH` to that directory
+3. change to the directory in this repo to `src/firmware`
+4. `mkdir build`
+5. `cd build`
+6. `cmake ..`
+7. `make`
+8. .uf2, .bin, and .elf files should be in `src/firmware/build/src`

@@ -32,12 +32,9 @@
 #define QUOKKADB_BOARD
 
 // --- UART ---
-#ifndef PICO_DEFAULT_UART
+
 #define PICO_DEFAULT_UART 0
-#endif
-#ifndef PICO_DEFAULT_UART_TX_PIN
 #define PICO_DEFAULT_UART_TX_PIN 16
-#endif
 
 
 // --- FLASH ---
@@ -56,7 +53,7 @@
 #define PICO_SMPS_MODE_PIN 23
 
 #ifndef PICO_RP2040_B0_SUPPORTED
-#define PICO_RP2040_B0_SUPPORTED 1
+#define PICO_RP2040_B0_SUPPORTED 0
 #endif
 
 #endif

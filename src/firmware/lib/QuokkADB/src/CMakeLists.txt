@@ -11,5 +11,5 @@ add_library(QuokkADB
     usbhost.cpp
     )
 
-    target_link_libraries(QuokkADB pico_stdlib hardware_flash pico_multicore adb usb tinyusb_common tinyusb_host)
-    target_include_directories(QuokkADB PUBLIC ../include)
+target_link_libraries(QuokkADB pico_stdlib hardware_flash pico_multicore adb usb tinyusb_common tinyusb_host)
+target_include_directories(QuokkADB PUBLIC ../include)

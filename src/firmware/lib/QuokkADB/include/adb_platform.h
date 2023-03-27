@@ -28,10 +28,17 @@
 #include <stdint.h>
 #include "quokkadb_gpio.h"
 #include <hardware/timer.h>
+#include <pico/time.h>
 
 extern bool adb_collision;
 
-class AdbInterfacePlatform {
+inline uint32_t millis()
+{
+  return to_ms_since_boot(get_absolute_time());
+}
+
+class AdbInterfacePlatform 
+{
   protected:
 
     void data_lo();
