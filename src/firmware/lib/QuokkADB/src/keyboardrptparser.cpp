@@ -164,7 +164,6 @@ void KeyboardReportParser::SetUSBkeyboardLEDs(bool capslock, bool numlock, bool 
 
 bool KeyboardReportParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
 {
-        uint8_t keys_down[6] = {};
         // Special keycombo actions
         uint8_t special_key_count = 0;
         uint8_t special_key = 0;

@@ -25,9 +25,9 @@
 #pragma once
 
 // Use macros for version number
-#define FW_VER_NUM      "0.1.2"
+#define FW_VER_NUM      "0.2.0"
 #define FW_VER_SUFFIX   "beta"
-#define QUOKKADB_FW_VERSION FW_VER_NUM "-" FW_VER_SUFFIX
+#define QUOKKADB_FW_VERSION FW_VER_NUM "-" FW_VER_SUFFIX 
 #define PRODUCT_NAME "QuokkADB"
-#define QUOKKADB_FW_VER_STRING PRODUCT_NAME " firmware: " QUOKKADB_FW_VERSION
+#define QUOKKADB_FW_VER_STRING PRODUCT_NAME " firmware: " QUOKKADB_FW_VERSION " " __DATE__ " " __TIME__ " "
 

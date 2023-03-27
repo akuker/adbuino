@@ -36,7 +36,6 @@
 #ifdef ADBUINO
 #include <stdio.h>
 #elif QUOKKADB
-#include <time.h>
 #include "rp2040_serial.h"
 #include <pico/printf.h>
 using rp2040_serial::Serial;
@@ -491,12 +490,10 @@ void AdbInterface::ProcessCommand(int16_t cmd)
           kbdreg0 = (kbdprev0 << 8) | 0xFF;
 
           // Save timestamp
-// @DEBUG switch back after getting cmake to compile QuokkADB
-//          kbskiptimer = millis();
-            kbskiptimer = (time_us_64() / 1000);
+          kbskiptimer = millis();
+
         }
-//        else if (millis() - kbskiptimer < 90)
-        else if (time_us_64() / 1000 - kbskiptimer  < 90)
+        else if (millis() - kbskiptimer < 90)
         {
           // Check timestamp and don't process the key event if it came right after a 255
           // This is meant to avoid a glitch where releasing a key sends 255->keydown instead
