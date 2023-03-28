@@ -1,9 +1,12 @@
 #!/bin/bash
 
-# QuokkADB - Copyright (c) 2023 Rabbit Hole Computing™
 # ZuluSCSI™ - Copyright (c) 2022 Rabbit Hole Computing™
+# QuokkADB - Copyright (c) 2023 Rabbit Hole Computing™
 #
-# QuokkADB file is licensed under the GPL version 3 or any later version. 
+# This file was orignally from the ZuluSCSI™ firmware project and
+# adapted for use with the QuokkADB project.
+#
+# This file is licensed under the GPL version 3 or any later version. 
 #
 # https://www.gnu.org/licenses/gpl-3.0.html
 # ----
