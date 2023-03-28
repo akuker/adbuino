@@ -14,7 +14,7 @@ the ADB chain is connected to the host computer before powering it up (the host 
 ### Ports
  - USB port: plug in your keyboard, mouse, or hub here.
  - Front and Back ADB ports: either port can be directly hooked up to the host computer or connected to a ADB chain. One port should be connected towards the host while the other may be connected to other ADB devices.
- - QuokkADB stack port: This port uses a 4 pin JST to JST wire to stack two QuokkADBs together giving two USB ports. The [Qwiic](https://www.sparkfun.com/categories/tags/qwiic-cables). JST cable can be used to connect two QuokkADBs together.
+ - QuokkADB stack port: This port uses a 4 pin JST to JST wire to stack two QuokkADBs together giving two USB ports. The four-pin [Qwiic](https://www.sparkfun.com/categories/tags/qwiic-cables). JST cable can be used to connect two QuokkADBs together.
 The stack port carries all four ADB signals.
     - pin 1 ADB
     - pin 2 Power Switch
@@ -62,13 +62,13 @@ disconnected).
 
 ## Parity with USB Wombat
  - Context menu for Mac OS 8.1 and above - middle mouse button switches right click mode
-   - default: right click actives Ctrl+left click
-   - other:  right click is sent over the ADB bus as a right click (should work on a NeXT box)
+   - default: mouse right clicks are sent as Ctrl+click
+   - other:  right click is sent over the ADB bus as a right click (should work on NeXTstations)
  - SysRq/Print Screen and F13 work as the Apple Power key (keycode 0x7F, separate from ADB power on button on the QuokkADB)
  - Ctrl + Shift + CapsLock + V - ghost types the firmware version to the host computer
- - power button on QuokkADB will boot computer while QuokkADB is powered off
+ - power button on QuokkADB will turn on computer while QuokkADB is powered off, if machine supports soft power-on
   
-## QuokkADB LED blink meaning
+## QuokkADB LED blink meanings
  - On boot - one blink
  - On keyboard mount (connected to usb) - two blinks
  - On mouse mount (connected to usb)- three blinks
@@ -90,8 +90,8 @@ Inserting a new mouse:
  1. 3 blinks
 
 ## Known Bugs
- - Pressing buttons that change the LEDs on the keyboard (Caps lock, num lock, scroll lock) stops changing the LEDs after many LED toggles. The keyboard functions normally and functions like caps lock still work but its LED status no longer changes.
- - Some USB hubs do not seem to work
+ - Repeatedly pressing buttons that toggle LED states, such as caps lock, num lock, and scroll lock results in the LEDs no longer changing state, after many LED toggles. The keyboard functions normally and functions like caps lock still works, but the LED status indicators no longer change.
+ - Some USB hubs do not seem to work.
 
 ## Compiling
 Prereqs: arm cross compiling tools
