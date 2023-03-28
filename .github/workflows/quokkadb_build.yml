@@ -27,18 +27,18 @@ jobs:
           git submodule update --init lib/tinyusb/
 
       - name: Build QuokkADB
-      - run: |
-        export PICO_SDK_PATH=${HOME}/pico-sdk
-        cd quokkadb/src/firmware
-        mkdir -p build
-        cd build
-        cmake ..
-        make -j
-        cd ..
-        util/rename_quokkadb_binaries.sh
+        run: |
+          export PICO_SDK_PATH=${HOME}/pico-sdk
+          cd quokkadb/src/firmware
+          mkdir -p build
+          cd build
+          cmake ..
+          make -j
+          cd ..
+          utils/rename_quokkadb_binaries.sh
         
       - name: Upload binaries into build artifacts
-        uses: actions/upload-artifacts@v3
+        uses: actions/upload-artifact@v3
         with: 
           path: quokkadb/src/firmware/distrib/*
           name: QuokkADB binaries
