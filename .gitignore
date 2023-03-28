@@ -27,3 +27,5 @@ fp-info-cache
 # Auto-generated directories by VS Code
 .vscode
 .pio
+images/.DS_Store
+.DS_Store
