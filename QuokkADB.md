@@ -1,20 +1,21 @@
 # QuokkADB
 A USB keyboard and mouse to ADB (Apple Desktop Bus) keyboard and mouse emulator.
-The firmware is based upon the ADBuino and is in a unified repository [https://github.com/akuker/adbuino](https://github.com/akuker/adbuino).
+The firmware is based upon the ADBuino and is kept in-sync with the upstream repository at [https://github.com/akuker/adbuino](https://github.com/akuker/adbuino).
 
 ## How to use
-1. Make sure the QuokkADB is plugged into the ADB chain and
-the ADB chain is connected to the host computer before powering it up (the host computer writes settings to the QuokkADB at boot and does not rewrite settings on reconnect. On the same note, do not unplug the QuokkADB from the ADB chain while the computer is on as the QuokkADB will lose its settings).
-1. The button on the QuokkADB will turn on most computers (otherwise use the switch on the computer).
-2. Once the power is turned on LEDs on the QuokkADB will blink once for power and then blink for all devices found on the USB bus.
-3. The QuokkADB LED should blink rapidly and brightly whenever the QuokkADB is reading or writing to the ADB bus. It should be very dim otherwise.
+1. Attach any USB keyboards/mice to your QuokkADB.
+2. Before powering on your Macintosh, make sure the QuokkADB is plugged into the ADB chain and
+the ADB chain is connected to the host computer. The host computer writes settings to the QuokkADB at boot and does not rewrite settings on reconnect. *DO NOT* unplug the QuokkADB from the ADB chain while the computer is on, as the QuokkADB will lose its settings).
+4. The button on the QuokkADB will turn on any ADB-equipped Macintosh which supports soft power-on. Otherwise, you must use the power switch on the computer.
+5. Once the power is turned on LEDs on the QuokkADB will blink once for power and then blink for all devices found on the USB bus.
+6. The QuokkADB LED should blink rapidly and brightly whenever the QuokkADB is reading or writing to the ADB bus. It should be very dim otherwise.
 
 
 ## The board
 ### Ports
  - USB port: plug in your keyboard, mouse, or hub here.
  - Front and Back ADB ports: either port can be directly hooked up to the host computer or connected to a ADB chain. One port should be connected towards the host while the other may be connected to other ADB devices.
- - QuokkADB stack port: This port uses a 4 pin JST to JST wire to stack two QuokkADBs together giving two USB ports. The four-pin [Qwiic](https://www.sparkfun.com/categories/tags/qwiic-cables). JST cable can be used to connect two QuokkADBs together.
+ - QuokkADB stack port: This port uses a 4 pin JST to JST wire to stack two QuokkADBs together giving two USB ports. The four-pin [Qwiic](https://www.sparkfun.com/categories/tags/qwiic-cables) JST cable can be used to connect two QuokkADBs together.
 The stack port carries all four ADB signals.
     - pin 1 ADB
     - pin 2 Power Switch
@@ -30,8 +31,8 @@ The special keyboad commands start with `CTRL + SHIFT + CAPLOCK` and a letter ke
  - `L` - Ghost types the busy LED status (ON/OFF) and saves the new status to flash and will be used when the board powers on again. This controls
  whether the LED blinks when accessing the ADB bus or remains off for light sensitive situations.
 
-## Programming 
-The firmware version can be found by opening up a empty text document or program that allows typing. 
+## Flashing firmware updates 
+The firmware version can be found by opening up an empty text document or program that allows typing. 
 Press `Ctrl + Shift + CapsLock + V` and the firmware version will be ghost typed.
 To change the firmware do the following:
 1. Disconnect the ADB ports, and the QuokkADB stack port on the QuokkADB
