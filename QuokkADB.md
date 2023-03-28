@@ -35,7 +35,7 @@ The firmware version can be found by opening up a empty text document or program
 Press `Ctrl + Shift + CapsLock + V` and the firmware version will be ghost typed.
 To change the firmware do the following:
 1. Disconnect the ADB ports, and the QuokkADB stack port on the QuokkADB
-2. Short the two boot loader contacts labeled "BOOTLDR
+2. Short the two boot loader contacts labeled "BOOTLDR" using a metal object such as a paperclip, tweezers, or a jumpered two-pin header strip.
 ![Boot loader pins](images/quokkadb-bootloader.jpg)
 3. Connect a USB A to USB A cable to the QuokkADB USB port and
 the computer with the `.uf2` file on it. Firmware can be downloaded from [here](https://github.com/rabbitholecomputing/QuokkADB-firmware/releases).
