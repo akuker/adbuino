@@ -17,18 +17,18 @@ jobs:
           fetch-depth: "0"
       - name: Install packages
         run: |
-          sudo apt update
-          sudo apt install -y cmake makepkg binutils-arm-none-eabi gcc-arm-none-eabi
+          sudo apt-get update
+          sudo apt-get install -y cmake binutils-arm-none-eabi gcc-arm-none-eabi
 
       - name: Install pico-sdk
         run: |
           git clone -b 1.5.0 https://github.com/raspberrypi/pico-sdk.git pico-sdk
-          cd pick-sdk
+          cd pico-sdk
           git submodule update --init lib/tinyusb/
 
       - name: Build QuokkADB
         run: |
-          export PICO_SDK_PATH=${HOME}/pico-sdk
+          export PICO_SDK_PATH=${{ github.workspace }}/pico-sdk
           cd quokkadb/src/firmware
           mkdir -p build
           cd build
