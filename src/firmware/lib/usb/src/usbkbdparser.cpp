@@ -34,6 +34,12 @@ using rp2040_serial::Serial;
 
 extern bool global_debug;
 
+KbdRptParser::KbdRptParser()
+{
+}
+
+KbdRptParser::~KbdRptParser(){}
+
 bool KbdRptParser::PendingKeyboardEvent()
 {
     return !m_keyboard_events.isEmpty();
@@ -119,24 +125,6 @@ void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
         }        
     }
 
-    /* @DEBUG original key status
-    if (key == USB_KEY_SCROLLLOCK)
-    {
-        B_UNSET(m_custom_mod_keys, ScrollLockFlag);
-        if (B_IS_SET(m_custom_mod_keys, Led3ScrollLockFlag))
-        {
-            B_TOGGLE(m_custom_mod_keys, Led3ScrollLockFlag);
-        }
-    }
-    if (key == USB_KEY_NUMLOCK)
-    {
-        B_UNSET(m_custom_mod_keys, NumLockFlag);
-        if (B_IS_SET(m_custom_mod_keys, Led1NumLockFlag))
-        {
-            B_UNSET(m_custom_mod_keys, Led1NumLockFlag);
-        }
-    }
-    */
     if (key == USB_KEY_NUMLOCK)
     {
         if (kbdLockingKeys.kbdLeds.bmNumLock == 1)
@@ -185,6 +173,7 @@ void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
     {
         Serial.println("Warning! unable to enqueue new KeyDown");
     }
+    
     // If power button replacement queue key twice
     else if (key == USB_KEY_PAUSE || key == USB_KEY_F15)
     {
@@ -193,26 +182,6 @@ void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
             Serial.println("Warning! unable to enqueue new Power Button KeyUp");
         }
     }
-
-/* @DEBUG Num and scroll lock keys 
-
-    if (key == USB_KEY_SCROLLLOCK)
-    {
-        B_SET(m_custom_mod_keys, ScrollLockFlag);
-        if (!B_IS_SET(m_custom_mod_keys, Led3ScrollLockFlag))
-        {
-            B_SET(m_custom_mod_keys, Led3ScrollLockFlag);
-        }
-    }
-    if (key == USB_KEY_NUMLOCK)
-    {
-      B_SET(m_custom_mod_keys, NumLockFlag);
-       if (!B_IS_SET(m_custom_mod_keys, Led1NumLockFlag))
-        {
-            B_SET(m_custom_mod_keys, Led1NumLockFlag);
-        }
-    }
- */
 
     if (key == USB_KEY_BACKSPACE)
     {

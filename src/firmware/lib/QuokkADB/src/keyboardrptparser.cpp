@@ -42,6 +42,15 @@ extern FlashSettings setting_storage;
 uint8_t inline findModifierKey(hid_keyboard_report_t const *report, const hid_keyboard_modifier_bm_t mod ) {
         return (mod & report->modifier) ? 1 : 0;
 }
+
+KeyboardReportParser::KeyboardReportParser()
+{
+        kbdLockingKeys.bLeds = 0;
+}
+KeyboardReportParser::~KeyboardReportParser()
+{
+}
+
 void KeyboardReportParser::AddKeyboard(uint8_t dev_addr, uint8_t instance) {
         for(size_t i = 0; i < MAX_KEYBOARDS; i++)
         {
@@ -155,7 +164,6 @@ void KeyboardReportParser::SetUSBkeyboardLEDs(bool capslock, bool numlock, bool 
 
 bool KeyboardReportParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
 {
-        uint8_t keys_down[6] = {};
         // Special keycombo actions
         uint8_t special_key_count = 0;
         uint8_t special_key = 0;

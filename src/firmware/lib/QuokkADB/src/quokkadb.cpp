@@ -39,7 +39,8 @@
 #include "pico/bootrom.h"
 
 #include "tusb.h"
-#include "printf/printf.h"
+//#include <pico/printf.h>
+#include "pico/stdio.h"
 #include "rp2040_serial.h"
 #include "adb.h"
 #include "quokkadb_gpio.h"
@@ -95,10 +96,11 @@ void core1_main() {
 // core0: handle device events
 int quokkadb(void) {
   set_sys_clock_khz(125000, true);
-
+  stdio_init_all();
   uart_gpio_init();
   adb_gpio_init();
   led_gpio_init();
+
   sleep_ms(10);
   
   setting_storage.init();
@@ -111,7 +113,7 @@ int quokkadb(void) {
   multicore_launch_core1(core1_main);
   multicore_lockout_victim_init();
   led_blink(1);
-  printf("QuokkADB firmware: %s\n", QUOKKADB_FW_VERSION);
+  printf("%s\n", QUOKKADB_FW_VER_STRING);
   srand(time_us_32());
 /*------------ Core0 main loop ------------*/
   while (true) {

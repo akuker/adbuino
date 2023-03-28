@@ -36,9 +36,8 @@
 #ifdef ADBUINO
 #include <stdio.h>
 #elif QUOKKADB
-#include <time.h>
 #include "rp2040_serial.h"
-#include "printf/printf.h"
+#include <pico/printf.h>
 using rp2040_serial::Serial;
 #endif
 
@@ -56,7 +55,7 @@ uint16_t kbdreg2 = 0xFFFF;
 uint8_t kbdsrq = 0;
 uint8_t mousesrq = 0;
 uint16_t modifierkeys = 0xFFFF;
-uint32_t kbskiptimer = 0;
+uint64_t kbskiptimer = 0;
 bool adb_reset = false;
 bool adb_collision = false; 
 bool collision_detection = false;
@@ -492,6 +491,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
 
           // Save timestamp
           kbskiptimer = millis();
+
         }
         else if (millis() - kbskiptimer < 90)
         {
