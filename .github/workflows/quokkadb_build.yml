@@ -1,0 +1,44 @@
+name: Build QuokkADB firmware
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build_firmware:
+    name: Build firmware on Ubuntu 22.04
+    runs-on: ubuntu-22.04
+  
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v3
+        with:
+          path: quokkadb
+          fetch-depth: "0"
+      - name: Install packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake binutils-arm-none-eabi gcc-arm-none-eabi
+
+      - name: Install pico-sdk
+        run: |
+          git clone -b 1.5.0 https://github.com/raspberrypi/pico-sdk.git pico-sdk
+          cd pico-sdk
+          git submodule update --init lib/tinyusb/
+
+      - name: Build QuokkADB
+        run: |
+          export PICO_SDK_PATH=${{ github.workspace }}/pico-sdk
+          cd quokkadb/src/firmware
+          mkdir -p build
+          cd build
+          cmake ..
+          make -j
+          cd ..
+          utils/rename_quokkadb_binaries.sh
+        
+      - name: Upload binaries into build artifacts
+        uses: actions/upload-artifact@v3
+        with: 
+          path: quokkadb/src/firmware/distrib/*
+          name: QuokkADB binaries
