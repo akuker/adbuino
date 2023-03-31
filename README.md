@@ -38,12 +38,18 @@ The [BMOW "Wombat"](https://www.bigmessowires.com/usb-wombat/) is a closed-sourc
 # References
 ![ADB Pinout](images/adb_pinout.png)
 
-[TinyUSB Library](https://github.com/raspberrypi/tinyusb)
+## Protocol/Software Documentation
+- [Apple ADB Manager Documenation](https://developer.apple.com/library/archive/documentation/mac/pdf/Devices/ADB_Manager.pdf)
+- [ADB Overview](https://www.lopaciuk.eu/2021/03/26/apple-adb-protocol.html)
+- [Microchip Application Note AN591](http://www.t-es-t.hu/download/microchip/an591b.pdf)
+- [TMK Documentation](https://github.com/tmk/tmk_keyboard/wiki/Apple-Desktop-Bus)
 
-[Running OpenOCD without root](https://forgge.github.io/theCore/guides/running-openocd-without-sudo.html)
+## Other libraries
+- [TinyUSB Library](https://github.com/raspberrypi/tinyusb)
+- [MiSTER adb hardware emulation](https://github.com/mist-devel/plus_too/blob/master/adb.v)
 
-[Apple ADB Manager Documenation](https://developer.apple.com/library/archive/documentation/mac/pdf/Devices/ADB_Manager.pdf)
+## Development resources
+- [Running OpenOCD without root](https://forgge.github.io/theCore/guides/running-openocd-without-sudo.html)
 
-https://www.mouser.com/ProductDetail/TE-Connectivity/5749181-1?qs=XlZqES4cpWbRcAMR%2FcJqkQ%3D%3D
-
-[MiSTER adb hardware emulation](https://github.com/mist-devel/plus_too/blob/master/adb.v)
+## Hardware Links
+- [ADB Connector - mouser](https://www.mouser.com/ProductDetail/TE-Connectivity/5749181-1?qs=XlZqES4cpWbRcAMR%2FcJqkQ%3D%3D)
