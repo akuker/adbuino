@@ -26,7 +26,7 @@ The stack port carries all four ADB signals.
 ![QuokkADB picture](images/quokkadb.jpg)
 
 ## Special Key-combos
-The special keyboad commands start with `CTRL + SHIFT + CAPLOCK` and a letter key.  Example: `CTRL + SHIFT + CAPLOCK + V` ghost types the firmware version.
+The special keyboad commands start with `CTRL + SHIFT + CAPS LOCK` and a letter key.  Example: `CTRL + SHIFT + CAPS LOCK + V` ghost types the firmware version.
  - `V` - Ghost types firmware version
  - `L` - Ghost types the busy LED status (ON/OFF) and saves the new status to flash and will be used when the board powers on again. This controls
  whether the LED blinks when accessing the ADB bus or remains off for light sensitive situations.
