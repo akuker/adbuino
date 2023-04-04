@@ -77,25 +77,25 @@ disconnected).
  - Normal operation - very dim light when idle, blinks when there is activity on the ADB bus for the device.
 
 ### Normal LED sequence:
-If both a mouse and keyboard are connected to the QuokkADB.
+If both a mouse and keyboard are connected to the QuokkADB:
 
 Turning on the Mac:
- 1. 1 blink - power on
- 2. 2 blinks - keyboard mounted
- 3. 3 blinks - mouse mounted
+ 1. One blink - power on
+ 2. Two blinks - keyboard initialized
+ 3. Three blinks - mouse initialized
 
 Removing mouse:
- 1. 1 blink
+ 1. One blink
 
 Inserting a new mouse:
- 1. 3 blinks
+ 1. Three blinks
 
 ## Known Bugs
  - Repeatedly pressing buttons that toggle LED states, such as caps lock, num lock, and scroll lock results in the LEDs no longer changing state, after many LED toggles. The keyboard functions normally and functions like caps lock still works, but the LED status indicators no longer change.
  - Some USB hubs do not seem to work.
 
 ## Compiling
-Prereqs: arm cross compiling tools
+Pre-requisites: ARM cross compiling tools
 
 Steps:
 1. Download the pico sdk: https://github.com/raspberrypi/pico-sdk
