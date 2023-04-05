@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.22)
 
 set(PICO_BOARD_HEADER_DIRS ${CMAKE_SOURCE_DIR}/boards) 
 #add_definitions(-DPICO_BOARD=quokkadb)
