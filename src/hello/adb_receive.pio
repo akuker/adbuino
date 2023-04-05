@@ -1,0 +1,85 @@
+;
+; Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+;
+; SPDX-License-Identifier: BSD-3-Clause
+;
+
+.program adb_write
+.side_set 1
+
+.define public US_TICK_LEN 5
+.define public TICKS_30_US (30/US_TICK_LEN)
+.define public TICKS_35_US (35/US_TICK_LEN)
+.define public LOW_TIME_BASE (35/US_TICK_LEN)
+.define public LOW_TIME_0 (30/US_TICK_LEN)
+.define public HIGH_TIME_0 (35/US_TICK_LEN)
+.define public LOW_TIME_1 (0/US_TICK_LEN)
+.define public HIGH_TIME_1 (65/US_TICK_LEN)
+.define public STOP_BIT_TIME (70/US_TICK_LEN)
+.define public HALF_STOP_TO_START_TIME (50/US_TICK_LEN)
+
+
+.define HIGH 1
+.define LOW 0
+
+
+.lang_opt python sideset_init = pico.PIO.OUT_HIGH
+.lang_opt python out_init     = pico.PIO.OUT_HIGH
+.lang_opt python out_shiftdir = 1
+
+wait_data:
+    ; Loop until we get some data
+    ;out x, 1             side HIGH  ; block until we have more data
+    pull block           side HIGH
+    nop                  side HIGH  [HALF_STOP_TO_START_TIME - 1]
+    nop                  side HIGH  [HALF_STOP_TO_START_TIME - 1]
+startbit:
+    ; Send the start bit - also flip the osr bit order
+    mov osr ::osr        side LOW   [TICKS_35_US - 1 ]
+    nop                  side HIGH  [TICKS_35_US + TICKS_30_US -1]
+bitloop:
+    out x, 1             side HIGH  ; This shouldn't block x = shift(OSR)
+    jmp !x    do_zero    side LOW   [LOW_TIME_BASE - 1] ; Branch on the bit we shifted out
+do_one:
+    ;nop                  side HIGH  [HIGH_TIME_1 - 1]; Initialize the bus to HIGH
+    jmp !OSRE bitloop    side HIGH  [HIGH_TIME_1 - 2]
+    jmp       stopbit    side HIGH ; Continue driving high, for a long pulse
+do_zero:
+    nop                  side LOW   [LOW_TIME_0 - 1] ; Or drive low, for a short pulse
+    jmp !OSRE bitloop    side HIGH  [HIGH_TIME_0 - 2]
+    jmp       stopbit    side HIGH  ;
+stopbit:
+    ; Send the start bit
+    nop                  side LOW [STOP_BIT_TIME]
+    jmp       wait_data  side HIGH
+.wrap
+
+% c-sdk {
+#include "hardware/clocks.h"
+
+static inline void adb_write_program_init(PIO pio, uint sm, uint offset, uint pin, float freq, bool rgbw) {
+
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+
+    pio_sm_config c = adb_write_program_get_default_config(offset);
+    sm_config_set_sideset_pins(&c, pin);
+
+    sm_config_set_out_pins(&c, pin, 1);
+
+    //c	Pointer to the configuration structure to modify
+    //shift_right	true to shift OSR to right, false to shift OSR to left
+    //autopull	whether autopull is enabled
+    //pull_threshold	threshold in bits to shift out before auto/conditional re-pulling of the OSR
+    sm_config_set_out_shift(&c, true, false, 16);
+ 
+    // We want each "tick" in the pio controller to be 5us
+    // This equates to 200000 ticks per second
+    float div = clock_get_hz(clk_sys) / 200000;
+    printf("clock_get_hz: %d  div: %f\n", clock_get_hz(clk_sys), div);
+    sm_config_set_clkdiv(&c, div);
+
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}
