@@ -4,8 +4,7 @@
 ; SPDX-License-Identifier: BSD-3-Clause
 ;
 
-.program adb_write
-.side_set 1
+.program adb_receive
 
 .define public US_TICK_LEN 5
 .define public TICKS_30_US (30/US_TICK_LEN)
@@ -15,8 +14,12 @@
 .define public HIGH_TIME_0 (35/US_TICK_LEN)
 .define public LOW_TIME_1 (0/US_TICK_LEN)
 .define public HIGH_TIME_1 (65/US_TICK_LEN)
+.define public HALF_BIT_TIME (50/US_TICK_LEN)
+.define public START_BIT_TIME (65/US_TICK_LEN)
 .define public STOP_BIT_TIME (70/US_TICK_LEN)
 .define public HALF_STOP_TO_START_TIME (50/US_TICK_LEN)
+.define public PINDIR_OUT 1
+.define public PINDIR_IN 0
 
 
 .define HIGH 1
@@ -27,51 +30,78 @@
 .lang_opt python out_init     = pico.PIO.OUT_HIGH
 .lang_opt python out_shiftdir = 1
 
-wait_data:
-    ; Loop until we get some data
-    ;out x, 1             side HIGH  ; block until we have more data
-    pull block           side HIGH
-    nop                  side HIGH  [HALF_STOP_TO_START_TIME - 1]
-    nop                  side HIGH  [HALF_STOP_TO_START_TIME - 1]
-startbit:
-    ; Send the start bit - also flip the osr bit order
-    mov osr ::osr        side LOW   [TICKS_35_US - 1 ]
-    nop                  side HIGH  [TICKS_35_US + TICKS_30_US -1]
-bitloop:
-    out x, 1             side HIGH  ; This shouldn't block x = shift(OSR)
-    jmp !x    do_zero    side LOW   [LOW_TIME_BASE - 1] ; Branch on the bit we shifted out
-do_one:
-    ;nop                  side HIGH  [HIGH_TIME_1 - 1]; Initialize the bus to HIGH
-    jmp !OSRE bitloop    side HIGH  [HIGH_TIME_1 - 2]
-    jmp       stopbit    side HIGH ; Continue driving high, for a long pulse
-do_zero:
-    nop                  side LOW   [LOW_TIME_0 - 1] ; Or drive low, for a short pulse
-    jmp !OSRE bitloop    side HIGH  [HIGH_TIME_0 - 2]
-    jmp       stopbit    side HIGH  ;
-stopbit:
-    ; Send the start bit
-    nop                  side LOW [STOP_BIT_TIME]
-    jmp       wait_data  side HIGH
+
+public start:
+  set pindirs, PINDIR_IN ; Set the pin to an input
+  set X, 0          ; preload X, will be decremented before test=0
+  wait 0 pin 0      ; if input is already high, wait for it to be low
+loop_attn:
+  jmp pin end_attn    [31]   ; If the input pin is high, jump to end
+  jmp X-- loop_attn      ; else: decrement X register and jump if non-zero
+  ; Potentially jump back to start if X counted down to zero??
+  ; the main processor will need to check whether there ATTN was a "reset" or normal attention
+end_attn:
+  mov X osr         ; transfer X counter values
+  ;;;;;;; push       noblock       ; send value to output FIFO
+  ; get ready for the command by loading "8" into the X register (number of bits)
+  set X, 7
+  ; wait for the start bit to finish (waif for signal to go low)
+  wait 0 pin 0
+receive_loop:
+  nop [ HALF_BIT_TIME -1 ] ; Wait for the middle of the bit time
+  IN PINS 1 ; Read in whether the bit is high or low
+  jmp X-- receive_loop [ HALF_BIT_TIME - 2] 
+stop_bit:
+  ;push   [STOP_BIT_TIME - 1] ; Store the read-in value and wait for the stop bit time to expire
+  ;irq set           ; let CPU know we're done (is this needed?)
+  ; TEMPORARY - wait for any data to be sent
+  nop [HALF_STOP_TO_START_TIME]
+  nop [HALF_STOP_TO_START_TIME]
+  nop [HALF_STOP_TO_START_TIME]
+  nop [TICKS_30_US]
 .wrap
 
 % c-sdk {
 #include "hardware/clocks.h"
 
-static inline void adb_write_program_init(PIO pio, uint sm, uint offset, uint pin, float freq, bool rgbw) {
+static inline void adb_receive_program_init(PIO pio, uint sm, uint offset, uint pin, float freq, bool rgbw) {
 
     pio_gpio_init(pio, pin);
-    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, false);
 
-    pio_sm_config c = adb_write_program_get_default_config(offset);
+    pio_sm_config c = adb_receive_program_get_default_config(offset);
     sm_config_set_sideset_pins(&c, pin);
 
     sm_config_set_out_pins(&c, pin, 1);
+    sm_config_set_in_pins(&c, pin);
 
     //c	Pointer to the configuration structure to modify
     //shift_right	true to shift OSR to right, false to shift OSR to left
     //autopull	whether autopull is enabled
     //pull_threshold	threshold in bits to shift out before auto/conditional re-pulling of the OSR
     sm_config_set_out_shift(&c, true, false, 16);
+
+
+
+    // Note that we may push at a < 32 bit threshold if pin_count does not
+    // divide 32. We are using shift-to-right, so the sample data ends up
+    // left-justified in the FIFO in this case, with some zeroes at the LSBs.
+
+
+
+/*! \brief Setup 'in' shifting parameters in a state machine configuration
+ *  \ingroup sm_config
+ *
+ * \param c Pointer to the configuration structure to modify
+ * \param shift_right true to shift ISR to right, false to shift ISR to left
+ * \param autopush whether autopush is enabled
+ * \param push_threshold threshold in bits to shift in before auto/conditional re-pushing of the ISR
+ */
+//static inline void sm_config_set_in_shift(pio_sm_config *c, bool shift_right, bool autopush, uint push_threshold)
+
+    sm_config_set_in_shift(&c, false, true, 8);
+
+
  
     // We want each "tick" in the pio controller to be 5us
     // This equates to 200000 ticks per second
