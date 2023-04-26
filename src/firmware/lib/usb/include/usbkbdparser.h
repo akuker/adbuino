@@ -23,11 +23,7 @@
 
 #pragma once
 
-#ifdef ADBUINO
-#include <hidboot.h>
-#elif QUOKKADB
-#include "keyboardrptparser.h"
-#endif
+#include "platformkbdparser.h"
 
 #include "scqueue.h"
 
@@ -55,19 +51,19 @@ protected:
     uint8_t m_key_updown;
 };
 
-class KbdRptParser : public KeyboardReportParser
+class KbdRptParser : public PlatformKbdParser
 {
 public:
     KbdRptParser();
     virtual ~KbdRptParser();
     void PrintKey(uint8_t mod, uint8_t key);
     KeyEvent GetKeyEvent();
-    bool PendingKeyboardEvent() override;
+    bool PendingKeyboardEvent();
     void Reset(void);
     
 
 protected:
-    void OnModifierKeysChanged(uint8_t before, uint8_t after) override;
+    void OnModifierKeysChanged(uint8_t before, uint8_t after);
     void OnKeyDown(uint8_t mod, uint8_t key) override;
     void OnKeyUp(uint8_t mod, uint8_t key) override;
     void OnKeyPressed(uint8_t key);

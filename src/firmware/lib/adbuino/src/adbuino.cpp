@@ -75,8 +75,9 @@ USBHub Hub4(&Usb);
 HIDBoot<USB_HID_PROTOCOL_KEYBOARD> HidKeyboard(&Usb);
 HIDBoot<USB_HID_PROTOCOL_MOUSE> HidMouse(&Usb);
 
-ADBMouseRptParser MousePrs;
+
 ADBKbdRptParser KeyboardPrs;
+ADBMouseRptParser MousePrs(KeyboardPrs);
 
 unsigned long blink_timer = 0;
 int led_state = HIGH;

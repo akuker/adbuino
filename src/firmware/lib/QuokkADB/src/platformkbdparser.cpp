@@ -25,9 +25,9 @@
 //
 //---------------------------------------------------------------------------
 
-#include "keyboardrptparser.h"
+#include "platformkbdparser.h"
 #include "usb_hid_keys.h"
-#include "quokkadb_config.h"
+#include "platform_config.h"
 #include "char2usbkeycode.h"
 #include "flashsettings.h"
 #include <tusb.h>
@@ -43,15 +43,15 @@ uint8_t inline findModifierKey(hid_keyboard_report_t const *report, const hid_ke
         return (mod & report->modifier) ? 1 : 0;
 }
 
-KeyboardReportParser::KeyboardReportParser()
+PlatformKbdParser::PlatformKbdParser()
 {
         kbdLockingKeys.bLeds = 0;
 }
-KeyboardReportParser::~KeyboardReportParser()
+PlatformKbdParser::~PlatformKbdParser()
 {
 }
 
-void KeyboardReportParser::AddKeyboard(uint8_t dev_addr, uint8_t instance) {
+void PlatformKbdParser::AddKeyboard(uint8_t dev_addr, uint8_t instance) {
         for(size_t i = 0; i < MAX_KEYBOARDS; i++)
         {
                 if (!keyboards_list[i].in_use)
@@ -69,7 +69,7 @@ void KeyboardReportParser::AddKeyboard(uint8_t dev_addr, uint8_t instance) {
         }
 
 }
-void KeyboardReportParser::RemoveKeyboard(uint8_t dev_addr, uint8_t instance) {
+void PlatformKbdParser::RemoveKeyboard(uint8_t dev_addr, uint8_t instance) {
   for(size_t i = 0; i < MAX_KEYBOARDS; i++)
   {
     if (keyboards_list[i].in_use && keyboards_list[i].device_addr == dev_addr && keyboards_list[i].instance == instance)
@@ -80,7 +80,7 @@ void KeyboardReportParser::RemoveKeyboard(uint8_t dev_addr, uint8_t instance) {
   }
 }
 
-void KeyboardReportParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_report_t const *report) {
+void PlatformKbdParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_report_t const *report) {
         union {
                 KBDINFO kbdInfo;
                 uint8_t bInfo[sizeof (KBDINFO)];
@@ -100,7 +100,7 @@ void KeyboardReportParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboar
         cur_kbd_info->bReserved =  report->reserved;
         
 
-        if (KeyboardReportParser::SpecialKeyCombo(cur_kbd_info))
+        if (PlatformKbdParser::SpecialKeyCombo(cur_kbd_info))
         {
                 return;
         }
@@ -152,7 +152,7 @@ void KeyboardReportParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboar
 }
 bool tuh_hid_set_report(uint8_t dev_addr, uint8_t instance, uint8_t report_id, uint8_t report_type, void* report, uint16_t len);
 
-void KeyboardReportParser::SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrolllock){
+void PlatformKbdParser::SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrolllock){
         // Send LEDs statuses to USB keyboard
         kbdLockingKeys.kbdLeds.bmCapsLock = capslock ? 1 : 0;
         kbdLockingKeys.kbdLeds.bmNumLock = numlock ? 1 : 0;
@@ -162,7 +162,7 @@ void KeyboardReportParser::SetUSBkeyboardLEDs(bool capslock, bool numlock, bool 
 }
 
 
-bool KeyboardReportParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
+bool PlatformKbdParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
 {
         // Special keycombo actions
         uint8_t special_key_count = 0;
@@ -196,7 +196,7 @@ bool KeyboardReportParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
                 switch (special_key)
                 {
                 case USB_KEY_V:
-                        SendString(QUOKKADB_FW_VER_STRING);
+                        SendString(PLATFORM_FW_VER_STRING);
                 break;
                 case USB_KEY_L:
                         setting_storage.settings()->led_on = ~setting_storage.settings()->led_on;
@@ -217,7 +217,7 @@ bool KeyboardReportParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
         return false;
 }
 
-void KeyboardReportParser::SendString(const char * message)
+void PlatformKbdParser::SendString(const char * message)
 {
         int i = 0;
         usbkey_t key;
@@ -254,7 +254,7 @@ void KeyboardReportParser::SendString(const char * message)
         }
 }
 
-void KeyboardReportParser::ChangeUSBKeyboardLEDs(void)
+void PlatformKbdParser::ChangeUSBKeyboardLEDs(void)
 {
         if (usb_set_leds == false) 
                 return;
@@ -298,12 +298,12 @@ void KeyboardReportParser::ChangeUSBKeyboardLEDs(void)
         }
 }
 
-const uint8_t KeyboardReportParser::numKeys[10]  = {'!', '@', '#', '$', '%', '^', '&', '*', '(', ')'};
-const uint8_t KeyboardReportParser::symKeysUp[12]  = {'_', '+', '{', '}', '|', '~', ':', '"', '~', '<', '>', '?'};
-const uint8_t KeyboardReportParser::symKeysLo[12]  = {'-', '=', '[', ']', '\\', ' ', ';', '\'', '`', ',', '.', '/'};
-const uint8_t KeyboardReportParser::padKeys[5]  = {'/', '*', '-', '+', '\r'};
+const uint8_t PlatformKbdParser::numKeys[10]  = {'!', '@', '#', '$', '%', '^', '&', '*', '(', ')'};
+const uint8_t PlatformKbdParser::symKeysUp[12]  = {'_', '+', '{', '}', '|', '~', ':', '"', '~', '<', '>', '?'};
+const uint8_t PlatformKbdParser::symKeysLo[12]  = {'-', '=', '[', ']', '\\', ' ', ';', '\'', '`', ',', '.', '/'};
+const uint8_t PlatformKbdParser::padKeys[5]  = {'/', '*', '-', '+', '\r'};
 
-uint8_t KeyboardReportParser::OemToAscii(uint8_t mod, uint8_t key) {
+uint8_t PlatformKbdParser::OemToAscii(uint8_t mod, uint8_t key) {
         uint8_t shift = (mod & 0x22);
 
         // [a-z]

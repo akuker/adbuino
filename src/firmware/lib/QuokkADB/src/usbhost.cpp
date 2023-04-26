@@ -29,8 +29,8 @@
 #include "adbregisters.h"
 #include "usbkbdparser.h"
 #include "usb_hid_keys.h"
-#include "keyboardrptparser.h"
-#include "mouserptparser.h"
+#include "platformkbdparser.h"
+#include "platformmouseparser.h"
 #include "usbmouseparser.h"
 
 #define kModCmd 1
@@ -61,7 +61,6 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_re
   (void)desc_report;
   (void)desc_len;
 
-  const char* protocol_str[] = { "None", "Keyboard", "Mouse" };
   uint8_t const itf_protocol = tuh_hid_interface_protocol(dev_addr, instance);
 
   uint16_t vid, pid;
@@ -123,7 +122,6 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
 {
   (void) len;
   uint8_t const itf_protocol = tuh_hid_interface_protocol(dev_addr, instance);
-  static uint8_t tu_leds = 0;
 
   switch(itf_protocol)
   {

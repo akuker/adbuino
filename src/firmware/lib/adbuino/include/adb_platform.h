@@ -38,6 +38,7 @@ class AdbInterfacePlatform {
     #define ADB_PIN       PIND
     #define ADB_DDR       DDRD
     #define ADB_DATA_BIT  3
+    #define ADB_DATA_ARDUINO_PIN_NUM 3
     
     void data_lo();
     void data_hi();
@@ -50,6 +51,11 @@ class AdbInterfacePlatform {
     uint16_t wait_data_hi(uint32_t us);
     
     bool adb_delay_us(double delay);
+
+    void adb_irq_init(void);
+    void adb_irq_disable(void);
+
+    void adb_set_leds(uint16_t reg2){};
 
 };
 

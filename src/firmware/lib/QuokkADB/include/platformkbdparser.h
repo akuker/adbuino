@@ -91,7 +91,7 @@ struct KeyboardDevices
   bool in_use;
 };
 
-class KeyboardReportParser {
+class PlatformKbdParser {
         
         static const uint8_t numKeys[10];
         static const uint8_t symKeysUp[12];
@@ -118,8 +118,8 @@ protected:
 
 public:
 
-        KeyboardReportParser();
-        virtual ~KeyboardReportParser();
+        PlatformKbdParser();
+        virtual ~PlatformKbdParser();
         void Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_report_t const *report);
         bool SpecialKeyCombo(KBDINFO *cur_kbd_info);
         void SendString(const char* message);

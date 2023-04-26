@@ -1,5 +1,6 @@
 
 add_library(usb
+    char2usbkeycode.cpp
     usbkbdparser.cpp
     usbmouseparser.cpp
     )

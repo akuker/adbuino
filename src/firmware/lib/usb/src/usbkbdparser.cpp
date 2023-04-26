@@ -52,8 +52,13 @@ void KbdRptParser::Reset(void)
         
         free(m_keyboard_events.dequeue());
     }
+
+    // QuokkADB handles keyboard LEDs directly
+    // ADBuino toggles LEDs status via keypress
+    #ifdef QUOKKADB
     kbdLockingKeys.bLeds = 0x00;
     SetUSBkeyboardLEDs(false, false, false);
+    #endif 
 }
 
 void KbdRptParser::PrintKey(uint8_t m, uint8_t key)

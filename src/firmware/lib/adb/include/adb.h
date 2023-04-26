@@ -38,8 +38,8 @@
 #define MOUSE_DEFAULT_HANDLER_ID 0x01
 #define KDB_EXTENDED_HANDLER_ID 0x3
 
-extern bool adb_collision;
-extern bool collision_detection;
+extern volatile bool adb_collision;
+extern volatile bool collision_detection;
 
 class AdbInterface : public AdbInterfacePlatform {
   public:
@@ -149,8 +149,8 @@ out:
 
 inline void AdbInterface::DetectCollision(void)
 {
-  adb_irq_init();
   collision_detection = true;
+  adb_irq_init();
 }
 
 inline void AdbInterface::ResetCollision(void)

@@ -57,8 +57,8 @@ uint8_t mousesrq = 0;
 uint16_t modifierkeys = 0xFFFF;
 uint64_t kbskiptimer = 0;
 bool adb_reset = false;
-bool adb_collision = false; 
-bool collision_detection = false;
+volatile bool adb_collision = false; 
+volatile bool collision_detection = false;
 bool mouse_skip_next_listen_reg3 = false;
 bool kbd_skip_next_listen_reg3 = false;
 
