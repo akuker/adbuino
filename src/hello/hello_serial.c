@@ -50,12 +50,15 @@ int main()
     {
         if(!pio_sm_is_rx_fifo_empty(pio0, 0)){
             uint32_t value = pio_sm_get(pio, 0);
-            slow+=20;
+            slow+=100;
             if(slow > 10){
                 slow = 0;
-                printf("%04X\n", value);
+                printf("%08X\n", value);
                 fflush(stdout);
             }
+        }
+        else{
+            slow = slow;
         }
     }
     while(1){
