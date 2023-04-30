@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 
 #include "tusb.h"
-#include "quokkadb_gpio.h"
+#include "rp2040_gpio.h"
 #include "adbregisters.h"
 #include "usbkbdparser.h"
 #include "usb_hid_keys.h"

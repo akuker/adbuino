@@ -22,10 +22,17 @@
 //  with the file. If not, see <https://www.gnu.org/licenses/>.
 //
 //---------------------------------------------------------------------------
+#include "adb.h"
 #include "adb_platform.h"
 #include "adbkbdparser.h"
+#include "rp2040_gpio.h"
 #include "hardware/gpio.h"
 #include <time.h>
+
+uint32_t millis()
+{
+  return to_ms_since_boot(get_absolute_time());
+}
 
 bool AdbInterfacePlatform::adb_delay_us(uint32_t delay) 
 {
@@ -75,3 +82,61 @@ void AdbInterfacePlatform::adb_set_leds(uint16_t reg2)
   bool scrolllock = !(reg2 & 0x4);
   KeyboardPrs.SetUSBkeyboardLEDs(capslock, numlock, scrolllock);
 }
+
+
+
+void AdbInterfacePlatform::data_lo()
+{
+    ADB_OUT_LOW();
+}
+
+void AdbInterfacePlatform::data_hi()
+{
+    ADB_OUT_HIGH();
+}
+uint8_t AdbInterfacePlatform::data_in()
+{
+    return ADB_IN_GET();
+}
+
+void AdbInterfacePlatform::adb_pin_out()
+{
+}
+void AdbInterfacePlatform::adb_pin_in()
+{
+}
+
+uint16_t AdbInterfacePlatform::wait_data_lo(uint32_t us)
+{
+  // use 64bit time to prevent possible wrapping
+  uint64_t start = time_us_64();
+  uint64_t time;
+  do
+  {
+    if (!data_in()) {
+      time = time_us_64();
+      break;
+    }
+    time = time_us_64();
+  } while (us >= time - start);
+  uint16_t diff = static_cast<uint16_t>(time - start);
+  return us >= diff ? diff : 0;
+}
+
+uint16_t AdbInterfacePlatform::wait_data_hi(uint32_t us)
+{
+  uint64_t start = time_us_64();
+  uint64_t time;
+  do
+  {
+    if (data_in()) {
+      time = time_us_64();
+      break;
+    }
+    time = time_us_64();
+  } while (us >= time - start);
+  uint16_t diff = static_cast<uint16_t>(time - start);
+  return diff;
+}
+
+

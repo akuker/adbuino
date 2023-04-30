@@ -2,9 +2,9 @@
 #include "adbuino.cpp"
 #endif
 
-#ifdef QUOKKADB
-#include "quokkadb.h"
+#ifdef RP2040_PLATFORM
+int core0_main(void);
 int main(void) {
-    return quokkadb();
+    return core0_main();
 }
 #endif

@@ -25,7 +25,7 @@
 
 #include "adbmouseparser.h"
 #ifdef QUOKKADB
-#include "quokkadb_gpio.h"
+#include "rp2040_gpio.h"
 #include "rp2040_serial.h"
 using rp2040_serial::Serial;
 #endif

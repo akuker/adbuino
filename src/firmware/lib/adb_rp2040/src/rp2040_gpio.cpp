@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "quokkadb_gpio.h"
+#include "rp2040_gpio.h"
 #include "pico/mutex.h"
 #include "hardware/gpio.h"
 #include <pico/printf.h>

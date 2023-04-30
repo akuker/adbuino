@@ -22,8 +22,7 @@
 
 // Bit definitions from "Guide to the Macintosh Family Hardware", Table 8-10 and 8-11
 
-#ifndef _ADBREGISTERS_H
-#define _ADBREGISTERS_H
+#pragma once
 
 // Table 8-10 Register 0 in the Apple Extended Keyboard
 //    Bit  = Meaning
@@ -68,6 +67,3 @@
 
 #define ADB_REG_2_DEFAULT 0xFFFF
 
-
-
-#endif

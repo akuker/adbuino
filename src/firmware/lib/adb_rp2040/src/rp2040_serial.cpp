@@ -1,6 +1,6 @@
 // Minimal implementation of Arudino's Serial class
 #include "rp2040_serial.h"
-#include "quokkadb_gpio.h"
+#include "rp2040_gpio.h"
 #include <pico/printf.h>
 
 namespace rp2040_serial {

@@ -1,7 +1,11 @@
 include_directories(${PROJECT_SOURCE_DIR}/include/)
 
-add_executable(QuokkADB-firmware main.cpp)
+add_executable(firmware main.cpp)
 
-target_link_libraries(QuokkADB-firmware QuokkADB)
+if( ADAPTER_TYPE STREQUAL "adbuinov2")
+    target_link_libraries(firmware adbuino_v2)
+else()
+    target_link_libraries(firmware QuokkADB)
+endif()
 
-pico_add_extra_outputs(QuokkADB-firmware)
+pico_add_extra_outputs(firmware)

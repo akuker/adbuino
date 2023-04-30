@@ -31,7 +31,8 @@
 #include <stdint.h>
 #ifdef ADBUINO
 #include <Arduino.h>
-#elif QUOKKADB
+#endif
+#if defined RP2040_PLATFORM
 #include "rp2040_serial.h"
 using rp2040_serial::Serial;
 #endif

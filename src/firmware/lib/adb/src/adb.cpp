@@ -35,10 +35,11 @@
 
 #ifdef ADBUINO
 #include <stdio.h>
-#elif QUOKKADB
+#elif defined RP2040_PLATFORM
 #include "rp2040_serial.h"
 #include <pico/printf.h>
 using rp2040_serial::Serial;
+
 #endif
 
 uint8_t mouse_addr = MOUSE_DEFAULT_ADDR;

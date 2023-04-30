@@ -23,7 +23,8 @@
 #pragma once
 #ifdef ADBUINO
 #include <hidboot.h>
-#elif QUOKKADB
+#endif
+#ifdef RP2040_PLATFORM
 #include <stdlib.h>
 #include "mouserptparser.h"
 #endif

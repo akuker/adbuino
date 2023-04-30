@@ -27,7 +27,7 @@
 #include "adbregisters.h"
 #include "usb_hid_keys.h"
 
-#ifdef QUOKKADB
+#ifdef RP2040_PLATFORM
 #include "rp2040_serial.h"
 using rp2040_serial::Serial;
 #endif

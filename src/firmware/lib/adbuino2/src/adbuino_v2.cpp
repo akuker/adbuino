@@ -7,10 +7,10 @@
 //	   Copyright (C) 2017 bbraun
 //     Copyright (C) 2019 Ha Thach (tinyusb.org)
 //	   Copyright (C) 2020 difegue
-//	   Copyright (C) 2021-2022 akuker
+//	   Copyright (C) 2021-2023 akuker
 //     Copyright (C) 2022 Rabbit Hole Computing LLC
 //
-//  This file is part of QuokkaADB.
+//  This file is part of the ADBuino and the QuokkADB projects.
 //
 //  This file is free software: you can redistribute it and/or modify it under 
 //  the terms of the GNU General Public License as published by the Free 
@@ -47,7 +47,7 @@
 #include "adbkbdparser.h"
 #include "adbmouseparser.h"
 #include "flashsettings.h"
-#include "quokkadb_config.h"
+#include "adbuino_v2_config.h"
 
 using rp2040_serial::Serial;
 

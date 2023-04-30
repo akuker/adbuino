@@ -6,6 +6,6 @@ add_library(adb
     usbtoadb.cpp
     )
 
-include_directories(../../misc/include)
-target_link_libraries(adb QuokkADB)
+include_directories(../../misc/include ../../adb_rp2040/include ../../usb/include)
+target_link_libraries(adb pico_stdlib tinyusb_common tinyusb_host)
 target_include_directories(adb PUBLIC ../include)

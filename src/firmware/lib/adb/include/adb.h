@@ -28,6 +28,14 @@
 #include <stdint.h>
 #include <adb_platform.h>
 
+#ifdef RP2040_PLATFORM
+extern "C"{
+  // These are standard Arduino functions that are not standard in the Pico SDK
+  uint32_t millis();
+  int rand(void);
+}
+#endif
+
 #ifndef ADB_START_BIT_DELAY
 #define ADB_START_BIT_DELAY 100000
 #endif

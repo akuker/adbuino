@@ -27,7 +27,12 @@
 
 #include "keyboardrptparser.h"
 #include "usb_hid_keys.h"
+#ifdef QUOKKADB
 #include "quokkadb_config.h"
+#endif
+#ifdef ADBUINOV2
+#include "adbuino_v2_config.h"
+#endif
 #include "char2usbkeycode.h"
 #include "flashsettings.h"
 #include <tusb.h>
