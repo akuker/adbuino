@@ -1,0 +1,30 @@
+name: Build Adbuino V1 firmware
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build_firmware:
+    name: Build firmware on Ubuntu 22.04
+    runs-on: ubuntu-22.04
+  
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v3
+        with:
+          path: adbuino
+          fetch-depth: "0"
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+      - uses: actions/setup-python@v4
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - name: Build Adbuino V1 PlatformIO Project
+        working-directory: adbuino/src/firmware
+        run: pio run
