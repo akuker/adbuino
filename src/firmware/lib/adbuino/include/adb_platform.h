@@ -86,24 +86,30 @@ inline void AdbInterfacePlatform::adb_pin_in()
 
 inline uint16_t AdbInterfacePlatform::wait_data_lo(uint32_t us)
 {
+  uint32_t timer = 0;
   do
   {
     if (!data_in())
       break;
-    _delay_us(1 - (6 * 1000000.0 / F_CPU));
-  } while (--us);
-  return us;
+    _delay_us(1 - (12 * 1000000.0 / F_CPU));
+    _NOP();
+    timer++;
+  } while (us > timer);
+  return timer;
 }
 
 inline uint16_t AdbInterfacePlatform::wait_data_hi(uint32_t us)
 {
+  uint32_t timer = 0;
   do
   {
     if (data_in())
       break;
-    _delay_us(1 - (6 * 1000000.0 / F_CPU));
-  } while (--us);
-  return us;
+    _delay_us(1 - (12 * 1000000.0 / F_CPU));
+    _NOP();
+    timer++;
+  } while (us > timer);
+  return timer;
 }
 
 inline bool AdbInterfacePlatform::adb_delay_us(double delay)
@@ -111,6 +117,16 @@ inline bool AdbInterfacePlatform::adb_delay_us(double delay)
     // for this _delay_us to compile "__DELAY_BACKWARD_COMPATIBLE__" 
     // must be defined in the platformio.ini file. Otherwise
     // it can only be delayed with compile time computations
-    _delay_us(delay);
+    
+    // there seems to be a compiling issue. For some reason the if
+    // statement fixes the issue.
+    if (delay > 40)
+    {
+      _delay_us(4.7*delay/5.0);  
+    }
+    else
+    {
+      _delay_us(4.5*delay/5.0);  
+    }
     return true; 
 }

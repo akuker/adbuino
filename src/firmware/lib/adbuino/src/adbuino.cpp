@@ -63,6 +63,9 @@ extern uint32_t kbskiptimer;
 extern bool adbcollision;
 
 bool global_debug = false;
+bool global_debug2 = true;
+
+extern bool adb_reset;
 
 AdbInterface adb;
 UsbInterface usb;
@@ -99,7 +102,7 @@ void setup()
   Serial.println("Initializing ADB");
   adb.Init();
   Serial.println("Initializing USB");
-  // usb.Init();
+  //usb.Init();
 
   if (Usb.Init() == -1)
     Serial.println("OSC did not start.");
@@ -127,7 +130,6 @@ void loop()
   uint8_t cmd = 0;
 
   Usb.Task();
-
   if(( Usb.getUsbTaskState() == USB_STATE_RUNNING )){
 
     if (global_debug && first_time)
@@ -136,28 +138,34 @@ void loop()
       Usb.ForEachUsbDevice(&PrintAllDescriptors);
       Usb.ForEachUsbDevice(&PrintAllAddresses);
     }
-
-    update_blinker();
-
+ 
     if (!mousepending)
     {
       if (MousePrs.MouseChanged())
       {
         mousereg0 = MousePrs.GetAdbRegister0();
         mousepending = 1;
+        Serial.println("MOUSE: Mouse changed");
       }
     }
-
+  
     if (!kbdpending)
     {
       if (KeyboardPrs.PendingKeyboardEvent())
       {
         kbdreg0 = KeyboardPrs.GetAdbRegister0();
         kbdpending = 1;
+        Serial.println("Keyboard event pending.");
       }
     }
-
+    
     cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
-    adb.ProcessCommand(cmd);
+    adb.ProcessCommand(cmd); 
+    if (adb_reset)
+    {
+      adb.Reset();
+      adb_reset = false;
+      Serial.println("ALL: Resetting devices");
+    } 
   }
 }
