@@ -96,8 +96,6 @@ void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
         PrintKey(mod, key);
     }
     uint8_t c = OemToAscii(mod, key);
-    // m_last_key_pressed = key;
-    // m_last_key_up_or_down = KeyEvent::KeyDown;
 
     if (c)
         OnKeyPressed(c);

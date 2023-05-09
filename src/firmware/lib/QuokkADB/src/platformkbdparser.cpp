@@ -32,6 +32,11 @@
 #include "flashsettings.h"
 #include <tusb.h>
 
+#if QUOKKADB
+#include "rp2040_serial.h"
+using rp2040_serial::Serial;
+#endif
+
 #define VALUE_WITHIN(v,l,h) (((v)>=(l)) && ((v)<=(h)))
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 
@@ -107,7 +112,7 @@ void PlatformKbdParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_r
 
         // provide event for changed control key state
         if (prevState.bInfo[0x00] != current_state.bInfo[0x00]) {
-                OnModifierKeysChanged(prevState.bInfo[0x00], current_state.bInfo[0x00]);
+                OnControlKeysChanged(prevState.bInfo[0x00], current_state.bInfo[0x00]);
         }
 
         for (uint8_t i = 2; i < 8; i++) {
@@ -121,20 +126,8 @@ void PlatformKbdParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_r
                                 up = true;
                 }
                 if (!down) {
-                        HandleLockingKeys(dev_addr, instance, current_state.bInfo[i]); 
-                        // This if statement is handling locking/unlocking the caps lock key
-                        if (current_state.bInfo[i] == UHS_HID_BOOT_KEY_CAPS_LOCK) {
-                                if (kbdLockingKeys.kbdLeds.bmCapsLock == 1) {
-                                        OnKeyDown(current_state.bInfo[0], current_state.bInfo[i]);
-                                }
-                                else {
-                                        OnKeyUp(current_state.bInfo[0], current_state.bInfo[i]);
-                                }
-                        }
-                        else {
-                                
-                                OnKeyDown(current_state.bInfo[0], current_state.bInfo[i]);
-                        }
+                        HandleLockingKeys(dev_addr, instance, current_state.bInfo[i]);        
+                        OnKeyDown(current_state.bInfo[0], current_state.bInfo[i]);
                 }
                 if (!up) {
                         // Ignore key up on caps lock
@@ -233,6 +226,17 @@ void PlatformKbdParser::SendString(const char * message)
         OnKeyUp(0, USB_KEY_CAPSLOCK);
         OnKeyUp(0, USB_KEY_LEFTMETA);
         OnKeyUp(0, USB_KEY_RIGHTMETA);
+        if (m_keyboard_events.enqueue(new KeyEvent(USB_KEY_CAPSLOCK, KeyEvent::KeyUp, 0)))
+        {
+            // as HandleLocking keys simply toggles the keyboard LEDs, setting it to 1
+            // forces it to toggle off. 
+            kbdLockingKeys.kbdLeds.bmCapsLock = 0;
+            SetUSBkeyboardLEDs(kbdLockingKeys.kbdLeds.bmCapsLock , kbdLockingKeys.kbdLeds.bmNumLock, kbdLockingKeys.kbdLeds.bmScrollLock);
+        }    
+        else
+        {
+            Serial.println("Warning! unable to queue CAPSLOCK key up");
+        }
 
         while(message[i] != '\0')        
         {

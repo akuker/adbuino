@@ -161,6 +161,7 @@ public:
         virtual void OnKeyDown(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) = 0;
 
         virtual void OnKeyUp(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) = 0;
+        virtual void OnControlKeysChanged(uint8_t before __attribute__((unused)), uint8_t after __attribute__((unused))) = 0;
 
 
 protected:
@@ -190,8 +191,6 @@ protected:
 
                 return 0;
         };
-
-        virtual void OnModifierKeysChanged(uint8_t before __attribute__((unused)), uint8_t after __attribute__((unused))) = 0;
 
 
 

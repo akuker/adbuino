@@ -33,9 +33,7 @@
 #include "bithacks.h"
 #include "math.h"
 
-#ifdef ADBUINO
-#include <stdio.h>
-#elif QUOKKADB
+#if QUOKKADB
 #include "rp2040_serial.h"
 using rp2040_serial::Serial;
 #endif

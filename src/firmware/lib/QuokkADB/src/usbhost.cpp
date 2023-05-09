@@ -32,6 +32,7 @@
 #include "platformkbdparser.h"
 #include "platformmouseparser.h"
 #include "usbmouseparser.h"
+#include "adbkbdparser.h"
 
 #define kModCmd 1
 #define kModOpt 2
@@ -41,7 +42,7 @@
 #define kModCaps 32
 #define kModDelete 64
 extern uint16_t modifierkeys;
-extern KbdRptParser KeyboardPrs;
+extern ADBKbdRptParser KeyboardPrs;
 extern MouseRptParser MousePrs;
 
 bool set_hid_report_ready = true;
