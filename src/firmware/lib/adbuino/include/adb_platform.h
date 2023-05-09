@@ -52,8 +52,8 @@ class AdbInterfacePlatform {
     
     bool adb_delay_us(double delay);
 
-    void adb_irq_init(void);
-    void adb_irq_disable(void);
+    void adb_irq_init(void){/*interrupt not enabled*/};
+    void adb_irq_disable(void){/*interrupt not enabled*/};
 
     void adb_set_leds(uint16_t reg2){};
 

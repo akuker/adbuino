@@ -64,7 +64,6 @@ bool kbd_skip_next_listen_reg3 = false;
 
 
 extern bool global_debug;
-extern bool global_debug2;
 // The original data_lo code would just set the bit as an output
 // That works for a host, since the host is doing the pullup on the ADB line,
 // but for a device, it won't reliably pull the line low.  We need to actually

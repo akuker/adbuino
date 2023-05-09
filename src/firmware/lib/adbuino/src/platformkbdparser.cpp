@@ -29,11 +29,12 @@
 #include "usb_hid_keys.h"
 #include "platform_config.h"
 #include "char2usbkeycode.h"
+#include "adbkbdparser.h"
+#include "adbmouseparser.h"
+#include "adb.h"
 
 extern uint16_t modifierkeys;
-extern bool set_hid_report_ready;
-
-
+extern ADBKbdRptParser KeyboardPrs;
 
 PlatformKbdParser::PlatformKbdParser()
 {
@@ -43,82 +44,145 @@ PlatformKbdParser::~PlatformKbdParser()
 {
 }
 
-bool PlatformKbdParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
+bool PlatformKbdParser::SpecialKeyCombo()
 {
-        // Special keycombo actions
-        uint8_t special_key_count = 0;
-        uint8_t special_key = 0;
-        uint8_t special_keys[] = { USB_KEY_V, USB_KEY_L};
-        uint8_t caps_lock_down = false;
-        
-        for (uint8_t i = 0; i < 6; i++)
-        {
-                if (cur_kbd_info->Keys[i] == USB_KEY_CAPSLOCK) {
-                        caps_lock_down = true;
-                }
-                for (size_t j = 0; j < sizeof(special_keys); j++)
-                {
-                        if (special_keys[j] == cur_kbd_info->Keys[i])
-                        {
-                                special_key_count++;
-                                special_key = cur_kbd_info->Keys[i];
-                        }
-                }
+    // Special keycombo actions
+    uint8_t special_key_count = 0;
+    uint8_t special_key = 0;
+    uint8_t special_keys[] = { USB_KEY_V};
+    uint8_t caps_lock_down = false;
+    
+    for (uint8_t i = 0; i < 6; i++)
+    {
+            if (prevState.kbdInfo.Keys[i] == USB_KEY_CAPSLOCK) {
+                    //@DEBUG
+                    // Serial.println("Found prevstate key capslock");
+                    caps_lock_down = true;
+            }
+            for (size_t j = 0; j < sizeof(special_keys); j++)
+            {
+                    if (special_keys[j] == prevState.kbdInfo.Keys[i])
+                    {
+                            special_key_count++;
+                            special_key = prevState.kbdInfo.Keys[i];
+                    }
+            }
 
-        }
-        
-        
-        if (    special_key_count == 1 && 
-                caps_lock_down &&
-                (cur_kbd_info->bmLeftCtrl || cur_kbd_info->bmRightCtrl) &&
-                (cur_kbd_info->bmLeftShift || cur_kbd_info->bmRightShift)
-        )
+    }
+    
+    if ( special_key_count == 1 && 
+        caps_lock_down &&
+        (prevState.kbdInfo.bmLeftCtrl || prevState.kbdInfo.bmRightCtrl) &&
+        (prevState.kbdInfo.bmLeftShift || prevState.kbdInfo.bmRightShift)
+    )
+    {
+        KeyboardPrs.Reset();
+        switch (special_key)
         {
-                switch (special_key)
-                {
-                case USB_KEY_V:
-                        SendString(PLATFORM_FW_VER_STRING);
-                break;       
-                }
-                
-                return true;
+        case USB_KEY_V:
+            //@DEBUG 
+            Serial.println("Printing version");
+            SendString(PLATFORM_FW_VER_STRING);
+        break;       
         }
-        return false;
+        
+        return true;
+    }
+    return false;
 }
 
 void PlatformKbdParser::SendString(const char * message)
 {
         int i = 0;
         usbkey_t key;
-
+        //@DEBUG
+        //Serial.println("Force Key modifiers up");
         // force key up on modifier keys
-        while(PendingKeyboardEvent());
+        TaskKeyboard();
         OnKeyUp(0, USB_KEY_LEFTSHIFT);
+        TaskKeyboard(false);
         OnKeyUp(0, USB_KEY_RIGHTSHIFT);
+        TaskKeyboard(false);
         OnKeyUp(0, USB_KEY_LEFTCTRL);
+        TaskKeyboard(false);
         OnKeyUp(0, USB_KEY_RIGHTCTRL);
+        TaskKeyboard(false);
         OnKeyUp(0, USB_KEY_LEFTALT);
+        TaskKeyboard(false);
         OnKeyUp(0, USB_KEY_RIGHTALT);
+        TaskKeyboard(false);
         OnKeyUp(0, USB_KEY_CAPSLOCK);
+        TaskKeyboard(false);
         OnKeyUp(0, USB_KEY_LEFTMETA);
+        TaskKeyboard(false);
         OnKeyUp(0, USB_KEY_RIGHTMETA);
+        TaskKeyboard(false);
 
         while(message[i] != '\0')        
         {
-                while(PendingKeyboardEvent());
-
                 key = char_to_usb_keycode(message[i++]);
 
                 if (key.shift_down) {
                         OnKeyDown(0, USB_KEY_LEFTSHIFT);
+                        TaskKeyboard();
                 }
 
                 OnKeyDown(0, key.keycode);
-
+                TaskKeyboard();
                 OnKeyUp(0, key.keycode);
-                
+                TaskKeyboard();
+
                 if (key.shift_down) {
                         OnKeyUp(0, USB_KEY_LEFTSHIFT);
+                        TaskKeyboard();
                 }
         }
+}
+extern ADBKbdRptParser KeyboardPrs;
+extern ADBMouseRptParser MousePrs;
+extern uint8_t mousepending;
+extern uint8_t kbdpending;
+extern uint16_t mousereg0;
+extern uint16_t kbdreg0;
+extern uint8_t kbdsrq;
+extern uint8_t mousesrq;
+extern AdbInterface adb;
+extern bool adb_reset;
+
+void PlatformKbdParser::TaskKeyboard(bool first)
+{       
+    uint16_t cmd;
+    if (first)
+    {
+        first = false;
+        if (kbdpending == 1)
+        {
+            if (KeyboardPrs.PendingKeyboardEvent())
+            {
+                kbdreg0 = KeyboardPrs.GetAdbRegister0();
+                kbdpending = 1;
+            }
+            cmd = adb.ReceiveCommand(kbdsrq);
+            adb.ProcessCommand(cmd);
+        }
+    }
+
+    do
+    {    
+        if (KeyboardPrs.PendingKeyboardEvent())
+        {
+            kbdreg0 = KeyboardPrs.GetAdbRegister0();
+            kbdpending = 1;
+        }
+        cmd = adb.ReceiveCommand(kbdsrq);
+        adb.ProcessCommand(cmd); 
+
+    } while(kbdpending != 0);
+
+    if (adb_reset)
+    {
+      adb.Reset();
+      adb_reset = false;
+      Serial.println("ALL: Resetting devices");
+    } 
 }

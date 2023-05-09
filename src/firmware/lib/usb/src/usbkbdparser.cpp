@@ -102,14 +102,14 @@ void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
     if (c)
         OnKeyPressed(c);
 
-    if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyDown)))
+    if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyDown, mod)))
     {
         Serial.println("Warning! unable to enqueue new KeyDown");
     }
     // If power button replacement queue key twice
     else if (key == USB_KEY_PAUSE || key == USB_KEY_F15)
     {
-        if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyDown)))
+        if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyDown, mod)))
         {
             Serial.println("Warning! unable to enqueue new Power Button KeyDown");
         }
@@ -174,7 +174,7 @@ void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
         Serial.print("UP ");
         PrintKey(mod, key);
     }
-    if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyUp)))
+    if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyUp, mod)))
     {
         Serial.println("Warning! unable to enqueue new KeyDown");
     }
@@ -182,7 +182,7 @@ void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
     // If power button replacement queue key twice
     else if (key == USB_KEY_PAUSE || key == USB_KEY_F15)
     {
-        if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyUp)))
+        if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyUp, mod)))
         {
             Serial.println("Warning! unable to enqueue new Power Button KeyUp");
         }
@@ -194,9 +194,9 @@ void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
     }
 }
 
-void KbdRptParser::OnModifierKeysChanged(uint8_t before, uint8_t after)
+void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
 {
-
+    Serial.println("Modifier Keys Changed");
     MODIFIERKEYS beforeMod;
     *((uint8_t *)&beforeMod) = before;
 

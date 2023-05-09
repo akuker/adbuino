@@ -60,7 +60,10 @@ private:
     bool m_mouse_left_button_is_pressed = false;
     bool m_mouse_right_button_is_pressed = false;
     bool m_mouse_button_changed = false;
+    #ifdef QUOKKADB
     MouseRightBtnMode m_right_btn_mode = MouseRightBtnMode::ctrl_click;
-    
+    #else
+    MouseRightBtnMode m_right_btn_mode = MouseRightBtnMode::right_click;
+    #endif
 
 };

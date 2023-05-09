@@ -152,11 +152,11 @@ void PlatformKbdParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_r
 }
 bool tuh_hid_set_report(uint8_t dev_addr, uint8_t instance, uint8_t report_id, uint8_t report_type, void* report, uint16_t len);
 
-void PlatformKbdParser::SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrolllock){
+void PlatformKbdParser::SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrollock){
         // Send LEDs statuses to USB keyboard
         kbdLockingKeys.kbdLeds.bmCapsLock = capslock ? 1 : 0;
         kbdLockingKeys.kbdLeds.bmNumLock = numlock ? 1 : 0;
-        kbdLockingKeys.kbdLeds.bmScrollLock = scrolllock ? 1 : 0;
+        kbdLockingKeys.kbdLeds.bmScrollLock = scrollock ? 1 : 0;
         usb_set_leds = true;
 
 }

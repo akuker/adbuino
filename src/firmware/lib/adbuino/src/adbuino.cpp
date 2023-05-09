@@ -36,6 +36,7 @@
 #include <usbhub.h>
 #include "usbinterface.h"
 #include "usb_description.h"
+#include "platform_config.h"
 // Satisfy the IDE, which needs to see the include statement in the ino too.
 #ifdef dobogusinclude
 #include <spi4teensy3.h>
@@ -63,7 +64,6 @@ extern uint32_t kbskiptimer;
 extern bool adbcollision;
 
 bool global_debug = false;
-bool global_debug2 = true;
 
 extern bool adb_reset;
 
@@ -98,7 +98,7 @@ void setup()
   // Setup blinking LED
   pinMode(A0, OUTPUT);
   digitalWrite(A0, HIGH);
-
+  Serial.println(PLATFORM_FW_VER_STRING);
   Serial.println("Initializing ADB");
   adb.Init();
   Serial.println("Initializing USB");
@@ -138,34 +138,35 @@ void loop()
       Usb.ForEachUsbDevice(&PrintAllDescriptors);
       Usb.ForEachUsbDevice(&PrintAllAddresses);
     }
- 
-    if (!mousepending)
+    if (!KeyboardPrs.SpecialKeyCombo())
     {
-      if (MousePrs.MouseChanged())
+      if (!mousepending)
       {
-        mousereg0 = MousePrs.GetAdbRegister0();
-        mousepending = 1;
-        Serial.println("MOUSE: Mouse changed");
+        if (MousePrs.MouseChanged())
+        {
+          mousereg0 = MousePrs.GetAdbRegister0();
+          mousepending = 1;
+        }
       }
-    }
-  
-    if (!kbdpending)
-    {
-      if (KeyboardPrs.PendingKeyboardEvent())
-      {
-        kbdreg0 = KeyboardPrs.GetAdbRegister0();
-        kbdpending = 1;
-        Serial.println("Keyboard event pending.");
-      }
-    }
     
-    cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
-    adb.ProcessCommand(cmd); 
-    if (adb_reset)
-    {
-      adb.Reset();
-      adb_reset = false;
-      Serial.println("ALL: Resetting devices");
-    } 
+      if (!kbdpending)
+      {
+        if (KeyboardPrs.PendingKeyboardEvent())
+        {
+          kbdreg0 = KeyboardPrs.GetAdbRegister0();
+          kbdpending = 1;
+        }
+      }
+      
+      cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
+      adb.ProcessCommand(cmd); 
+      if (adb_reset)
+      {
+        adb.Reset();
+        adb_reset = false;
+        Serial.println("ALL: Resetting devices");
+      } 
+    }
   }
+  
 }

@@ -126,7 +126,7 @@ public:
         void AddKeyboard(uint8_t dev_addr, uint8_t instance);
         void RemoveKeyboard(uint8_t dev_addr, uint8_t instance);
         // Sets the LEDs to shared memory
-        void SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrolllock);
+        void SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrollock);
         // Executes the LED changes from shared memory (meant to be run on the same core as tuh_task)
         void ChangeUSBKeyboardLEDs(void);
 

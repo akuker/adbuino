@@ -32,16 +32,6 @@
 
 #include <hidboot.h>
 
-#define MAX_KEYBOARDS 32
-
-struct KeyboardDevices  
-{
-  uint8_t device_addr;
-  uint8_t instance;
-  bool in_use;
-};
-
-
 class PlatformKbdParser : public KeyboardReportParser {
         
         static const uint8_t numKeys[10];
@@ -49,70 +39,21 @@ class PlatformKbdParser : public KeyboardReportParser {
         static const uint8_t symKeysLo[12];
         static const uint8_t padKeys[5];
 
-protected:
-
-        union {
-                KBDINFO kbdInfo;
-                uint8_t bInfo[sizeof (KBDINFO)];
-        } prevState;
-
-        union {
-                KBDLEDS kbdLeds;
-                uint8_t bLeds;
-        } kbdLockingKeys;
-
-        bool usb_set_leds = false;
-
-
-        KeyboardDevices keyboards_list[MAX_KEYBOARDS] = {};
-
 public:
 
         PlatformKbdParser();
         virtual ~PlatformKbdParser();
-        bool SpecialKeyCombo(KBDINFO *cur_kbd_info);
+        void TaskKeyboard(bool first = true);
+        bool SpecialKeyCombo();
         void SendString(const char* message);
-        void AddKeyboard(uint8_t dev_addr, uint8_t instance);
-        void RemoveKeyboard(uint8_t dev_addr, uint8_t instance);
-        // Sets the LEDs to shared memory
-        void SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrolllock);
-        // Executes the LED changes from shared memory (meant to be run on the same core as tuh_task)
-        void ChangeUSBKeyboardLEDs(void);
-
         virtual bool PendingKeyboardEvent() = 0;
-
         virtual void OnKeyDown(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) = 0;
 
         virtual void OnKeyUp(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) = 0;
-
+        
+        virtual void OnControlKeysChanged(uint8_t before __attribute__((unused)), uint8_t after __attribute__((unused))) = 0;  
 
 protected:
 
-        uint8_t HandleLockingKeys(uint8_t dev_addr, uint8_t instance, uint8_t key) {
-                uint8_t old_keys = kbdLockingKeys.bLeds;
-
-                switch(key) {
-                        case UHS_HID_BOOT_KEY_NUM_LOCK:
-                                kbdLockingKeys.kbdLeds.bmNumLock = ~kbdLockingKeys.kbdLeds.bmNumLock;
-                                break;
-                        case UHS_HID_BOOT_KEY_CAPS_LOCK:
-                                kbdLockingKeys.kbdLeds.bmCapsLock = ~kbdLockingKeys.kbdLeds.bmCapsLock;
-                                break;
-                        case UHS_HID_BOOT_KEY_SCROLL_LOCK:
-                                kbdLockingKeys.kbdLeds.bmScrollLock = ~kbdLockingKeys.kbdLeds.bmScrollLock;
-                                break;
-                }
-
-                if(old_keys != kbdLockingKeys.bLeds ) {
-                        bool numlock = !!(kbdLockingKeys.kbdLeds.bmNumLock);
-                        bool capslock = !!(kbdLockingKeys.kbdLeds.bmCapsLock);
-                        bool scrolllock = !!(kbdLockingKeys.kbdLeds.bmScrollLock);
-                        SetUSBkeyboardLEDs(capslock, numlock, scrolllock);                        
-                }
-
-                return 0;
-        };
-
-        virtual void OnModifierKeysChanged(uint8_t before __attribute__((unused)), uint8_t after __attribute__((unused))) = 0;
 
 };

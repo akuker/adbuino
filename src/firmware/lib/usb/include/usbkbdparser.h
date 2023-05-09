@@ -40,15 +40,17 @@ public:
     inline uint8_t GetKeycode() { return m_keycode; }
     inline bool IsKeyUp() { return m_key_updown == KeyUp; }
     inline bool IsKeyDown() { return m_key_updown == KeyDown; }
-    KeyEvent(uint8_t KeyCode, uint8_t KeyUpDown)
+    KeyEvent(uint8_t KeyCode, uint8_t KeyUpDown, uint8_t mod)
     {
         m_key_updown = KeyUpDown;
         m_keycode = KeyCode;
+        m_mod = mod;
     }
 
 protected:
     uint8_t m_keycode;
     uint8_t m_key_updown;
+    uint8_t m_mod;
 };
 
 class KbdRptParser : public PlatformKbdParser
@@ -60,12 +62,12 @@ public:
     KeyEvent GetKeyEvent();
     bool PendingKeyboardEvent();
     void Reset(void);
-    
+    void OnControlKeysChanged(uint8_t before, uint8_t after) override;
+    void OnKeyDown(uint8_t mod, uint8_t key) override;
+    void OnKeyUp(uint8_t mod, uint8_t key) override;    
 
 protected:
-    void OnModifierKeysChanged(uint8_t before, uint8_t after);
-    void OnKeyDown(uint8_t mod, uint8_t key) override;
-    void OnKeyUp(uint8_t mod, uint8_t key) override;
+
     void OnKeyPressed(uint8_t key);
 
     uint8_t m_last_key_pressed;

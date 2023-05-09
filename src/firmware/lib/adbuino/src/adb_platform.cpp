@@ -28,23 +28,3 @@ void AdbInterfacePlatform::Init()
   // Set ADB line as input
   adb_pin_in();
 }
-
-extern volatile bool adb_collision;
-extern volatile bool collision_detection;
-static void isr_adb_data_falling_edge(void)
-{
-  if (collision_detection)
-  {
-    adb_collision = true;
-  }
-}
-
-void AdbInterfacePlatform::adb_irq_init(void) 
-{
-  attachInterrupt(digitalPinToInterrupt(ADB_DATA_ARDUINO_PIN_NUM), isr_adb_data_falling_edge, FALLING);
-}
-
-void AdbInterfacePlatform::adb_irq_disable(void) 
-{
-  detachInterrupt(digitalPinToInterrupt(ADB_DATA_ARDUINO_PIN_NUM));
-}
