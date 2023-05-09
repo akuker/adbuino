@@ -105,22 +105,6 @@ void PrintAllDescriptors(UsbDevice *pdev)
   PrintDescriptors( pdev->address.devAddress );
 }
 
-// void loop()
-// {
-//   Usb.Task();
-
-//   if ( Usb.getUsbTaskState() == USB_STATE_RUNNING )
-//   {
-//     Usb.ForEachUsbDevice(&PrintAllDescriptors);
-//     Usb.ForEachUsbDevice(&PrintAllAddresses);
-
-//     while ( 1 ) { // stop
-// #ifdef ESP8266
-//         yield(); // needed in order to reset the watchdog timer on the ESP8266
-// #endif
-//     }
-//   }
-// }
 
 uint8_t getdevdescr( uint8_t addr, uint8_t &num_conf )
 {

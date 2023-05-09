@@ -33,7 +33,33 @@
 
 #include <stdint.h>
 #include "tusb.h"
+#include "scqueue.h"
 
+using simple_circular_queue::SCQueue;
+
+#define KEYBOARD_QUEUE_CAPACITY (20)
+
+class KeyEvent
+{
+public:
+    static const uint8_t NoKey = 0xFF;
+    static const uint8_t KeyDown = 0x01;
+    static const uint8_t KeyUp = 0x02;
+    inline uint8_t GetKeycode() { return m_keycode; }
+    inline bool IsKeyUp() { return m_key_updown == KeyUp; }
+    inline bool IsKeyDown() { return m_key_updown == KeyDown; }
+    KeyEvent(uint8_t KeyCode, uint8_t KeyUpDown, uint8_t mod)
+    {
+        m_key_updown = KeyUpDown;
+        m_keycode = KeyCode;
+        m_mod = mod;
+    }
+
+protected:
+    uint8_t m_keycode;
+    uint8_t m_key_updown;
+    uint8_t m_mod;
+};
 //----------------------------------------------------------------------------
 // Keyboard handler
 //----------------------------------------------------------------------------
@@ -138,7 +164,8 @@ public:
 
 
 protected:
-
+        SCQueue<KeyEvent*, KEYBOARD_QUEUE_CAPACITY> m_keyboard_events; 
+        
         uint8_t HandleLockingKeys(uint8_t dev_addr, uint8_t instance, uint8_t key) {
                 uint8_t old_keys = kbdLockingKeys.bLeds;
 

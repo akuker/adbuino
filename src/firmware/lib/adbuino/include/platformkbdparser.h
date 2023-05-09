@@ -31,6 +31,33 @@
 #pragma once
 
 #include <hidboot.h>
+#include "scqueue.h"
+
+class KeyEvent
+{
+public:
+    static const uint8_t NoKey = 0xFF;
+    static const uint8_t KeyDown = 0x01;
+    static const uint8_t KeyUp = 0x02;
+    inline uint8_t GetKeycode() { return m_keycode; }
+    inline bool IsKeyUp() { return m_key_updown == KeyUp; }
+    inline bool IsKeyDown() { return m_key_updown == KeyDown; }
+    KeyEvent(uint8_t KeyCode, uint8_t KeyUpDown, uint8_t mod)
+    {
+        m_key_updown = KeyUpDown;
+        m_keycode = KeyCode;
+        m_mod = mod;
+    }
+
+protected:
+    uint8_t m_keycode;
+    uint8_t m_key_updown;
+    uint8_t m_mod;
+};
+
+using simple_circular_queue::SCQueue;
+
+#define KEYBOARD_QUEUE_CAPACITY (20)
 
 class PlatformKbdParser : public KeyboardReportParser {
         
@@ -43,7 +70,7 @@ public:
 
         PlatformKbdParser();
         virtual ~PlatformKbdParser();
-        void TaskKeyboard(bool first = true);
+        void TaskKeyboard(bool first = false);
         bool SpecialKeyCombo();
         void SendString(const char* message);
         virtual bool PendingKeyboardEvent() = 0;
@@ -54,6 +81,6 @@ public:
         virtual void OnControlKeysChanged(uint8_t before __attribute__((unused)), uint8_t after __attribute__((unused))) = 0;  
 
 protected:
-
+        SCQueue<KeyEvent*, KEYBOARD_QUEUE_CAPACITY> m_keyboard_events;  
 
 };

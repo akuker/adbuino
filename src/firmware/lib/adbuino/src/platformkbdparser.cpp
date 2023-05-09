@@ -55,8 +55,6 @@ bool PlatformKbdParser::SpecialKeyCombo()
     for (uint8_t i = 0; i < 6; i++)
     {
             if (prevState.kbdInfo.Keys[i] == USB_KEY_CAPSLOCK) {
-                    //@DEBUG
-                    // Serial.println("Found prevstate key capslock");
                     caps_lock_down = true;
             }
             for (size_t j = 0; j < sizeof(special_keys); j++)
@@ -80,8 +78,6 @@ bool PlatformKbdParser::SpecialKeyCombo()
         switch (special_key)
         {
         case USB_KEY_V:
-            //@DEBUG 
-            Serial.println("Printing version");
             SendString(PLATFORM_FW_VER_STRING);
         break;       
         }
@@ -91,32 +87,43 @@ bool PlatformKbdParser::SpecialKeyCombo()
     return false;
 }
 
+extern HIDBoot<USB_HID_PROTOCOL_KEYBOARD> HidKeyboard;
+
 void PlatformKbdParser::SendString(const char * message)
 {
         int i = 0;
         usbkey_t key;
-        //@DEBUG
-        //Serial.println("Force Key modifiers up");
         // force key up on modifier keys
-        TaskKeyboard();
+        TaskKeyboard(true);
         OnKeyUp(0, USB_KEY_LEFTSHIFT);
-        TaskKeyboard(false);
+        TaskKeyboard();
         OnKeyUp(0, USB_KEY_RIGHTSHIFT);
-        TaskKeyboard(false);
+        TaskKeyboard();
         OnKeyUp(0, USB_KEY_LEFTCTRL);
-        TaskKeyboard(false);
+        TaskKeyboard();
         OnKeyUp(0, USB_KEY_RIGHTCTRL);
-        TaskKeyboard(false);
+        TaskKeyboard();
         OnKeyUp(0, USB_KEY_LEFTALT);
-        TaskKeyboard(false);
+        TaskKeyboard();
         OnKeyUp(0, USB_KEY_RIGHTALT);
-        TaskKeyboard(false);
-        OnKeyUp(0, USB_KEY_CAPSLOCK);
-        TaskKeyboard(false);
+        TaskKeyboard();
         OnKeyUp(0, USB_KEY_LEFTMETA);
-        TaskKeyboard(false);
+        TaskKeyboard();
         OnKeyUp(0, USB_KEY_RIGHTMETA);
-        TaskKeyboard(false);
+        TaskKeyboard();
+        // Change Caps Lock manually as it gets ignored in the OnKeyUp function
+        if (m_keyboard_events.enqueue(new KeyEvent(USB_KEY_CAPSLOCK, KeyEvent::KeyUp, 0)))
+        {
+            // as HandleLocking keys simply toggles the keyboard LEDs, setting it to 1
+            // forces it to toggle off. 
+            kbdLockingKeys.kbdLeds.bmCapsLock = 1;
+            HandleLockingKeys(&HidKeyboard, USB_KEY_CAPSLOCK);
+            TaskKeyboard();
+        }    
+        else
+        {
+            Serial.println("Warning! unable to queue CAPSLOCK key up");
+        }
 
         while(message[i] != '\0')        
         {
