@@ -49,8 +49,8 @@
 #define CFG_TUH_ENABLED     1
 
 // CFG_TUSB_DEBUG is defined by compiler in DEBUG build
-#define CFG_TUSB_DEBUG 0
-// #define CFG_TUSB_DEBUG 3
+// #define CFG_TUSB_DEBUG 0
+#define CFG_TUSB_DEBUG 3
 
 
 /* USB DMA on some MCUs can only access a specific SRAM region with restriction on alignment.

@@ -1,11 +1,11 @@
 //---------------------------------------------------------------------------
 //
-//	ADBuino ADB keyboard and mouse adapter
-//
-//	   Copyright (C) 2017 bbraun
+//	ADBuino & QuokkaADB ADB keyboard and mouse adapter
+
 //	   Copyright (C) 2021-2022 akuker
+//     Copyright (C) 2022 Rabbit Hole Computing LLC
 //
-//  This file is part of the ADBuino project.
+//  This file is part of the ADBuino and the QuokkaADB projects.
 //
 //  This file is free software: you can redistribute it and/or modify it under 
 //  the terms of the GNU General Public License as published by the Free 
@@ -20,11 +20,15 @@
 //  You should have received a copy of the GNU General Public License along 
 //  with the file. If not, see <https://www.gnu.org/licenses/>.
 //
-//---------------------------------------------------------------------------
-#include "adb_platform.h"
+//----------------------------------------------------------------------------
+#include <stdint.h>
 
-void AdbInterfacePlatform::Init()
+
+struct usbkey_t
 {
-  // Set ADB line as input
-  adb_pin_in();
-}
+    uint8_t keycode;
+    bool shift_down;
+};
+
+
+usbkey_t char_to_usb_keycode(char character);

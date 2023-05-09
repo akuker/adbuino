@@ -33,7 +33,33 @@
 
 #include <stdint.h>
 #include "tusb.h"
+#include "scqueue.h"
 
+using simple_circular_queue::SCQueue;
+
+#define KEYBOARD_QUEUE_CAPACITY (20)
+
+class KeyEvent
+{
+public:
+    static const uint8_t NoKey = 0xFF;
+    static const uint8_t KeyDown = 0x01;
+    static const uint8_t KeyUp = 0x02;
+    inline uint8_t GetKeycode() { return m_keycode; }
+    inline bool IsKeyUp() { return m_key_updown == KeyUp; }
+    inline bool IsKeyDown() { return m_key_updown == KeyDown; }
+    KeyEvent(uint8_t KeyCode, uint8_t KeyUpDown, uint8_t mod)
+    {
+        m_key_updown = KeyUpDown;
+        m_keycode = KeyCode;
+        m_mod = mod;
+    }
+
+protected:
+    uint8_t m_keycode;
+    uint8_t m_key_updown;
+    uint8_t m_mod;
+};
 //----------------------------------------------------------------------------
 // Keyboard handler
 //----------------------------------------------------------------------------
@@ -91,7 +117,7 @@ struct KeyboardDevices
   bool in_use;
 };
 
-class KeyboardReportParser {
+class PlatformKbdParser {
         
         static const uint8_t numKeys[10];
         static const uint8_t symKeysUp[12];
@@ -118,15 +144,15 @@ protected:
 
 public:
 
-        KeyboardReportParser();
-        virtual ~KeyboardReportParser();
+        PlatformKbdParser();
+        virtual ~PlatformKbdParser();
         void Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_report_t const *report);
         bool SpecialKeyCombo(KBDINFO *cur_kbd_info);
         void SendString(const char* message);
         void AddKeyboard(uint8_t dev_addr, uint8_t instance);
         void RemoveKeyboard(uint8_t dev_addr, uint8_t instance);
         // Sets the LEDs to shared memory
-        void SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrolllock);
+        void SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrollock);
         // Executes the LED changes from shared memory (meant to be run on the same core as tuh_task)
         void ChangeUSBKeyboardLEDs(void);
 
@@ -135,10 +161,12 @@ public:
         virtual void OnKeyDown(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) = 0;
 
         virtual void OnKeyUp(uint8_t mod __attribute__((unused)), uint8_t key __attribute__((unused))) = 0;
+        virtual void OnControlKeysChanged(uint8_t before __attribute__((unused)), uint8_t after __attribute__((unused))) = 0;
 
 
 protected:
-
+        SCQueue<KeyEvent*, KEYBOARD_QUEUE_CAPACITY> m_keyboard_events; 
+        
         uint8_t HandleLockingKeys(uint8_t dev_addr, uint8_t instance, uint8_t key) {
                 uint8_t old_keys = kbdLockingKeys.bLeds;
 
@@ -163,8 +191,6 @@ protected:
 
                 return 0;
         };
-
-        virtual void OnModifierKeysChanged(uint8_t before __attribute__((unused)), uint8_t after __attribute__((unused))) = 0;
 
 
 

@@ -60,7 +60,7 @@ uint16_t ADBMouseRptParser::GetAdbRegister0()
         reg_value |= (1 << 7);
     }
 
-    // // Bits 14-8 = Y move Counts (Two's compliment. Negative = up, positive = down)
+    // Bits 14-8 = Y move Counts (Two's compliment. Negative = up, positive = down)
     reg_value |= (EightBitToSevenBitSigned(GetDeltaY()) << 8);
 
     // Bits 6-0 = X move counts (Two's compliment. Negative = left, positive = right)

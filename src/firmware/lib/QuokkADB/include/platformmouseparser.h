@@ -33,7 +33,7 @@
 
 #include <stdint.h>
 #include "tusb.h"
-#include "keyboardrptparser.h"
+#include "platformkbdparser.h"
 
 //----------------------------------------------------------------------------
 // Mouse handler
@@ -51,7 +51,7 @@ struct MOUSEINFO {
         int8_t dY;
 };
 
-class MouseReportParser {
+class PlatformMouseParser {
 
         union {
                 MOUSEINFO mouseInfo;
@@ -83,5 +83,5 @@ protected:
         virtual void OnMiddleButtonDown(MOUSEINFO *mi __attribute__((unused))) {
         };
 
-        KeyboardReportParser* m_keyboard;
+        PlatformKbdParser* m_keyboard;
 };

@@ -23,53 +23,23 @@
 
 #pragma once
 
-#ifdef ADBUINO
-#include <hidboot.h>
-#elif QUOKKADB
-#include "keyboardrptparser.h"
-#endif
+#include "platformkbdparser.h"
 
-#include "scqueue.h"
-
-using simple_circular_queue::SCQueue;
-
-#define KEYBOARD_QUEUE_CAPACITY (20)
-
-class KeyEvent
-{
-public:
-    static const uint8_t NoKey = 0xFF;
-    static const uint8_t KeyDown = 0x01;
-    static const uint8_t KeyUp = 0x02;
-    inline uint8_t GetKeycode() { return m_keycode; }
-    inline bool IsKeyUp() { return m_key_updown == KeyUp; }
-    inline bool IsKeyDown() { return m_key_updown == KeyDown; }
-    KeyEvent(uint8_t KeyCode, uint8_t KeyUpDown)
-    {
-        m_key_updown = KeyUpDown;
-        m_keycode = KeyCode;
-    }
-
-protected:
-    uint8_t m_keycode;
-    uint8_t m_key_updown;
-};
-
-class KbdRptParser : public KeyboardReportParser
+class KbdRptParser : public PlatformKbdParser
 {
 public:
     KbdRptParser();
     virtual ~KbdRptParser();
     void PrintKey(uint8_t mod, uint8_t key);
     KeyEvent GetKeyEvent();
-    bool PendingKeyboardEvent() override;
+    bool PendingKeyboardEvent();
     void Reset(void);
-    
+    void OnControlKeysChanged(uint8_t before, uint8_t after) override;
+    void OnKeyDown(uint8_t mod, uint8_t key) override;
+    void OnKeyUp(uint8_t mod, uint8_t key) override;    
 
 protected:
-    void OnModifierKeysChanged(uint8_t before, uint8_t after) override;
-    void OnKeyDown(uint8_t mod, uint8_t key) override;
-    void OnKeyUp(uint8_t mod, uint8_t key) override;
+
     void OnKeyPressed(uint8_t key);
 
     uint8_t m_last_key_pressed;
@@ -95,6 +65,6 @@ protected:
     static const int Led2CapsLockFlag = 6;
     static const int Led1NumLockFlag = 7;
 
-    SCQueue<KeyEvent*, KEYBOARD_QUEUE_CAPACITY> m_keyboard_events;
+    
 
 };

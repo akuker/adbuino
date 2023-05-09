@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_firmware:
+  build_quokkadb:
     name: Build firmware on Ubuntu 22.04
     runs-on: ubuntu-22.04
   

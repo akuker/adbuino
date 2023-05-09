@@ -1,11 +1,12 @@
 //---------------------------------------------------------------------------
 //
-//	ADBuino ADB keyboard and mouse adapter
+//	QuokkaADB ADB keyboard and mouse adapter
 //
 //	   Copyright (C) 2017 bbraun
 //	   Copyright (C) 2021-2022 akuker
+//     Copyright (C) 2022 Rabbit Hole Computing LLC
 //
-//  This file is part of the ADBuino project.
+//  This file is part of the QuokkaADB project.
 //
 //  This file is free software: you can redistribute it and/or modify it under 
 //  the terms of the GNU General Public License as published by the Free 
@@ -21,10 +22,12 @@
 //  with the file. If not, see <https://www.gnu.org/licenses/>.
 //
 //---------------------------------------------------------------------------
-#include "adb_platform.h"
+#pragma once
 
-void AdbInterfacePlatform::Init()
-{
-  // Set ADB line as input
-  adb_pin_in();
-}
+// Use macros for version number
+#define FW_VER_NUM      "0.2.2"
+#define FW_VER_SUFFIX   "beta"
+#define PLATFORM_FW_VERSION FW_VER_NUM "-" FW_VER_SUFFIX 
+#define PRODUCT_NAME "QuokkADB"
+#define PLATFORM_FW_VER_STRING PRODUCT_NAME " firmware: " PLATFORM_FW_VERSION " " __DATE__ " " __TIME__ " "
+

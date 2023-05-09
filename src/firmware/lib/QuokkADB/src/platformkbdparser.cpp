@@ -25,12 +25,17 @@
 //
 //---------------------------------------------------------------------------
 
-#include "keyboardrptparser.h"
+#include "platformkbdparser.h"
 #include "usb_hid_keys.h"
-#include "quokkadb_config.h"
+#include "platform_config.h"
 #include "char2usbkeycode.h"
 #include "flashsettings.h"
 #include <tusb.h>
+
+#if QUOKKADB
+#include "rp2040_serial.h"
+using rp2040_serial::Serial;
+#endif
 
 #define VALUE_WITHIN(v,l,h) (((v)>=(l)) && ((v)<=(h)))
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
@@ -43,15 +48,15 @@ uint8_t inline findModifierKey(hid_keyboard_report_t const *report, const hid_ke
         return (mod & report->modifier) ? 1 : 0;
 }
 
-KeyboardReportParser::KeyboardReportParser()
+PlatformKbdParser::PlatformKbdParser()
 {
         kbdLockingKeys.bLeds = 0;
 }
-KeyboardReportParser::~KeyboardReportParser()
+PlatformKbdParser::~PlatformKbdParser()
 {
 }
 
-void KeyboardReportParser::AddKeyboard(uint8_t dev_addr, uint8_t instance) {
+void PlatformKbdParser::AddKeyboard(uint8_t dev_addr, uint8_t instance) {
         for(size_t i = 0; i < MAX_KEYBOARDS; i++)
         {
                 if (!keyboards_list[i].in_use)
@@ -69,7 +74,7 @@ void KeyboardReportParser::AddKeyboard(uint8_t dev_addr, uint8_t instance) {
         }
 
 }
-void KeyboardReportParser::RemoveKeyboard(uint8_t dev_addr, uint8_t instance) {
+void PlatformKbdParser::RemoveKeyboard(uint8_t dev_addr, uint8_t instance) {
   for(size_t i = 0; i < MAX_KEYBOARDS; i++)
   {
     if (keyboards_list[i].in_use && keyboards_list[i].device_addr == dev_addr && keyboards_list[i].instance == instance)
@@ -80,7 +85,7 @@ void KeyboardReportParser::RemoveKeyboard(uint8_t dev_addr, uint8_t instance) {
   }
 }
 
-void KeyboardReportParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_report_t const *report) {
+void PlatformKbdParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_report_t const *report) {
         union {
                 KBDINFO kbdInfo;
                 uint8_t bInfo[sizeof (KBDINFO)];
@@ -100,14 +105,14 @@ void KeyboardReportParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboar
         cur_kbd_info->bReserved =  report->reserved;
         
 
-        if (KeyboardReportParser::SpecialKeyCombo(cur_kbd_info))
+        if (PlatformKbdParser::SpecialKeyCombo(cur_kbd_info))
         {
                 return;
         }
 
         // provide event for changed control key state
         if (prevState.bInfo[0x00] != current_state.bInfo[0x00]) {
-                OnModifierKeysChanged(prevState.bInfo[0x00], current_state.bInfo[0x00]);
+                OnControlKeysChanged(prevState.bInfo[0x00], current_state.bInfo[0x00]);
         }
 
         for (uint8_t i = 2; i < 8; i++) {
@@ -121,20 +126,8 @@ void KeyboardReportParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboar
                                 up = true;
                 }
                 if (!down) {
-                        HandleLockingKeys(dev_addr, instance, current_state.bInfo[i]); 
-                        // This if statement is handling locking/unlocking the caps lock key
-                        if (current_state.bInfo[i] == UHS_HID_BOOT_KEY_CAPS_LOCK) {
-                                if (kbdLockingKeys.kbdLeds.bmCapsLock == 1) {
-                                        OnKeyDown(current_state.bInfo[0], current_state.bInfo[i]);
-                                }
-                                else {
-                                        OnKeyUp(current_state.bInfo[0], current_state.bInfo[i]);
-                                }
-                        }
-                        else {
-                                
-                                OnKeyDown(current_state.bInfo[0], current_state.bInfo[i]);
-                        }
+                        HandleLockingKeys(dev_addr, instance, current_state.bInfo[i]);        
+                        OnKeyDown(current_state.bInfo[0], current_state.bInfo[i]);
                 }
                 if (!up) {
                         // Ignore key up on caps lock
@@ -152,17 +145,17 @@ void KeyboardReportParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboar
 }
 bool tuh_hid_set_report(uint8_t dev_addr, uint8_t instance, uint8_t report_id, uint8_t report_type, void* report, uint16_t len);
 
-void KeyboardReportParser::SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrolllock){
+void PlatformKbdParser::SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrollock){
         // Send LEDs statuses to USB keyboard
         kbdLockingKeys.kbdLeds.bmCapsLock = capslock ? 1 : 0;
         kbdLockingKeys.kbdLeds.bmNumLock = numlock ? 1 : 0;
-        kbdLockingKeys.kbdLeds.bmScrollLock = scrolllock ? 1 : 0;
+        kbdLockingKeys.kbdLeds.bmScrollLock = scrollock ? 1 : 0;
         usb_set_leds = true;
 
 }
 
 
-bool KeyboardReportParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
+bool PlatformKbdParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
 {
         // Special keycombo actions
         uint8_t special_key_count = 0;
@@ -196,7 +189,7 @@ bool KeyboardReportParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
                 switch (special_key)
                 {
                 case USB_KEY_V:
-                        SendString(QUOKKADB_FW_VER_STRING);
+                        SendString(PLATFORM_FW_VER_STRING);
                 break;
                 case USB_KEY_L:
                         setting_storage.settings()->led_on = ~setting_storage.settings()->led_on;
@@ -217,7 +210,7 @@ bool KeyboardReportParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
         return false;
 }
 
-void KeyboardReportParser::SendString(const char * message)
+void PlatformKbdParser::SendString(const char * message)
 {
         int i = 0;
         usbkey_t key;
@@ -233,6 +226,17 @@ void KeyboardReportParser::SendString(const char * message)
         OnKeyUp(0, USB_KEY_CAPSLOCK);
         OnKeyUp(0, USB_KEY_LEFTMETA);
         OnKeyUp(0, USB_KEY_RIGHTMETA);
+        if (m_keyboard_events.enqueue(new KeyEvent(USB_KEY_CAPSLOCK, KeyEvent::KeyUp, 0)))
+        {
+            // as HandleLocking keys simply toggles the keyboard LEDs, setting it to 1
+            // forces it to toggle off. 
+            kbdLockingKeys.kbdLeds.bmCapsLock = 0;
+            SetUSBkeyboardLEDs(kbdLockingKeys.kbdLeds.bmCapsLock , kbdLockingKeys.kbdLeds.bmNumLock, kbdLockingKeys.kbdLeds.bmScrollLock);
+        }    
+        else
+        {
+            Serial.println("Warning! unable to queue CAPSLOCK key up");
+        }
 
         while(message[i] != '\0')        
         {
@@ -254,7 +258,7 @@ void KeyboardReportParser::SendString(const char * message)
         }
 }
 
-void KeyboardReportParser::ChangeUSBKeyboardLEDs(void)
+void PlatformKbdParser::ChangeUSBKeyboardLEDs(void)
 {
         if (usb_set_leds == false) 
                 return;
@@ -298,12 +302,12 @@ void KeyboardReportParser::ChangeUSBKeyboardLEDs(void)
         }
 }
 
-const uint8_t KeyboardReportParser::numKeys[10]  = {'!', '@', '#', '$', '%', '^', '&', '*', '(', ')'};
-const uint8_t KeyboardReportParser::symKeysUp[12]  = {'_', '+', '{', '}', '|', '~', ':', '"', '~', '<', '>', '?'};
-const uint8_t KeyboardReportParser::symKeysLo[12]  = {'-', '=', '[', ']', '\\', ' ', ';', '\'', '`', ',', '.', '/'};
-const uint8_t KeyboardReportParser::padKeys[5]  = {'/', '*', '-', '+', '\r'};
+const uint8_t PlatformKbdParser::numKeys[10]  = {'!', '@', '#', '$', '%', '^', '&', '*', '(', ')'};
+const uint8_t PlatformKbdParser::symKeysUp[12]  = {'_', '+', '{', '}', '|', '~', ':', '"', '~', '<', '>', '?'};
+const uint8_t PlatformKbdParser::symKeysLo[12]  = {'-', '=', '[', ']', '\\', ' ', ';', '\'', '`', ',', '.', '/'};
+const uint8_t PlatformKbdParser::padKeys[5]  = {'/', '*', '-', '+', '\r'};
 
-uint8_t KeyboardReportParser::OemToAscii(uint8_t mod, uint8_t key) {
+uint8_t PlatformKbdParser::OemToAscii(uint8_t mod, uint8_t key) {
         uint8_t shift = (mod & 0x22);
 
         // [a-z]

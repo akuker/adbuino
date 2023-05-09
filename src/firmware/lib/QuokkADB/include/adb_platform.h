@@ -30,7 +30,7 @@
 #include <hardware/timer.h>
 #include <pico/time.h>
 
-extern bool adb_collision;
+extern bool volatile adb_collision;
 
 inline uint32_t millis()
 {
