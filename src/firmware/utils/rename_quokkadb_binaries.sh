@@ -30,11 +30,13 @@
 mkdir -p distrib
 
 DATE=$(date +%Y-%m-%d)
-VERSION=$(git describe --always)
+COMMIT=$(git describe --always)
+VERSION=$(gcc -E utils/version-extractor.cpp -Ilib/QuokkADB/include/ | grep  "version\[\]" | cut -d '"' -f2)
+SUFFIX=$(gcc -E utils/version-extractor.cpp -Ilib/QuokkADB/include/ | grep  "suffix\[\]" | cut -d '"' -f2)
 
 for file in $(ls build/src/*.bin build/src/*.elf build/src/*.uf2)
 do
-    NEWNAME=$(echo $file | sed 's|build/src/\(.*\)\.\(.*\)|\1_'$DATE'_'$VERSION'.\2|')
+    NEWNAME=$(echo $file | sed 's|build/src/\(.*\)\.\(.*\)|\1-v'$VERSION'-'$SUFFIX'_'$DATE'_'$COMMIT'.\2|')
     echo $file to distrib/$NEWNAME
     cp $file distrib/$NEWNAME
 done

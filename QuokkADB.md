@@ -71,6 +71,7 @@ disconnected).
   
 ## QuokkADB LED blink meanings
  - On boot - one blink
+ - On second core and USB host driver loaded - one blink
  - On keyboard mount (connected to usb) - two blinks
  - On mouse mount (connected to usb)- three blinks
  - On device unmount (disconnected to usb) - one blink
@@ -81,6 +82,7 @@ If both a mouse and keyboard are connected to the QuokkADB:
 
 Turning on the Mac:
  1. One blink - power on
+ 2. One blink - second core and USB up and running
  2. Two blinks - keyboard initialized
  3. Three blinks - mouse initialized
 
