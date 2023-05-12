@@ -1,10 +1,9 @@
 
 add_library(QuokkADB 
     adb_platform.cpp
-    char2usbkeycode.cpp
     flashsettings.cpp
-    keyboardrptparser.cpp
-    mouserptparser.cpp
+    platformkbdparser.cpp
+    platformmouseparser.cpp
     quokkadb_gpio.cpp
     quokkadb.cpp
     rp2040_serial.cpp

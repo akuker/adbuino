@@ -98,7 +98,11 @@ void MouseRptParser::OnRightButtonUp(MOUSEINFO *mi)
 
             m_mouse_left_button_is_pressed = false;
             m_mouse_button_changed = true;
+            #ifdef QUOKKADB
             sleep_ms(100);
+            #else
+            delay(100);
+            #endif
             while(m_keyboard->PendingKeyboardEvent());
             m_keyboard->OnKeyUp(0, USB_KEY_LEFTCTRL);
             while(m_keyboard->PendingKeyboardEvent());
@@ -123,7 +127,11 @@ void MouseRptParser::OnRightButtonDown(MOUSEINFO *mi)
             while(m_keyboard->PendingKeyboardEvent());
             m_keyboard->OnKeyDown(0, USB_KEY_LEFTCTRL);
             while(m_keyboard->PendingKeyboardEvent());
+            #ifdef QUOKKADB
             sleep_ms(200);
+            #else
+            delay(200);
+            #endif
             m_mouse_left_button_is_pressed = true;
             m_mouse_button_changed = true;
 

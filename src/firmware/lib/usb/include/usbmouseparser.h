@@ -21,12 +21,12 @@
 //  with this file. If not, see <https://www.gnu.org/licenses/>.
 //----------------------------------------------------------------------------
 #pragma once
-#ifdef ADBUINO
-#include <hidboot.h>
-#elif QUOKKADB
+
+#ifdef QUOKKADB
 #include <stdlib.h>
-#include "mouserptparser.h"
 #endif
+
+#include "platformmouseparser.h"
 
 enum class MouseRightBtnMode {
     ctrl_click,
@@ -34,7 +34,7 @@ enum class MouseRightBtnMode {
 };
 
 
-class MouseRptParser : public MouseReportParser
+class MouseRptParser : public PlatformMouseParser
 {
 public:
     bool MouseChanged();
@@ -60,7 +60,10 @@ private:
     bool m_mouse_left_button_is_pressed = false;
     bool m_mouse_right_button_is_pressed = false;
     bool m_mouse_button_changed = false;
+    #ifdef QUOKKADB
     MouseRightBtnMode m_right_btn_mode = MouseRightBtnMode::ctrl_click;
-    
+    #else
+    MouseRightBtnMode m_right_btn_mode = MouseRightBtnMode::right_click;
+    #endif
 
 };

@@ -1,0 +1,40 @@
+name: Build ADBuino firmware
+
+on: 
+  push:
+  workflow_dispatch:
+
+jobs:
+  build_adbuino:
+    name: Build firmware on Ubuntu 22.04
+    runs-on: ubuntu-22.04
+    
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v3
+        with:
+          path: adbuino
+          fetch-depth: "0"
+      - name: Install packages
+        run: |
+            sudo apt-get update      
+            sudo apt-get install -y python3-pip
+      - name: Install platformio
+        run: |
+          sudo pip install platformio
+      
+      - name: Build firmware
+        run: |
+          cd adbuino/src/firmware
+          pio run -v
+    
+      - name: Rename firmware files
+        run: |
+          cd adbuino/src/firmware
+          utils/rename_adbuino_binaries.sh
+
+      - name: Upload binaries into build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: adbuino/src/firmware/distrib/*
+          name: ADBuino binaries

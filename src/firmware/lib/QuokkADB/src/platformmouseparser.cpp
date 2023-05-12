@@ -25,10 +25,10 @@
 //
 //---------------------------------------------------------------------------
 
-#include "mouserptparser.h"
+#include "platformmouseparser.h"
 #include "tusb.h"
 
-void MouseReportParser::Parse(const hid_mouse_report_t *report){
+void PlatformMouseParser::Parse(const hid_mouse_report_t *report){
     static MOUSEINFO mouse_info;
 
     mouse_info.bmLeftButton = !!(report->buttons & MOUSE_BUTTON_LEFT);

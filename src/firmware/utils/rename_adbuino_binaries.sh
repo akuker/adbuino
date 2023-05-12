@@ -31,12 +31,12 @@ mkdir -p distrib
 
 DATE=$(date +%Y-%m-%d)
 COMMIT=$(git describe --always)
-VERSION=$(gcc -E utils/version-extractor.cpp -Ilib/QuokkADB/include/ | grep  "version\[\]" | cut -d '"' -f2)
-SUFFIX=$(gcc -E utils/version-extractor.cpp -Ilib/QuokkADB/include/ | grep  "suffix\[\]" | cut -d '"' -f2)
+VERSION=$(gcc -E utils/version-extractor.cpp -Ilib/adbuino/include/ | grep  "version\[\]" | cut -d '"' -f2)
+SUFFIX=$(gcc -E utils/version-extractor.cpp -Ilib/adbuino/include/ | grep  "suffix\[\]" | cut -d '"' -f2)
 
-for file in $(ls build/src/*.bin build/src/*.elf build/src/*.uf2)
+for file in $(ls .pio/build/adbuino/*.bin .pio/build/adbuino/*.elf .pio/build/adbuino/*.hex)
 do
-    NEWNAME=$(echo $file | sed 's|build/src/\(.*\)\.\(.*\)|\1-v'$VERSION'-'$SUFFIX'_'$DATE'_'$COMMIT'.\2|')
+    NEWNAME=$(echo $file | sed 's|.pio/build/adbuino/\(.*\)\.\(.*\)|ADBuino-\1-v'$VERSION'-'$SUFFIX'_'$DATE'_'$COMMIT'.\2|')
     echo $file to distrib/$NEWNAME
     cp $file distrib/$NEWNAME
 done

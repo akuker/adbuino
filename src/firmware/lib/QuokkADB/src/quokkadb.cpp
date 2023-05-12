@@ -39,7 +39,6 @@
 #include "pico/bootrom.h"
 
 #include "tusb.h"
-//#include <pico/printf.h>
 #include "pico/stdio.h"
 #include "rp2040_serial.h"
 #include "adb.h"
@@ -47,7 +46,7 @@
 #include "adbkbdparser.h"
 #include "adbmouseparser.h"
 #include "flashsettings.h"
-#include "quokkadb_config.h"
+#include "platform_config.h"
 
 using rp2040_serial::Serial;
 
@@ -77,8 +76,8 @@ FlashSettings setting_storage;
 
 // core1: handle host events
 void core1_main() {
-  sleep_ms(10);
   tuh_init(0);
+  led_blink(1);
   /*------------ Core1 main loop ------------*/
   while (true) {
     tuh_task(); // tinyusb host task
@@ -96,24 +95,27 @@ void core1_main() {
 // core0: handle device events
 int quokkadb(void) {
   set_sys_clock_khz(125000, true);
+  
+  led_gpio_init();
+  led_blink(1);
   stdio_init_all();
   uart_gpio_init();
   adb_gpio_init();
-  led_gpio_init();
+  
 
-  sleep_ms(10);
+
   
   setting_storage.init();
   
   //  Block this core when the core1 is writing to flash 
 
-
+ 
   multicore_reset_core1();
   // all USB task run in core1
   multicore_launch_core1(core1_main);
   multicore_lockout_victim_init();
-  led_blink(1);
-  printf("%s\n", QUOKKADB_FW_VER_STRING);
+  
+  printf("%s\n", PLATFORM_FW_VER_STRING);
   srand(time_us_32());
 /*------------ Core0 main loop ------------*/
   while (true) {

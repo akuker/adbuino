@@ -44,8 +44,8 @@ bool AdbInterfacePlatform::adb_delay_us(uint32_t delay)
   return collision_free;
 }
 
-extern bool adb_collision;
-extern bool collision_detection;
+extern volatile bool adb_collision;
+extern volatile bool collision_detection;
 extern ADBKbdRptParser KeyboardPrs;
 
 static void adb_in_irq_callback(uint gpio, uint32_t event_mask) {
