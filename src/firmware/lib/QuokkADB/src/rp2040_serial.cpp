@@ -2,7 +2,7 @@
 //
 //	QuokkADB ADB keyboard and mouse adapter
 //
-//     Copyright (C) 2022 Rabbit Hole Computing LLC
+//     Copyright (C) 2023 Rabbit Hole Computing LLC
 //
 //  This file is part of QuokkADB.
 //

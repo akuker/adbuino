@@ -1,11 +1,11 @@
 This project has a long history with a collection of updates from several
-people. This is being distributed under the GPL v2 (or later) license.
-    https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+people. This is being distributed under the GPL v3 (or later) license.
+    https://www.gnu.org/licenses/gpl-3.0.txt
 
 The following copyright notice should be included with distributions of 
 this source code:
-    Copyright 2021-2022 Tony Kuker
-    Copyright 2022 Rabbit Hole Computing LLC
+    Copyright 2021-2023 Tony Kuker
+    Copyright 2022-2023 Rabbit Hole Computing LLC
     Copyright 2020 Difegue
     Copyright 2015 Rob Braun
     Copyright 2011 Jun WAKO <wakojun@gmail.com>
