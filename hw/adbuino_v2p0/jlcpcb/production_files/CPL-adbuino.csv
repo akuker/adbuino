@@ -1,0 +1,21 @@
+Designator,Val,Package,Mid X,Mid Y,Rotation,Layer
+D1,LED_Small,LED_0805_2012Metric,32.2625,77.15125,0.0,bottom
+D2,LED_Small,LED_0805_2012Metric,32.2625,73.7525,0.0,bottom
+D3,LED_Small,LED_0805_2012Metric,32.2625,80.55,0.0,bottom
+D4,D_Schottky,D_SOD-123,19.95,90.35,180.0,bottom
+D5,D_Schottky,D_SOD-123,17.7,64.5,90.0,bottom
+F1,Polyfuse,Fuse_0805_2012Metric,27.35,90.35,0.0,bottom
+F2,Polyfuse,Fuse_0805_2012Metric,17.7,69.2,270.0,bottom
+J2,U254-051N-4BH806,U254051N4BH806,15.835,76.9005,90.0,bottom
+J4,Mini-DIN-4,CUI_MD2-40ST-SMT,23.7,56.4075,270.0,bottom
+J5,Mini-DIN-4,CUI_MD2-40ST-SMT,23.7,97.2925,90.0,bottom
+Q1,BSS138,SOT-23,20.8,64.0,270.0,bottom
+Q2,BSS138,SOT-23,26.8,64.0,270.0,bottom
+R1,10k,R_0402_1005Metric,21.75,67.21,270.0,bottom
+R2,10k,R_0402_1005Metric,19.85,67.21,270.0,bottom
+R3,10k,R_0402_1005Metric,27.75,67.21,270.0,bottom
+R4,10k,R_0402_1005Metric,28.6625,77.15125,270.0,bottom
+R5,10k,R_0402_1005Metric,28.6625,73.7525,270.0,bottom
+R6,10k,R_0402_1005Metric,25.85,67.21,270.0,bottom
+R12,10k,R_0402_1005Metric,28.6625,80.55,270.0,bottom
+U2,Pico,Customized_RPi_Pico_SMD_TH,23.7,77.0,0.0,top
