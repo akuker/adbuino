@@ -59,8 +59,6 @@ volatile bool collision_detection = false;
 bool mouse_skip_next_listen_reg3 = false;
 bool kbd_skip_next_listen_reg3 = false;
 
-
-
 extern bool global_debug;
 // The original data_lo code would just set the bit as an output
 // That works for a host, since the host is doing the pullup on the ADB line,
@@ -297,7 +295,17 @@ void AdbInterface::ProcessCommand(int16_t cmd)
               }
               break;
             }
-            mouse_addr = listen_addr;
+
+            // Moving to address 0 can cause issues as it is normally reserved for the host
+            if (listen_addr == 0)
+            {
+              break;
+            }
+            else
+            {
+              mouse_addr = listen_addr;
+            }
+
             if (global_debug)
             {
               Serial.print("MOUSE: address change to 0x");
@@ -473,7 +481,17 @@ void AdbInterface::ProcessCommand(int16_t cmd)
               }
               break;
             }
-            kbd_addr = listen_addr;
+
+            // Moving to address 0 can cause issues as it is normally reserved for the host
+            if ( listen_addr == 0 )
+            {
+              break;
+            }
+            else
+            {
+              kbd_addr = listen_addr;
+            }
+
             if (global_debug)
             {
               Serial.print("KBD: address change to 0x");
@@ -612,8 +630,6 @@ void AdbInterface::ProcessCommand(int16_t cmd)
 uint16_t AdbInterface::GetAdbRegister3Keyboard()
 {
   uint16_t kbdreg3 = 0;
-  // using random address 
-  uint8_t random_address = rand() & 0xF;
   // Bit 15 Reserved; must be 0
   B_UNSET(kbdreg3, 15);
   // 14      Exceptional event, device specific; always 1 if not used
@@ -625,6 +641,12 @@ uint16_t AdbInterface::GetAdbRegister3Keyboard()
   // 11-8      Device address
   // "ADB - The Untold Story: Space Aliens Ate My Mouse"
   // specifies that a random value should be returned as the address for register 3
+  static uint8_t random_address = 0xFF;
+  if (random_address == 0xFF)
+  {
+    random_address = rand() & 0xF;
+  }
+
   kbdreg3 |=  random_address << 8;
   // 7-0       Device Handler ID
   kbdreg3 |= kbd_handler_id;
@@ -634,8 +656,6 @@ uint16_t AdbInterface::GetAdbRegister3Keyboard()
 uint16_t AdbInterface::GetAdbRegister3Mouse()
 {
   uint16_t mousereg3 = 0;
-  // using random address in 0x8 to 0xE addresses
-  uint8_t random_address =  rand() & 0xF;
   // Bit 15 Reserved; must be 0
   B_UNSET(mousereg3, 15);
   // 14      Exceptional event, device specific; always 1 if not used
@@ -647,6 +667,11 @@ uint16_t AdbInterface::GetAdbRegister3Mouse()
   // 11-8      Device address 
   // "ADB - The Untold Story: Space Aliens Ate My Mouse"
   // specifies that a random value should be returned as the address for register 3
+  static uint8_t random_address = 0xFF;
+  if (random_address == 0xFF)
+  {
+    random_address = rand() & 0xF;
+  }
   mousereg3 |= random_address << 8;  
   // 7-0       Device Handler ID
   mousereg3 |= mouse_handler_id;

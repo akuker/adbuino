@@ -201,10 +201,10 @@ bool PlatformKbdParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
                         else
                         {
                                 SendString("Busy LED is off");
-                        }                 
-                break;        
+                        }
+                break;
                 }
-                
+
                 return true;
         }
         return false;
