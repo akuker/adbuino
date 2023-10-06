@@ -27,6 +27,10 @@
 #include "hardware/gpio.h"
 #include <time.h>
 
+extern volatile bool adb_collision;
+extern volatile bool collision_detection;
+extern ADBKbdRptParser KeyboardPrs;
+
 bool AdbInterfacePlatform::adb_delay_us(uint32_t delay) 
 {
   uint64_t start = time_us_64();
@@ -43,10 +47,6 @@ bool AdbInterfacePlatform::adb_delay_us(uint32_t delay)
   
   return collision_free;
 }
-
-extern volatile bool adb_collision;
-extern volatile bool collision_detection;
-extern ADBKbdRptParser KeyboardPrs;
 
 static void adb_in_irq_callback(uint gpio, uint32_t event_mask) {
     // a possible collision occurs when ABD is meant to be high

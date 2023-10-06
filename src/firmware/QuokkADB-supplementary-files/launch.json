@@ -9,12 +9,12 @@
             "type": "cortex-debug",
             "servertype": "openocd",
             // this is using https://github.com/raspberrypi/openocd compiled locally
-            "serverpath": "${env:HOME}/openocd/src/openocd",
+            "serverpath": "openocd",
             // This may need to be arm-none-eabi-gdb depending on your system
             "gdbPath" : "gdb-multiarch",
             "device": "RP2040",
             "configFiles": [
-                "interface/picoprobe.cfg",
+                "interface/cmsis-dap.cfg",
                 "target/rp2040.cfg"
             ],
             "svdFile": "${env:PICO_SDK_PATH}/src/rp2040/hardware_regs/rp2040.svd",
@@ -24,7 +24,7 @@
                 "break main",
                 "continue"
             ],
-            "searchDir": ["${env:HOME}/openocd/tcl"],
+            "searchDir": ["usr/local/share/openocd/scripts"],
         }
     ]
 }
