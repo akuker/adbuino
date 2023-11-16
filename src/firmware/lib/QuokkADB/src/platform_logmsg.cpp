@@ -24,28 +24,30 @@
 //
 //----------------------------------------------------------------------------
 
-// Minimal implementation of Arudino's Serial class
-#include "rp2040_serial.h"
+// Logging system based on Arduino Serial library
+#include "platform_logmsg.h"
 #include "quokkadb_gpio.h"
 #include <pico/printf.h>
 
-namespace rp2040_serial {
- 
-    RPSerial Serial;
-    size_t RPSerial::print(int number) {
-        return print(number, DEC);
+
+platform::PLogmsg Logmsg;
+
+namespace platform {
+     
+    size_t PLogmsg::print(int number) {
+        return print(number, fmtDEC);
     }
 
-    size_t RPSerial::print(int number, print_type type) {
+    size_t PLogmsg::print(int number, print_type type) {
         switch (type)
         {
-        case DEC :
+        case fmtDEC :
             return printf("%d", number);
 //        case BIN :
 //            return printf("%b", number);
-        case OCT :
+        case fmtOCT :
             return printf("%o", number);
-        case HEX :
+        case fmtHEX :
             return printf("%X", number);
         default:
             return 0;
@@ -53,32 +55,32 @@ namespace rp2040_serial {
         }
     }
     
-    size_t RPSerial::print(const char* string) {
+    size_t PLogmsg::print(const char* string) {
         return printf("%s", string);
 
     }
     
-    size_t RPSerial::println(int number) {
-        return println(number, DEC);
+    size_t PLogmsg::println(int number) {
+        return println(number, fmtDEC);
     }
     
-    size_t RPSerial::println(int number, print_type type) {
+    size_t PLogmsg::println(int number, print_type type) {
         switch (type)
         {
-        case DEC :
+        case fmtDEC :
             return printf("%d\n", number);
 //        case BIN :
 //            return printf("%b\n", number);
-        case OCT :
+        case fmtOCT :
             return printf("%o\n", number);
-        case HEX :
+        case fmtHEX :
             return printf("%X\n", number);
         default:
             return 0;
         }
     }
     
-    size_t RPSerial::println(const char* string) {
+    size_t PLogmsg::println(const char* string) {
         return printf("%s\n", string);
 
     }

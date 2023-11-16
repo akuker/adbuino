@@ -266,8 +266,8 @@ void SetupPS2Mouse(void)
         uint8_t mouseid;
         uint8_t result;
         _delay_us(100);
-        Serial.println("Initializing mouse");
-        Serial.print("Sending mouse reset: ");
+        Logmsg.println("Initializing mouse");
+        Logmsg.print("Sending mouse reset: ");
         // reset
         SendPS2MouseCommand(0xFF, kPS2MouseClockPin, kPS2MouseDataPin);
         ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
@@ -277,12 +277,12 @@ void SetupPS2Mouse(void)
         resetresult = ps2frame >> 1;
         ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
         mouseid = ps2frame >> 1;
-        Serial.print(result);
-        Serial.print(" ");
-        Serial.print(resetresult);
-        Serial.print(" ");
-        Serial.println(mouseid);
-        Serial.print("Setting sample rate: ");
+        Logmsg.print(result);
+        Logmsg.print(" ");
+        Logmsg.print(resetresult);
+        Logmsg.print(" ");
+        Logmsg.println(mouseid);
+        Logmsg.print("Setting sample rate: ");
         // Set sample rate
         SendPS2MouseCommand(0xF3, kPS2MouseClockPin, kPS2MouseDataPin);
         ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
@@ -292,10 +292,10 @@ void SetupPS2Mouse(void)
         ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
         ps2scancode = ps2frame >> 1;
         // ps2scancode should be 0xFA for ack
-        Serial.print(result, HEX);
-        Serial.print(" ");
-        Serial.println(ps2scancode, HEX);
-        Serial.print("reading device type: ");
+        Logmsg.print(result, fmtHEX);
+        Logmsg.print(" ");
+        Logmsg.println(ps2scancode, fmtHEX);
+        Logmsg.print("reading device type: ");
         // Read device type
         SendPS2MouseCommand(0xF2, kPS2MouseClockPin, kPS2MouseDataPin);
         ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
@@ -304,10 +304,10 @@ void SetupPS2Mouse(void)
         ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
         ps2scancode = ps2frame >> 1;
         // ps2scancode should be mouseid
-        Serial.print(result, HEX);
-        Serial.print(" ");
-        Serial.println(ps2scancode, HEX);
-        Serial.print("Setting resolution: ");
+        Logmsg.print(result, fmtHEX);
+        Logmsg.print(" ");
+        Logmsg.println(ps2scancode, fmtHEX);
+        Logmsg.print("Setting resolution: ");
         // Set resolution
         SendPS2MouseCommand(0xE8, kPS2MouseClockPin, kPS2MouseDataPin);
         while(kPS2MouseInPort & kPS2MouseDataPin);
@@ -319,23 +319,23 @@ void SetupPS2Mouse(void)
         ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
         ps2scancode = ps2frame >> 1;
         // ps2scancode should be 0xFA for ack
-        Serial.print(result);
-        Serial.print(" ");
-        Serial.println(ps2scancode, HEX);
-        Serial.print("Setting scaling: ");
+        Logmsg.print(result);
+        Logmsg.print(" ");
+        Logmsg.println(ps2scancode, fmtHEX);
+        Logmsg.print("Setting scaling: ");
         // Set scaling
         SendPS2MouseCommand(0xE6, kPS2MouseClockPin, kPS2MouseDataPin);
         ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
         ps2scancode = ps2frame >> 1;
         // ps2scancode should be 0xFA for ack
-        Serial.println(ps2scancode, HEX);
-        Serial.print("Enabling: ");
+        Logmsg.println(ps2scancode, fmtHEX);
+        Logmsg.print("Enabling: ");
         // Enable
         SendPS2MouseCommand(0xF4, kPS2MouseClockPin, kPS2MouseDataPin);
         ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
         ps2scancode = ps2frame >> 1;
         // ps2scancode should be 0xFA for ack
-        Serial.println(ps2scancode, HEX);
+        Logmsg.println(ps2scancode, fmtHEX);
 }
 int HandlePS2Mouse(uint8_t *status, uint8_t *xmove, uint8_t *ymove)
 {
@@ -355,7 +355,7 @@ int HandlePS2Mouse(uint8_t *status, uint8_t *xmove, uint8_t *ymove)
                 // Read mouse id
                 ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
                 
-                Serial.println("Re-setup mouse");
+                Logmsg.println("Re-setup mouse");
                 //SetupPS2Mouse();
                 return -1;
         }
@@ -364,7 +364,7 @@ int HandlePS2Mouse(uint8_t *status, uint8_t *xmove, uint8_t *ymove)
         do {
                 ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
                 if(ps2frame == kPS2ErrorCode) {
-                        Serial.println("Failure on xmove");
+                        Logmsg.println("Failure on xmove");
                         return -1;
                 }
         }while(ps2frame == kPS2RetryCode);
@@ -374,21 +374,21 @@ int HandlePS2Mouse(uint8_t *status, uint8_t *xmove, uint8_t *ymove)
         do {
                 ps2frame = PollPS2MouseFrame(kPS2MouseClockPin, kPS2MouseDataPin, 0);
                 if(ps2frame == kPS2ErrorCode) {
-                        Serial.println("Failure on ymove");
+                        Logmsg.println("Failure on ymove");
                         return -1;
                 }
         }while(ps2frame == kPS2RetryCode);
         *ymove = (ps2frame >> 1) & 0xFF;
         if(!(*status & 0x08)) {
                 //Serial.print("Status is missing bit 0x08: ");
-                Serial.println(*status);
+                Logmsg.println(*status);
                 return -1;
         }
 #if 0 
-        Serial.print("PS2: ");
-        Serial.print(*status);
-        Serial.print(*xmove);
-        Serial.println(*ymove);
+        Logmsg.print("PS2: ");
+        Logmsg.print(*status);
+        Logmsg.print(*xmove);
+        Logmsg.println(*ymove);
 #endif
         return 0;
 }
@@ -461,14 +461,14 @@ uint16_t PollPS2MouseFrame(uint8_t clock, uint8_t data, uint32_t polltimeout)
         }
         if(ps2frame & 1) {
                 //Serial.print("Start bit failure on ");
-                //Serial.print(ps2frame >> 8, HEX);
-                //Serial.println(ps2frame, HEX);
+                //Serial.print(ps2frame >> 8, fmtHEX);
+                //Serial.println(ps2frame, fmtHEX);
                 return kPS2ErrorCode;
         }
         if(!(ps2frame & (1<<10))) {
                 //Serial.print("Stop bit failure on ");
-                //Serial.print(ps2frame >> 8, HEX);
-                //Serial.println(ps2frame, HEX);
+                //Serial.print(ps2frame >> 8, fmtHEX);
+                //Serial.println(ps2frame, fmtHEX);
                 return kPS2ErrorCode;
         }
         // Enforce parity
@@ -478,7 +478,7 @@ uint16_t PollPS2MouseFrame(uint8_t clock, uint8_t data, uint32_t polltimeout)
         if((ps2frame & (1<<9)) && ((parity & 0x01) == 0)) return ps2frame;
         if(!(ps2frame & (1<<9)) && ((parity & 0x01) == 1)) return ps2frame;
         //Serial.print("Parity failure on ");
-        //Serial.print(ps2frame >> 8, HEX);
-        //Serial.println(ps2frame, HEX);
+        //Serial.print(ps2frame >> 8, fmtHEX);
+        //Serial.println(ps2frame, fmtHEX);
         return kPS2ErrorCode;
 }

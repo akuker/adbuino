@@ -24,18 +24,14 @@
 //  See LICENSE in the root of this repository for more info.
 //
 //---------------------------------------------------------------------------
-
+#include <Arduino.h>
 #include "platformkbdparser.h"
 #include "usb_hid_keys.h"
 #include "platform_config.h"
 #include "char2usbkeycode.h"
 #include "flashsettings.h"
 #include <tusb.h>
-
-#if QUOKKADB
-#include "rp2040_serial.h"
-using rp2040_serial::Serial;
-#endif
+#include "platform_logmsg.h"
 
 #define VALUE_WITHIN(v,l,h) (((v)>=(l)) && ((v)<=(h)))
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
@@ -143,7 +139,7 @@ void PlatformKbdParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_r
                 prevState.bInfo[i] = current_state.bInfo[i];
 
 }
-bool tuh_hid_set_report(uint8_t dev_addr, uint8_t instance, uint8_t report_id, uint8_t report_type, void* report, uint16_t len);
+//bool tuh_hid_set_report(uint8_t dev_addr, uint8_t instance, uint8_t report_id, uint8_t report_type, void* report, uint16_t len);
 
 void PlatformKbdParser::SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrollock){
         // Send LEDs statuses to USB keyboard
@@ -235,7 +231,7 @@ void PlatformKbdParser::SendString(const char * message)
         }    
         else
         {
-            Serial.println("Warning! unable to queue CAPSLOCK key up");
+            Logmsg.println("Warning! unable to queue CAPSLOCK key up");
         }
 
         while(message[i] != '\0')        

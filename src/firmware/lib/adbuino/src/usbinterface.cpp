@@ -21,20 +21,21 @@
 //---------------------------------------------------------------------------
 
 #include "usbinterface.h"
+#include "platform_logmsg.h"
 
 void UsbInterface::Init(){
     Usb = new USB();
 
 
     if (Usb->Init() == -1)
-        Serial.println("OSC did not start.");
+        Logmsg.println("OSC did not start.");
     delay(200);
 
     // HidKeyboard->SetReportParser(0, KeyboardPrs);
     // HidMouse->SetReportParser(0, MousePrs);
 
     // next_time = (uint32_t)millis() + 10000;
-    Serial.println("Done init USB");
+    Logmsg.println("Done init USB");
 }
 
 void UsbInterface::RunTask(){

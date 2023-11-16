@@ -25,6 +25,7 @@
 //----------------------------------------------------------------------------
 
 #include "tusb.h"
+#include <class/hid/hid_host.h>
 #include "quokkadb_gpio.h"
 #include "adbregisters.h"
 #include "usbkbdparser.h"

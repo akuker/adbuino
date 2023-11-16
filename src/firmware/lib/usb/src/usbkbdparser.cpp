@@ -21,16 +21,15 @@
 //  with file. If not, see <https://www.gnu.org/licenses/>.
 //
 //----------------------------------------------------------------------------
-
+#include <Arduino.h>
 #include "usbkbdparser.h"
 #include "bithacks.h"
 #include "adbregisters.h"
 #include "usb_hid_keys.h"
 
-#ifdef QUOKKADB
-#include "rp2040_serial.h"
-using rp2040_serial::Serial;
-#endif
+// #ifdef QUOKKADB
+#include "platform_logmsg.h"
+// #endif
 
 extern bool global_debug;
 
@@ -65,23 +64,23 @@ void KbdRptParser::PrintKey(uint8_t m, uint8_t key)
 {
     MODIFIERKEYS mod;
     *((uint8_t *)&mod) = m;
-    Serial.print((mod.bmLeftCtrl == 1) ? "C" : " ");
-    Serial.print((mod.bmLeftShift == 1) ? "S" : " ");
-    Serial.print((mod.bmLeftAlt == 1) ? "A" : " ");
-    Serial.print((mod.bmLeftGUI == 1) ? "G" : " ");
+    Logmsg.print((mod.bmLeftCtrl == 1) ? "C" : " ");
+    Logmsg.print((mod.bmLeftShift == 1) ? "S" : " ");
+    Logmsg.print((mod.bmLeftAlt == 1) ? "A" : " ");
+    Logmsg.print((mod.bmLeftGUI == 1) ? "G" : " ");
 
-    Serial.print(" >");
+    Logmsg.print(" >");
     #ifdef ADBIUNO
         PrintHex<uint8_t>(key, 0x80);
     #elif QUOKKADB
-        Serial.print(key, HEX);
+        Logmsg.print(key, fmtHEX);
     #endif
-    Serial.print("< ");
+    Logmsg.print("< ");
 
-    Serial.print((mod.bmRightCtrl == 1) ? "C" : " ");
-    Serial.print((mod.bmRightShift == 1) ? "S" : " ");
-    Serial.print((mod.bmRightAlt == 1) ? "A" : " ");
-    Serial.println((mod.bmRightGUI == 1) ? "G" : " ");
+    Logmsg.print((mod.bmRightCtrl == 1) ? "C" : " ");
+    Logmsg.print((mod.bmRightShift == 1) ? "S" : " ");
+    Logmsg.print((mod.bmRightAlt == 1) ? "A" : " ");
+    Logmsg.println((mod.bmRightGUI == 1) ? "G" : " ");
 };
 
 void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
@@ -92,7 +91,7 @@ void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
 
     if (global_debug)
     {
-        Serial.print("DN ");
+        Logmsg.print("DN ");
         PrintKey(mod, key);
     }
     uint8_t c = OemToAscii(mod, key);
@@ -109,7 +108,7 @@ void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
             B_UNSET(m_custom_mod_keys, Led2CapsLockFlag);
             if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyDown, mod)))
             {
-                Serial.println("Warning! unable to queue caps lock down");
+                Logmsg.println("Warning! unable to queue caps lock down");
             }
         }
         else
@@ -118,20 +117,20 @@ void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
             B_SET(m_custom_mod_keys, Led2CapsLockFlag);
             if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyUp, mod)))
             {
-                Serial.println("Warning! unable to queue caps lock up");
+                Logmsg.println("Warning! unable to queue caps lock up");
             }
         }        
     }
     else if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyDown, mod)))
     {
-        Serial.println("Warning! unable to enqueue new KeyDown");
+        Logmsg.println("Warning! unable to enqueue new KeyDown");
     }
     // If power button replacement queue key twice
     else if (key == USB_KEY_PAUSE || key == USB_KEY_F15)
     {
         if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyDown, mod)))
         {
-            Serial.println("Warning! unable to enqueue new Power Button KeyDown");
+            Logmsg.println("Warning! unable to enqueue new Power Button KeyDown");
         }
     }
 
@@ -178,14 +177,14 @@ void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
 
     if (global_debug)
     {
-        Serial.print("UP ");
+        Logmsg.print("UP ");
         PrintKey(mod, key);
     }
     if (key != USB_KEY_CAPSLOCK)
     {
         if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyUp, mod)))
         {
-            Serial.println("Warning! unable to enqueue new KeyDown");
+            Logmsg.println("Warning! unable to enqueue new KeyDown");
         }
     
         // If power button replacement queue key twice
@@ -193,7 +192,7 @@ void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
         {
             if (!m_keyboard_events.enqueue(new KeyEvent(key, KeyEvent::KeyUp, mod)))
             {
-                Serial.println("Warning! unable to enqueue new Power Button KeyUp");
+                Logmsg.println("Warning! unable to enqueue new Power Button KeyUp");
             }
         }
         if (key == USB_KEY_BACKSPACE)
@@ -216,18 +215,18 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
 
     if (global_debug)
     {
-        Serial.print("Before: ");
-        Serial.print(before, HEX);
-        Serial.print(" after: ");
-        Serial.print(after, HEX);
-        Serial.print(" ");
-        Serial.print(*((uint8_t *)&m_modifier_keys), HEX);
+        Logmsg.print("Before: ");
+        Logmsg.print(before,  fmtHEX);
+        Logmsg.print(" after: ");
+        Logmsg.print(after,  fmtHEX);
+        Logmsg.print(" ");
+        Logmsg.print(*((uint8_t *)&m_modifier_keys), fmtHEX);
     }
     if (beforeMod.bmLeftCtrl != afterMod.bmLeftCtrl)
     {
         if (global_debug)
         {
-            Serial.println("LeftCtrl changed");
+            Logmsg.println("LeftCtrl changed");
         }
         if (afterMod.bmLeftCtrl)
         {
@@ -242,7 +241,7 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
     {
         if (global_debug)
         {
-            Serial.println("LeftShift changed");
+            Logmsg.println("LeftShift changed");
         }
         if (afterMod.bmLeftShift)
         {
@@ -257,7 +256,7 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
     {
         if (global_debug)
         {
-            Serial.println("LeftAlt changed");
+            Logmsg.println("LeftAlt changed");
         }
         if (afterMod.bmLeftAlt)
         {
@@ -272,7 +271,7 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
     {
         if (global_debug)
         {
-            Serial.println("LeftGUI changed");
+            Logmsg.println("LeftGUI changed");
         }
         if (afterMod.bmLeftGUI)
         {
@@ -288,7 +287,7 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
     {
         if (global_debug)
         {
-            Serial.println("RightCtrl changed");
+            Logmsg.println("RightCtrl changed");
         }
         if (afterMod.bmRightCtrl)
         {
@@ -303,7 +302,7 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
     {
         if (global_debug)
         {
-            Serial.println("RightShift changed");
+            Logmsg.println("RightShift changed");
         }
         if (afterMod.bmRightShift)
         {
@@ -318,7 +317,7 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
     {
         if (global_debug)
         {
-            Serial.println("RightAlt changed");
+            Logmsg.println("RightAlt changed");
         }
         if (afterMod.bmRightAlt)
         {
@@ -333,7 +332,7 @@ void KbdRptParser::OnControlKeysChanged(uint8_t before, uint8_t after)
     {
         if (global_debug)
         {
-            Serial.println("RightGUI changed");
+            Logmsg.println("RightGUI changed");
         }
         if (afterMod.bmRightGUI)
         {
@@ -351,7 +350,7 @@ void KbdRptParser::OnKeyPressed(uint8_t key)
     if (global_debug)
     {
 
-        Serial.print("ASCII: ");
-        Serial.println((char)key);
+        Logmsg.print("ASCII: ");
+        Logmsg.println((char)key);
     }
 };

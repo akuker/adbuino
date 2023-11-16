@@ -1,11 +1,11 @@
 //---------------------------------------------------------------------------
 //
-//	QuokkADB ADB keyboard and mouse adapter
+//	ADBuino keyboard and mouse adapter
 //
 //     Copyright (c) 2008 David A. Mellis.  All right reserved.
 //     Copyright (C) 2022 Rabbit Hole Computing LLC
 //
-//  This file is part of QuokkADB.
+//  This file is part of ADBuino.
 //
 //  This file is free software: you can redistribute it and/or modify it under 
 //  the terms of the GNU General Public License as published by the Free 
@@ -25,20 +25,24 @@
 //
 //----------------------------------------------------------------------------
 
-// Minimal implementation of Arduino's Print class
+// Logging system based on Arduino Serial library
 #pragma once
 
+#include <Arduino.h>
 #include <stdlib.h>
 
+
 enum print_type {
-    BIN,
-    OCT,
-    DEC,
-    HEX, 
+    fmtBIN = BIN,
+    fmtOCT = OCT,
+    fmtDEC = DEC,
+    fmtHEX = HEX
 };
 
-namespace rp2040_serial {
-    class RPSerial 
+
+
+namespace platform {
+    class PLogmsg 
     {
         public:
             size_t print(int number);
@@ -49,6 +53,6 @@ namespace rp2040_serial {
             size_t println(const char* string);
     };
     
-    extern RPSerial Serial;
 }
 
+extern platform::PLogmsg Logmsg;
