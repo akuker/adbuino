@@ -28,15 +28,11 @@
 //  License. See LICENSE in the root of this repository for more info.
 //
 //----------------------------------------------------------------------------
-
+#include <Arduino.h>
 #include "adb.h"
 #include "bithacks.h"
 #include "math.h"
-
-#if QUOKKADB
-#include "rp2040_serial.h"
-using rp2040_serial::Serial;
-#endif
+#include <platform_logmsg.h>
 
 uint8_t mouse_addr = MOUSE_DEFAULT_ADDR;
 uint8_t kbd_addr = KBD_DEFAULT_ADDR;
@@ -115,18 +111,18 @@ int16_t AdbInterface::ReceiveCommand(uint8_t srq)
         adb_reset = true;
         if (global_debug)
         {
-          Serial.print("ALL: Global reset detected, wait time was ");
-          Serial.print(lo, DEC);
-          Serial.println("us");
+          Logmsg.print("ALL: Global reset detected, wait time was ");
+          Logmsg.print(lo, fmtDEC);
+          Logmsg.println("us");
         }
         return -100;
       }
       else {
         if (global_debug)
         {
-          Serial.print("ALL: Error in attention low time,  wait time was ");
-          Serial.print(lo, DEC);
-          Serial.println("us");
+          Logmsg.print("ALL: Error in attention low time,  wait time was ");
+          Logmsg.print(lo, fmtDEC);
+          Logmsg.println("us");
 
         }
       }
@@ -146,9 +142,9 @@ int16_t AdbInterface::ReceiveCommand(uint8_t srq)
   {
     if (global_debug)
     {
-      Serial.print("Start bit not found, wait time was ");
-      Serial.print(hi, DEC);
-      Serial.println("us");
+      Logmsg.print("Start bit not found, wait time was ");
+      Logmsg.print(hi, fmtDEC);
+      Logmsg.println("us");
     }
     return -3;
   }
@@ -192,12 +188,12 @@ int16_t AdbInterface::ReceiveCommand(uint8_t srq)
 out:
   if (global_debug)
   {
-    Serial.print("ALL: Error reading CMD bits, low time ");
-    Serial.print(lo, DEC);
-    Serial.print(", high time ");
-    Serial.print(hi, DEC);
-    Serial.print(" at bit ");
-    Serial.println(bits, HEX);
+    Logmsg.print("ALL: Error reading CMD bits, low time ");
+    Logmsg.print(lo, fmtDEC);
+    Logmsg.print(", high time ");
+    Logmsg.print(hi, fmtDEC);
+    Logmsg.print(" at bit ");
+    Logmsg.println(bits, fmtHEX);
   }
   return -4;
 }
@@ -219,7 +215,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       {
         if (global_debug)
         {
-          Serial.println("ALL: Global 3ms reset signal");
+          Logmsg.println("ALL: Global 3ms reset signal");
         }
       }
       return;
@@ -227,8 +223,8 @@ void AdbInterface::ProcessCommand(int16_t cmd)
 
     if (global_debug)
     {
-      Serial.print("ALL: CMD code error, cmd: ");
-      Serial.println(cmd, HEX);
+      Logmsg.print("ALL: CMD code error, cmd: ");
+      Logmsg.println(cmd, fmtHEX);
     }
     return;
   }
@@ -238,7 +234,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
     adb_reset = true;
     if (global_debug)
     {
-      Serial.println("ALL: Cmd for reset all devices");
+      Logmsg.println("ALL: Cmd for reset all devices");
     }
     return;
   }
@@ -248,23 +244,23 @@ void AdbInterface::ProcessCommand(int16_t cmd)
     switch (cmd & 0x0F)
     {
     case 0x1:
-      Serial.println("MOUSE: Got FLUSH request");
+      Logmsg.println("MOUSE: Got FLUSH request");
       break;
     case 0x8:
-      Serial.println("MOUSE: Got LISTEN request for register 0");
+      Logmsg.println("MOUSE: Got LISTEN request for register 0");
       break;
     case 0x9:
-      Serial.println("MOUSE: Got LISTEN request for register 1");
+      Logmsg.println("MOUSE: Got LISTEN request for register 1");
       break;
     case 0xA:
-      Serial.println("MOUSE: Got LISTEN request for register 2");
+      Logmsg.println("MOUSE: Got LISTEN request for register 2");
       break;
     case 0xB:
       listen_register = Receive16bitRegister();
       if (global_debug)
       {
-        Serial.print("MOUSE: Got LISTEN request for register 3 at address 0x");
-        Serial.println( mouse_addr, HEX);
+        Logmsg.print("MOUSE: Got LISTEN request for register 3 at address 0x");
+        Logmsg.println( mouse_addr, fmtHEX);
       }
 
       if (listen_register >= 0)
@@ -273,8 +269,8 @@ void AdbInterface::ProcessCommand(int16_t cmd)
         listen_handler_id = listen_register & 0xFF;
         if (global_debug)
         {
-          Serial.print("MOUSE: Listen Register 3 value is 0x");
-          Serial.println(listen_register, HEX);
+          Logmsg.print("MOUSE: Listen Register 3 value is 0x");
+          Logmsg.println(listen_register, fmtHEX);
         }
         // self-test
         if (0xFF == listen_handler_id)
@@ -290,8 +286,8 @@ void AdbInterface::ProcessCommand(int16_t cmd)
               mouse_skip_next_listen_reg3 = false;
               if (global_debug)
               {
-                Serial.print("MOUSE: TALK reg 3 had a collision at 0x");
-                Serial.println(mouse_addr, HEX);
+                Logmsg.print("MOUSE: TALK reg 3 had a collision at 0x");
+                Logmsg.println(mouse_addr, fmtHEX);
               }
               break;
             }
@@ -308,8 +304,8 @@ void AdbInterface::ProcessCommand(int16_t cmd)
 
             if (global_debug)
             {
-              Serial.print("MOUSE: address change to 0x");
-              Serial.println(mouse_addr, HEX);
+              Logmsg.print("MOUSE: address change to 0x");
+              Logmsg.println(mouse_addr, fmtHEX);
             }
         }
         else
@@ -327,13 +323,13 @@ void AdbInterface::ProcessCommand(int16_t cmd)
           */
           if (global_debug)
           {
-            Serial.print("MOUSE: LSTN Reg3 val is 0x");
-            Serial.print(listen_register, HEX);
-            Serial.print("@0x");
-            Serial.println(mouse_addr, HEX);
+            Logmsg.print("MOUSE: LSTN Reg3 val is 0x");
+            Logmsg.print(listen_register, fmtHEX);
+            Logmsg.print("@0x");
+            Logmsg.println(mouse_addr, fmtHEX);
             
-            Serial.print("MOUSE: handler id change to  0x");
-            Serial.println( mouse_handler_id, HEX);
+            Logmsg.print("MOUSE: handler id change to  0x");
+            Logmsg.println( mouse_handler_id, fmtHEX);
           }
         }
       } 
@@ -342,8 +338,8 @@ void AdbInterface::ProcessCommand(int16_t cmd)
         if (global_debug)
         {
           
-          Serial.print("MOUSE: Listen Register 3 errored with code ");
-          Serial.println( listen_register, DEC);
+          Logmsg.print("MOUSE: Listen Register 3 errored with code ");
+          Logmsg.println( listen_register, fmtDEC);
         }
       }
       break;
@@ -363,8 +359,8 @@ void AdbInterface::ProcessCommand(int16_t cmd)
           mousesrq = 1;
           if (global_debug) 
           {
-            Serial.print("MOUSE: Collision on sending register 0 on TALK request at address 0x");
-            Serial.println(mouse_addr, HEX);
+            Logmsg.print("MOUSE: Collision on sending register 0 on TALK request at address 0x");
+            Logmsg.println(mouse_addr, fmtHEX);
           }  
         }
 
@@ -372,15 +368,15 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       }
       break;
     case 0xD: // talk register 1
-      Serial.println("MOUSE: Got TALK request for register 1");
+      Logmsg.println("MOUSE: Got TALK request for register 1");
       break;
     case 0xE: // talk register 2
-      Serial.println("MOUSE Got TALK request for register 2");
+      Logmsg.println("MOUSE Got TALK request for register 2");
       break;
     case 0xF: // talk register 3
       if (global_debug) 
       {
-        Serial.println("MOUSE: Got TALK request for register 3");
+        Logmsg.println("MOUSE: Got TALK request for register 3");
       }
       // sets device address
       mousereg3 = GetAdbRegister3Mouse();
@@ -395,19 +391,19 @@ void AdbInterface::ProcessCommand(int16_t cmd)
         mouse_skip_next_listen_reg3 = true;
         if (global_debug)
         {
-          Serial.print("MOUSE: Collision TALK register 3 at 0x");
-          Serial.println(mouse_addr, HEX);
+          Logmsg.print("MOUSE: Collision TALK register 3 at 0x");
+          Logmsg.println(mouse_addr, fmtHEX);
         }
       }
       if (global_debug)
       {
-          Serial.print("MOUSE: Got TALK request for register 3 at address 0x");
-          Serial.println( mouse_addr, HEX);
+          Logmsg.print("MOUSE: Got TALK request for register 3 at address 0x");
+          Logmsg.println( mouse_addr, fmtHEX);
       }
       break;
     default:
-      Serial.print("MOUSE: Unknown cmd: 0x");
-      Serial.println(cmd, HEX);
+      Logmsg.print("MOUSE: Unknown cmd: 0x");
+      Logmsg.println(cmd, fmtHEX);
       break;
     }
   }
@@ -424,20 +420,20 @@ void AdbInterface::ProcessCommand(int16_t cmd)
     case 0x1:
       if (global_debug)
       {
-        Serial.println("KBD: Got FLUSH request");
+        Logmsg.println("KBD: Got FLUSH request");
       }
       break;
     case 0x8:
-      Serial.println("KBD: Got LISTEN request for register 0");
+      Logmsg.println("KBD: Got LISTEN request for register 0");
       
       break;
     case 0x9:
-      Serial.println("KBD: Got LISTEN request for register 1");
+      Logmsg.println("KBD: Got LISTEN request for register 1");
       break;
     case 0xA:
       if (global_debug)
       {
-        Serial.println("KBD: Got LISTEN request for register 2");
+        Logmsg.println("KBD: Got LISTEN request for register 2");
       }
       listen_register = Receive16bitRegister();
       
@@ -450,8 +446,8 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       listen_register = Receive16bitRegister();
       if (global_debug)
       {
-        Serial.print("KBD: Got LISTEN request for register 3 at address 0x");
-        Serial.println(kbd_addr, HEX);
+        Logmsg.print("KBD: Got LISTEN request for register 3 at address 0x");
+        Logmsg.println(kbd_addr, fmtHEX);
       }
       if (listen_register >= 0)
       {
@@ -459,8 +455,8 @@ void AdbInterface::ProcessCommand(int16_t cmd)
         listen_handler_id = listen_register & 0xFF;
         if (global_debug)             
         {
-          Serial.print("KBD: Listen Register 3 value is 0x");
-          Serial.println(listen_register, HEX);
+          Logmsg.print("KBD: Listen Register 3 value is 0x");
+          Logmsg.println(listen_register, fmtHEX);
         }
         // self-test
         if (0xFF == listen_handler_id)
@@ -476,8 +472,8 @@ void AdbInterface::ProcessCommand(int16_t cmd)
               kbd_skip_next_listen_reg3 = false;
               if (global_debug)
               {
-                Serial.print("KDB: had a collision reg 3 at 0x");
-                Serial.println(kbd_addr, HEX);
+                Logmsg.print("KDB: had a collision reg 3 at 0x");
+                Logmsg.println(kbd_addr, fmtHEX);
               }
               break;
             }
@@ -494,8 +490,8 @@ void AdbInterface::ProcessCommand(int16_t cmd)
 
             if (global_debug)
             {
-              Serial.print("KBD: address change to 0x");
-              Serial.println(kbd_addr, HEX);
+              Logmsg.print("KBD: address change to 0x");
+              Logmsg.println(kbd_addr, fmtHEX);
             }
 
         }
@@ -507,10 +503,10 @@ void AdbInterface::ProcessCommand(int16_t cmd)
           }
           if (global_debug)
           {              
-            Serial.print("KBD: address change to 0x");
-            Serial.print(kbd_addr, HEX);
-            Serial.print(", handler id change to 0x");
-            Serial.println(kbd_handler_id, HEX);
+            Logmsg.print("KBD: address change to 0x");
+            Logmsg.print(kbd_addr, fmtHEX);
+            Logmsg.print(", handler id change to 0x");
+            Logmsg.println(kbd_handler_id, fmtHEX);
           }
         }
       }  
@@ -518,8 +514,8 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       {
         if (global_debug)
         {
-          Serial.print("KBD: Listen Register 3 errored with code ");
-          Serial.println(listen_register, DEC);
+          Logmsg.print("KBD: Listen Register 3 errored with code ");
+          Logmsg.println(listen_register, fmtDEC);
         }
       }
       
@@ -531,7 +527,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
         if (kbdskip)
         {
           kbdskip = 0;
-          // Serial.println("Skipping invalid 255 signal and sending keyup instead");
+          // Logmsg.println("Skipping invalid 255 signal and sending keyup instead");
 
           // Send a 'key released' code to avoid ADB sticking to the previous key
           kbdprev0 |= 0x80;
@@ -545,7 +541,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
         {
           // Check timestamp and don't process the key event if it came right after a 255
           // This is meant to avoid a glitch where releasing a key sends 255->keydown instead
-          Serial.println("Too little time since bugged keyup, skipping this keydown event");
+          Logmsg.println("Too little time since bugged keyup, skipping this keydown event");
           kbdpending = 0;
           break;
         }
@@ -563,18 +559,18 @@ void AdbInterface::ProcessCommand(int16_t cmd)
           kbdsrq = 1;
           if (global_debug)
           {
-            Serial.println("KBD: Collision detected on sending register 0 on TALK request");
+            Logmsg.println("KBD: Collision detected on sending register 0 on TALK request");
           }
         }
       }
       break;
     case 0xD: // talk register 1
-      Serial.println("KBD: Got TALK request for register 1");
+      Logmsg.println("KBD: Got TALK request for register 1");
       break;
     case 0xE: // talk register 2
       if (global_debug) 
       {
-        Serial.println("KBD: Got TALK request for register 2");
+        Logmsg.println("KBD: Got TALK request for register 2");
       }
       DetectCollision();
       if (Send16bitRegister(kbdreg2))
@@ -586,7 +582,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
         ResetCollision();
         if (global_debug)
         {
-          Serial.println("KBD: Collision detected on sending register 2 on TALK request");
+          Logmsg.println("KBD: Collision detected on sending register 2 on TALK request");
         }
       }
       
@@ -594,7 +590,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
     case 0xF: // talk register 3
       if (global_debug) 
       { 
-        Serial.println("KBD: Got TALK request for register 3");
+        Logmsg.println("KBD: Got TALK request for register 3");
       }
       // sets device address
       kbdreg3 = GetAdbRegister3Keyboard();
@@ -609,14 +605,14 @@ void AdbInterface::ProcessCommand(int16_t cmd)
         kbd_skip_next_listen_reg3 = true;
         if (global_debug)
         {
-          Serial.print("KBD: Collision TALK register 3 at 0x");
-          Serial.println(kbd_addr, HEX);           
+          Logmsg.print("KBD: Collision TALK register 3 at 0x");
+          Logmsg.println(kbd_addr, fmtHEX);           
         }
       }
       break;
     default:
-      Serial.print("KBD: Unknown cmd: 0x");
-      Serial.println(cmd, HEX);           
+      Logmsg.print("KBD: Unknown cmd: 0x");
+      Logmsg.println(cmd, fmtHEX);           
       break;
     }
   }

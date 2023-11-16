@@ -32,15 +32,13 @@
 //  See LICENSE in the root of this repository for more info.
 //----------------------------------------------------------------------------
 
-//#include <stdlib.h>
+#include <Arduino.h>
 
 #include "pico/stdlib.h"
-#include "pico/multicore.h"
-#include "pico/bootrom.h"
-
 #include "tusb.h"
+#include "host/usbh.h"
 #include "pico/stdio.h"
-#include "rp2040_serial.h"
+#include "platform_logmsg.h"
 #include "adb.h"
 #include "quokkadb_gpio.h"
 #include "adbkbdparser.h"
@@ -48,7 +46,6 @@
 #include "flashsettings.h"
 #include "platform_config.h"
 
-using rp2040_serial::Serial;
 
 // Globals
 extern uint8_t mousepending;
@@ -72,15 +69,77 @@ ADBKbdRptParser KeyboardPrs;
 ADBMouseRptParser MousePrs(KeyboardPrs);
 FlashSettings setting_storage;
 
-/*------------- MAIN -------------*/
+/*------------ Core0 setup ------------*/
+void setup()
+{
+  set_sys_clock_khz(125000, true);
+  
+  led_gpio_init();
+  led_blink(1);
+  uart_gpio_init();
+  adb_gpio_init();
 
-// core1: handle host events
-void core1_main() {
+  setting_storage.init();
+  
+  printf("%s\n", PLATFORM_FW_VER_STRING);
+  srand(time_us_32());
+}
+
+/*------------ Core0 main loop ------------*/
+void loop()
+{
+  int16_t cmd = 0;
+
+  if (!kbdpending)
+  {
+    if (KeyboardPrs.PendingKeyboardEvent())
+    {
+      kbdreg0 = KeyboardPrs.GetAdbRegister0();
+      kbdreg2 = KeyboardPrs.GetAdbRegister2();
+      kbdpending = 1;
+
+    }
+  }
+  
+  if (!mousepending)
+  {
+    if (MousePrs.MouseChanged())
+    {
+      mousereg0 = MousePrs.GetAdbRegister0();
+      mousepending = 1;
+    }
+  }
+
+  led_off();
+  cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
+  if(setting_storage.settings()->led_on)
+  {
+    led_on();
+  }  
+  adb.ProcessCommand(cmd);
+
+  if (adb_reset)
+  {
+    adb.Reset();
+    adb_reset = false;
+    usb_reset = true;
+    Logmsg.println("ALL: Resetting devices");
+  } 
+}
+
+
+/*------------ Core1 setup ------------*/
+
+void setup1()
+{
   tuh_init(0);
   led_blink(1);
-  /*------------ Core1 main loop ------------*/
-  while (true) {
-    tuh_task(); // tinyusb host task
+}
+
+/*------------ Core1 main loop ------------*/
+void loop1()
+{
+      tuh_task(); // tinyusb host task
 
     KeyboardPrs.ChangeUSBKeyboardLEDs();
     
@@ -89,73 +148,4 @@ void core1_main() {
       KeyboardPrs.Reset();
       usb_reset = false;
     }
-  }
-}
-
-// core0: handle device events
-int quokkadb(void) {
-  set_sys_clock_khz(125000, true);
-  
-  led_gpio_init();
-  led_blink(1);
-  stdio_init_all();
-  uart_gpio_init();
-  adb_gpio_init();
-  
-
-
-  
-  setting_storage.init();
-  
-  //  Block this core when the core1 is writing to flash 
-
- 
-  multicore_reset_core1();
-  // all USB task run in core1
-  multicore_launch_core1(core1_main);
-  multicore_lockout_victim_init();
-  
-  printf("%s\n", PLATFORM_FW_VER_STRING);
-  srand(time_us_32());
-/*------------ Core0 main loop ------------*/
-  while (true) {
-    int16_t cmd = 0;
-
-    if (!kbdpending)
-    {
-      if (KeyboardPrs.PendingKeyboardEvent())
-      {
-        kbdreg0 = KeyboardPrs.GetAdbRegister0();
-        kbdreg2 = KeyboardPrs.GetAdbRegister2();
-        kbdpending = 1;
-
-      }
-    }
-    
-    if (!mousepending)
-    {
-      if (MousePrs.MouseChanged())
-      {
-        mousereg0 = MousePrs.GetAdbRegister0();
-        mousepending = 1;
-      }
-    }
-
-    led_off();
-    cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
-    if(setting_storage.settings()->led_on)
-    {
-      led_on();
-    }  
-    adb.ProcessCommand(cmd);
-
-    if (adb_reset)
-    {
-      adb.Reset();
-      adb_reset = false;
-      usb_reset = true;
-      Serial.println("ALL: Resetting devices");
-    } 
-  }
-  return 0;
 }

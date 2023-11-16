@@ -21,16 +21,17 @@
 //  with file. If not, see <https://www.gnu.org/licenses/>.
 //
 //----------------------------------------------------------------------------
-
+#include <Arduino.h>
 #include "adbkbdparser.h"
 #include "bithacks.h"
 #include "adbregisters.h"
 #include "usb_hid_keys.h"
 
 #ifdef QUOKKADB
-#include "rp2040_serial.h"
-using rp2040_serial::Serial;
+// #include "platform_logmsg.h"
+//extern rp2040_serial::RPSerial Logmsg;
 #endif
+#include <platform_logmsg.h>
 
 extern bool global_debug;
 
@@ -102,8 +103,8 @@ uint16_t ADBKbdRptParser::GetAdbRegister0()
     if (global_debug)
     {
 
-        Serial.print("Keyboard Register 0 = ");
-        Serial.println(kbdreg0, HEX);
+        Logmsg.print("Keyboard Register 0 = ");
+        Logmsg.println(kbdreg0, fmtHEX);
     }
     return kbdreg0;
 }
@@ -174,8 +175,8 @@ uint16_t ADBKbdRptParser::GetAdbRegister2()
     }
     if (global_debug)
     {
-        Serial.print("Kbdreg2 is ");
-        Serial.println(kbdreg2, HEX);
+        Logmsg.print("Kbdreg2 is ");
+        Logmsg.println(kbdreg2, fmtHEX);
     }
     return kbdreg2;
 }

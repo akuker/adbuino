@@ -24,6 +24,7 @@
 
 #include "usb_description.h"
 #include "pgmstrings.h"
+#include "platform_logmsg.h"
 
 
 
@@ -31,29 +32,29 @@ void PrintAllAddresses(UsbDevice *pdev)
 {
   UsbDeviceAddress adr;
   adr.devAddress = pdev->address.devAddress;
-  Serial.print("\r\nAddr:");
-  Serial.print(adr.devAddress, HEX);
-  Serial.print("(");
-  Serial.print(adr.bmHub, HEX);
-  Serial.print(".");
-  Serial.print(adr.bmParent, HEX);
-  Serial.print(".");
-  Serial.print(adr.bmAddress, HEX);
-  Serial.println(")");
+  Logmsg.print("\r\nAddr:");
+  Logmsg.print(adr.devAddress, fmtHEX);
+  Logmsg.print("(");
+  Logmsg.print(adr.bmHub, fmtHEX);
+  Logmsg.print(".");
+  Logmsg.print(adr.bmParent, fmtHEX);
+  Logmsg.print(".");
+  Logmsg.print(adr.bmAddress, fmtHEX);
+  Logmsg.println(")");
 }
 
 void PrintAddress(uint8_t addr)
 {
   UsbDeviceAddress adr;
   adr.devAddress = addr;
-  Serial.print("\r\nADDR:\t");
-  Serial.println(adr.devAddress, HEX);
-  Serial.print("DEV:\t");
-  Serial.println(adr.bmAddress, HEX);
-  Serial.print("PRNT:\t");
-  Serial.println(adr.bmParent, HEX);
-  Serial.print("HUB:\t");
-  Serial.println(adr.bmHub, HEX);
+  Logmsg.print("\r\nADDR:\t");
+  Logmsg.println(adr.devAddress, fmtHEX);
+  Logmsg.print("DEV:\t");
+  Logmsg.println(adr.bmAddress, fmtHEX);
+  Logmsg.print("PRNT:\t");
+  Logmsg.println(adr.bmParent, fmtHEX);
+  Logmsg.print("HUB:\t");
+  Logmsg.println(adr.bmHub, fmtHEX);
 }
 
 // void setup()
@@ -83,7 +84,7 @@ void PrintDescriptors(uint8_t addr)
     printProgStr(Gen_Error_str);
     print_hex( rcode, 8 );
   }
-  Serial.print("\r\n");
+  Logmsg.print("\r\n");
 
   for (int i = 0; i < num_conf; i++)
   {
@@ -93,15 +94,15 @@ void PrintDescriptors(uint8_t addr)
       printProgStr(Gen_Error_str);
       print_hex(rcode, 8);
     }
-    Serial.println("\r\n");
+    Logmsg.println("\r\n");
   }
 }
 
 void PrintAllDescriptors(UsbDevice *pdev)
 {
-  Serial.println("\r\n");
+  Logmsg.println("\r\n");
   print_hex(pdev->address.devAddress, 8);
-  Serial.println("\r\n--");
+  Logmsg.println("\r\n--");
   PrintDescriptors( pdev->address.devAddress );
 }
 
@@ -154,37 +155,37 @@ void printhubdescr(uint8_t *descrptr, uint8_t addr)
 
   printProgStr(PSTR("\r\n\r\nHub Descriptor:\r\n"));
   printProgStr(PSTR("bDescLength:\t\t"));
-  Serial.println(pHub->bDescLength, HEX);
+  Logmsg.println(pHub->bDescLength, fmtHEX);
 
   printProgStr(PSTR("bDescriptorType:\t"));
-  Serial.println(pHub->bDescriptorType, HEX);
+  Logmsg.println(pHub->bDescriptorType, fmtHEX);
 
   printProgStr(PSTR("bNbrPorts:\t\t"));
-  Serial.println(pHub->bNbrPorts, HEX);
+  Logmsg.println(pHub->bNbrPorts, fmtHEX);
 
   printProgStr(PSTR("LogPwrSwitchMode:\t"));
-  Serial.println(pHub->LogPwrSwitchMode, BIN);
+  Logmsg.println(pHub->LogPwrSwitchMode, fmtBIN);
 
   printProgStr(PSTR("CompoundDevice:\t\t"));
-  Serial.println(pHub->CompoundDevice, BIN);
+  Logmsg.println(pHub->CompoundDevice, fmtBIN);
 
   printProgStr(PSTR("OverCurrentProtectMode:\t"));
-  Serial.println(pHub->OverCurrentProtectMode, BIN);
+  Logmsg.println(pHub->OverCurrentProtectMode, fmtBIN);
 
   printProgStr(PSTR("TTThinkTime:\t\t"));
-  Serial.println(pHub->TTThinkTime, BIN);
+  Logmsg.println(pHub->TTThinkTime, fmtBIN);
 
   printProgStr(PSTR("PortIndicatorsSupported:"));
-  Serial.println(pHub->PortIndicatorsSupported, BIN);
+  Logmsg.println(pHub->PortIndicatorsSupported, fmtBIN);
 
   printProgStr(PSTR("Reserved:\t\t"));
-  Serial.println(pHub->Reserved, HEX);
+  Logmsg.println(pHub->Reserved, fmtHEX);
 
   printProgStr(PSTR("bPwrOn2PwrGood:\t\t"));
-  Serial.println(pHub->bPwrOn2PwrGood, HEX);
+  Logmsg.println(pHub->bPwrOn2PwrGood, fmtHEX);
 
   printProgStr(PSTR("bHubContrCurrent:\t"));
-  Serial.println(pHub->bHubContrCurrent, HEX);
+  Logmsg.println(pHub->bHubContrCurrent, fmtHEX);
 
   for (uint8_t i = 7; i < len; i++)
     print_hex(descrptr[i], 8);
@@ -251,7 +252,7 @@ void print_hex(int v, int num_places)
   }
   do {
     digit = ((v >> (num_nibbles - 1) * 4)) & 0x0f;
-    Serial.print(digit, HEX);
+    Logmsg.print(digit, fmtHEX);
   }
   while (--num_nibbles);
 }
@@ -336,5 +337,5 @@ void printProgStr(const char* str)
   char c;
   if (!str) return;
   while ((c = pgm_read_byte(str++)))
-    Serial.print(c);
+    Logmsg.print(c);
 }

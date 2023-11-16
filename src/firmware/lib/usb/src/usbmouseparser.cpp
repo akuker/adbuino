@@ -22,13 +22,11 @@
 //
 //----------------------------------------------------------------------------
 
-
+#include <Arduino.h>
 #include "usbmouseparser.h"
 #include "usb_hid_keys.h"
-#ifdef QUOKKADB
-#include "rp2040_serial.h"
-using rp2040_serial::Serial;
-#endif
+#include <platform_logmsg.h>
+
 
 extern bool global_debug;
 
@@ -60,10 +58,10 @@ void MouseRptParser::OnMouseMove(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.print("dx=");
-        Serial.print(mi->dX, DEC);
-        Serial.print(" dy=");
-        Serial.println(mi->dY, DEC);
+        Logmsg.print("dx=");
+        Logmsg.print(mi->dX, fmtDEC);
+        Logmsg.print(" dy=");
+        Logmsg.println(mi->dY, fmtDEC);
     }
     m_movedy = mi->dY;
     m_movedx = mi->dX;
@@ -72,7 +70,7 @@ void MouseRptParser::OnLeftButtonUp(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("L Butt Up");
+        Logmsg.println("L Butt Up");
     }
     m_mouse_left_button_is_pressed = false;
     m_mouse_button_changed = true;
@@ -81,7 +79,7 @@ void MouseRptParser::OnLeftButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("L Butt Dn");
+        Logmsg.println("L Butt Dn");
     }
     m_mouse_left_button_is_pressed = true;
     m_mouse_button_changed = true;
@@ -90,7 +88,7 @@ void MouseRptParser::OnRightButtonUp(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("R Butt Up");
+        Logmsg.println("R Butt Up");
     }
     switch (m_right_btn_mode)
     {
@@ -119,7 +117,7 @@ void MouseRptParser::OnRightButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("R Butt Dn");
+        Logmsg.println("R Butt Dn");
     }
     switch (m_right_btn_mode)
     {
@@ -146,7 +144,7 @@ void MouseRptParser::OnMiddleButtonUp(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("M Butt Up");
+        Logmsg.println("M Butt Up");
     }
 
 };
@@ -154,7 +152,7 @@ void MouseRptParser::OnMiddleButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("M Butt Dn");
+        Logmsg.println("M Butt Dn");
     }
     switch (m_right_btn_mode)
     {

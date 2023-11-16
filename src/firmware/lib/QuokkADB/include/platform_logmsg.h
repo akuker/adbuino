@@ -2,6 +2,7 @@
 //
 //	QuokkADB ADB keyboard and mouse adapter
 //
+//     Copyright (c) 2008 David A. Mellis.  All right reserved.
 //     Copyright (C) 2022 Rabbit Hole Computing LLC
 //
 //  This file is part of QuokkADB.
@@ -24,7 +25,30 @@
 //
 //----------------------------------------------------------------------------
 
-
+// Logging system based on Arduino Serial library
 #pragma once
 
-int quokkadb(void);
+#include <stdlib.h>
+
+enum print_type {
+    fmtBIN,
+    fmtOCT,
+    fmtDEC,
+    fmtHEX, 
+};
+
+namespace platform {
+    class PLogmsg 
+    {
+        public:
+            size_t print(int number);
+            size_t print(int number, print_type type);
+            size_t print(const char* string);
+            size_t println(int number);
+            size_t println(int number, print_type type);
+            size_t println(const char* string);
+    };
+    
+}
+
+extern platform::PLogmsg Logmsg;

@@ -31,6 +31,7 @@
 #include "char2usbkeycode.h"
 #include "adbkbdparser.h"
 #include "adbmouseparser.h"
+#include "platform_logmsg.h"
 #include "adb.h"
 
 extern uint16_t modifierkeys;
@@ -122,7 +123,7 @@ void PlatformKbdParser::SendString(const char * message)
         }    
         else
         {
-            Serial.println("Warning! unable to queue CAPSLOCK key up");
+            Logmsg.println("Warning! unable to queue CAPSLOCK key up");
         }
 
         while(message[i] != '\0')        
@@ -190,6 +191,6 @@ void PlatformKbdParser::TaskKeyboard(bool first)
     {
       adb.Reset();
       adb_reset = false;
-      Serial.println("ALL: Resetting devices");
+      Logmsg.println("ALL: Resetting devices");
     } 
 }

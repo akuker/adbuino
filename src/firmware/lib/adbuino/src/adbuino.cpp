@@ -37,6 +37,7 @@
 #include "usbinterface.h"
 #include "usb_description.h"
 #include "platform_config.h"
+#include "platform_logmsg.h"
 // Satisfy the IDE, which needs to see the include statement in the ino too.
 #ifdef dobogusinclude
 #include <spi4teensy3.h>
@@ -88,8 +89,7 @@ int led_state = HIGH;
 void setup()
 {
   Serial.begin(115200);
-  while (!Serial)
-    ;
+  while (!Serial);
 
   // Clear the reset signal from the USB controller
   pinMode(7, OUTPUT);
@@ -98,21 +98,21 @@ void setup()
   // Setup blinking LED
   pinMode(A0, OUTPUT);
   digitalWrite(A0, HIGH);
-  Serial.println(PLATFORM_FW_VER_STRING);
-  Serial.println("Initializing ADB");
+  Logmsg.println(PLATFORM_FW_VER_STRING);
+  Logmsg.println("Initializing ADB");
   adb.Init();
-  Serial.println("Initializing USB");
+  Logmsg.println("Initializing USB");
   //usb.Init();
 
   if (Usb.Init() == -1)
-    Serial.println("OSC did not start.");
+    Logmsg.println("OSC did not start.");
   else 
-    Serial.println("OSC started");
+    Logmsg.println("OSC started");
 
   HidKeyboard.SetReportParser(0, &KeyboardPrs);
   HidMouse.SetReportParser(0, &MousePrs);
 
-  Serial.println("setup complete");
+  Logmsg.println("setup complete");
 }
 
 void update_blinker(){
@@ -164,7 +164,7 @@ void loop()
       {
         adb.Reset();
         adb_reset = false;
-        Serial.println("ALL: Resetting devices");
+        Logmsg.println("ALL: Resetting devices");
       } 
     }
   }
