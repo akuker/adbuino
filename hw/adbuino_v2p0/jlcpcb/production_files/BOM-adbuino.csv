@@ -1,0 +1,14 @@
+Comment,Designator,Footprint,LCSC
+LED_Small,"D1,D2,D3",LED_0805_2012Metric,C2297
+10k,"R1,R12,R2,R3,R4,R5,R6",R_0402_1005Metric,C25744
+U254-051N-4BH806,J2,U254051N4BH806,C319170
+Polyfuse,"F1,F2",Fuse_0805_2012Metric,C66452
+BSS138,"Q1,Q2",SOT-23,C78284
+D_Schottky,"D4,D5",D_SOD-123,C8598
+Mini-DIN-4,J5,CUI_MD2-40ST-SMT,
+Pico,U2,Customized_RPi_Pico_SMD_TH,
+TestPoint_Small,TP3,TestPoint_Pad_D1.0mm,
+TestPoint_Small,TP2,TestPoint_Pad_D1.0mm,
+TestPoint_Small,TP1,TestPoint_Pad_D1.0mm,
+Mini-DIN-4,J4,CUI_MD2-40ST-SMT,
+SolderJumper_2_Open,JP5,SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm,
