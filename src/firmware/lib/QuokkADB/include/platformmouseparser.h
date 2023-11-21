@@ -83,5 +83,17 @@ protected:
         virtual void OnMiddleButtonDown(MOUSEINFO *mi __attribute__((unused))) {
         };
 
+        // A stack like data structure, except it resets the stack after the most recent item has been popped
+        bool PushMouseInfo(const MOUSEINFO& mouse_action);
+        bool PopMouseInfo(MOUSEINFO& mouse_action);
+        bool hasQueuedMouseInfo();
+
         PlatformKbdParser* m_keyboard;
+        union
+        {
+                MOUSEINFO mouseInfo;
+                uint8_t bInfo[sizeof(MOUSEINFO)];
+        } m_mouse_action_queue[10];
+
+        int m_mouse_action_index = -1;
 };

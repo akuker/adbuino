@@ -27,12 +27,14 @@
 
 #include "platformmouseparser.h"
 #include "tusb.h"
+#include "pico/mutex.h"
+auto_init_mutex(mouse_action_mutex);
 
 void PlatformMouseParser::Parse(const hid_mouse_report_t *report){
     static MOUSEINFO mouse_info;
 
-    mouse_info.bmLeftButton = !!(report->buttons & MOUSE_BUTTON_LEFT);
-    mouse_info.bmRightButton = !!(report->buttons & MOUSE_BUTTON_RIGHT);
+    mouse_info.bmLeftButton   = !!(report->buttons & MOUSE_BUTTON_LEFT);
+    mouse_info.bmRightButton  = !!(report->buttons & MOUSE_BUTTON_RIGHT);
     mouse_info.bmMiddleButton = !!(report->buttons & MOUSE_BUTTON_MIDDLE);
     mouse_info.dX = report->x;
     mouse_info.dY = report->y;
@@ -65,7 +67,48 @@ void PlatformMouseParser::Parse(const hid_mouse_report_t *report){
     if (!prevState.mouseInfo.bmMiddleButton && mouse_info.bmMiddleButton) {
         OnMiddleButtonUp(&mouse_info);
     }
-
-
+    PushMouseInfo(mouse_info);
     prevState.mouseInfo = mouse_info;
+}
+
+bool PlatformMouseParser::PushMouseInfo(const MOUSEINFO& mouse_action)
+{
+    mutex_enter_blocking(&mouse_action_mutex); 
+    bool queue_push_successful = true;
+    if (++m_mouse_action_index >= (sizeof(m_mouse_action_queue)/sizeof(m_mouse_action_queue[0])))
+    {
+        m_mouse_action_index = 0;
+        memset(m_mouse_action_queue[m_mouse_action_index].bInfo, 0, sizeof(m_mouse_action_queue[m_mouse_action_index]));
+        queue_push_successful = false;
+    }
+    else
+    {
+        memset(m_mouse_action_queue[m_mouse_action_index].bInfo, 0, sizeof(m_mouse_action_queue[m_mouse_action_index]));
+        memcpy(&m_mouse_action_queue[m_mouse_action_index].bInfo, &mouse_action, sizeof(m_mouse_action_queue[m_mouse_action_index].bInfo));
+        queue_push_successful = true;
+    }
+    mutex_exit(&mouse_action_mutex);
+    return queue_push_successful;
+}
+
+bool PlatformMouseParser::PopMouseInfo(MOUSEINFO& mouse_action)
+{
+    mutex_enter_blocking(&mouse_action_mutex); 
+    bool queue_pop_successful = true;
+    if (m_mouse_action_index >= 0)
+    {
+        memcpy(&mouse_action, &m_mouse_action_queue[m_mouse_action_index].bInfo, sizeof(m_mouse_action_queue[m_mouse_action_index].bInfo));
+        m_mouse_action_index = -1;
+    }
+    else
+    {
+        queue_pop_successful = false;
+    }
+    mutex_exit(&mouse_action_mutex);
+    return queue_pop_successful;  
+}
+
+bool PlatformMouseParser::hasQueuedMouseInfo()
+{
+    return m_mouse_action_index >= 0;
 }

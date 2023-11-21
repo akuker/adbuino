@@ -28,6 +28,7 @@
 #include "quokkadb_gpio.h"
 #include "pico/mutex.h"
 #include "hardware/gpio.h"
+#include <pico/stdio_uart.h>
 #include <pico/printf.h>
 
 mutex_t led_mutex;
@@ -62,7 +63,6 @@ void uart_gpio_init(void) {
 
     uart_init(UART_PORT, UART_TX_BAUD);
     gpio_set_function(UART_TX_GPIO, GPIO_FUNC_UART);
-
 }
     
 

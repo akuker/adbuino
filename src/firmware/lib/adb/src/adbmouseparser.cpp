@@ -40,30 +40,38 @@ uint32_t ADBMouseRptParser::EightBitToSevenBitSigned(int8_t value)
     //   - Easy way to convert from 8 bit to 7 bit number
     //   - It "softens" the mouse movement. Modern optical
     //     mice seem a little jumpy.
-    return (uint32_t)((value/2) & 0x7F);
+    int32_t adjusted_value = (( (abs(value)+3) / 4));
+    if (value < 0)
+    {
+        adjusted_value = -adjusted_value;
+    }
+
+    return ((uint32_t)adjusted_value) & 0x7F;
 }
 
 uint16_t ADBMouseRptParser::GetAdbRegister0()
 {
+    MOUSEINFO mouse_info;
+    PopMouseInfo(mouse_info);
     uint16_t reg_value = 0;
     // Bit 15 = Left Button Status; 0=down
-    if (!IsLeftButtonPressed())
+    if (!mouse_info.bmLeftButton)
     {
         reg_value |= (1 << 15);
     }
     // Bit 7 = Right Button Status - introduced in System 8
-    if (!IsRightButtonPressed())
+    if (!mouse_info.bmRightButton)
     {
         reg_value |= (1 << 7);
     }
 
     // Bits 14-8 = Y move Counts (Two's compliment. Negative = up, positive = down)
-    reg_value |= (EightBitToSevenBitSigned(GetDeltaY()) << 8);
+    reg_value |= (EightBitToSevenBitSigned(mouse_info.dY) << 8);
 
     // Bits 6-0 = X move counts (Two's compliment. Negative = left, positive = right)
-    reg_value |= (EightBitToSevenBitSigned(GetDeltaX()) << 0);
+    reg_value |= (EightBitToSevenBitSigned(mouse_info.dX) << 0);
 
-    ResetMouseMovement();
+    // ResetMouseMovement();
 
     return reg_value;
 }
