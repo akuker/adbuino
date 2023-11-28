@@ -97,14 +97,18 @@ Inserting a new mouse:
  - Some USB hubs do not seem to work.
 
 ## Compiling
-Pre-requisites: ARM cross compiling tools
+This is a PlatformIO project
+Download the PlatformIO CLI or install the extension in VSCode
 
-Steps:
-1. Download the pico sdk: https://github.com/raspberrypi/pico-sdk
-2. set `$PICO_SDK_PATH` to that directory
-3. change to the directory in this repo to `src/firmware`
-4. `mkdir build`
-5. `cd build`
-6. `cmake ..`
-7. `make`
-8. .uf2, .bin, and .elf files should be in `src/firmware/build/src`
+### With the CLI
+From the root directory of the project
+1) `cd src/firmware`
+2) Run `pio run -e quokkadb`
+
+
+### With VSCode
+Open the directory `src/firmware` from the project root directory with VSCode 
+1) Select the environment `quokkadb`
+2)  Click Build under the PlatformIO panel
+
+In either case the uf2 file should be in the directory `src/firmware/.pio/quokkadb/build`
