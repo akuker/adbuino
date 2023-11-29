@@ -32,27 +32,8 @@ extern bool global_debug;
 
 bool MouseRptParser::MouseChanged()
 {
-    return hasQueuedMouseInfo();
+    return !m_mouse_events.isEmpty();
 }
-// int32_t MouseRptParser::GetDeltaX()
-// {
-//     return m_movedx;
-// }
-// int32_t MouseRptParser::GetDeltaY()
-// {
-//     return m_movedy;
-// }
-// void MouseRptParser::ResetMouseMovement()
-// {
-//     m_movedy = 0;
-//     m_movedx = 0;
-//     m_mouse_button_changed = false;
-// }
-// bool MouseRptParser::MouseButtonIsPressed()
-// {
-//     return m_mouse_left_button_is_pressed || m_mouse_right_button_is_pressed;
-// }
-
 
 void MouseRptParser::OnMouseMove(MOUSEINFO *mi)
 {

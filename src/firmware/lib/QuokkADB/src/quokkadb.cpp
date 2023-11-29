@@ -130,20 +130,20 @@ void loop()
 
 void setup1()
 {
-  tuh_init(0);
+  tuh_init(0);  
   led_blink(1);
 }
 
 /*------------ Core1 main loop ------------*/
 void loop1()
 {
-      tuh_task(); // tinyusb host task
+  tuh_task(); // tinyusb host task
 
-    KeyboardPrs.ChangeUSBKeyboardLEDs();
-    
-    if (true == usb_reset)
-    {
-      KeyboardPrs.Reset();
-      usb_reset = false;
-    }
+  KeyboardPrs.ChangeUSBKeyboardLEDs();
+  
+  if (true == usb_reset)
+  {
+    KeyboardPrs.Reset();
+    usb_reset = false;
+  }
 }

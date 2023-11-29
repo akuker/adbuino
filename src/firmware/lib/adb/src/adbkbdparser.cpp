@@ -61,7 +61,7 @@ uint16_t ADBKbdRptParser::GetAdbRegister0()
         }
         adb_keycode = usb_keycode_to_adb_code(event->GetKeycode());
         kbdreg0 |= (adb_keycode << ADB_REG_0_KEY_1_KEY_CODE);
-        free(event);
+        delete(event);
     }
     else
     {
