@@ -34,6 +34,10 @@
 #include <stdint.h>
 #include "tusb.h"
 #include "platformkbdparser.h"
+#include <scqueue.h>
+using simple_circular_queue::SCQueue;
+
+#define MOUSE_QUEUE_CAPACITY (20)
 
 //----------------------------------------------------------------------------
 // Mouse handler
@@ -82,6 +86,9 @@ protected:
 
         virtual void OnMiddleButtonDown(MOUSEINFO *mi __attribute__((unused))) {
         };
+
+
+        SCQueue<MOUSEINFO*, MOUSE_QUEUE_CAPACITY> m_mouse_events;
 
         PlatformKbdParser* m_keyboard;
 };

@@ -37,7 +37,6 @@
 #include "pico/stdlib.h"
 #include "tusb.h"
 #include "host/usbh.h"
-#include "pico/stdio.h"
 #include "platform_logmsg.h"
 #include "adb.h"
 #include "quokkadb_gpio.h"
@@ -78,10 +77,9 @@ void setup()
   led_blink(1);
   uart_gpio_init();
   adb_gpio_init();
-
+  Serial1.begin();
   setting_storage.init();
-  
-  printf("%s\n", PLATFORM_FW_VER_STRING);
+  Logmsg.println(PLATFORM_FW_VER_STRING);
   srand(time_us_32());
 }
 
@@ -132,20 +130,21 @@ void loop()
 
 void setup1()
 {
-  tuh_init(0);
+  tuh_init(0);  
   led_blink(1);
 }
 
 /*------------ Core1 main loop ------------*/
 void loop1()
 {
-      tuh_task(); // tinyusb host task
+  tuh_task(); // tinyusb host task
 
-    KeyboardPrs.ChangeUSBKeyboardLEDs();
-    
-    if (true == usb_reset)
-    {
-      KeyboardPrs.Reset();
-      usb_reset = false;
-    }
+  KeyboardPrs.ChangeUSBKeyboardLEDs();
+  
+  if (true == usb_reset)
+  {
+    KeyboardPrs.Reset();
+    MousePrs.Reset();
+    usb_reset = false;
+  }
 }

@@ -28,8 +28,6 @@
 // Logging system based on Arduino Serial library
 #pragma once
 
-#include <stdlib.h>
-
 enum print_type {
     fmtBIN,
     fmtOCT,

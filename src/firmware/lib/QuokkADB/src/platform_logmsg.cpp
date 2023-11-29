@@ -25,10 +25,9 @@
 //----------------------------------------------------------------------------
 
 // Logging system based on Arduino Serial library
+#include <Arduino.h>
 #include "platform_logmsg.h"
 #include "quokkadb_gpio.h"
-#include <pico/printf.h>
-
 
 platform::PLogmsg Logmsg;
 
@@ -42,13 +41,13 @@ namespace platform {
         switch (type)
         {
         case fmtDEC :
-            return printf("%d", number);
+            return Serial1.print(number, DEC);
 //        case BIN :
 //            return printf("%b", number);
         case fmtOCT :
-            return printf("%o", number);
+            return Serial1.print(number, OCT);
         case fmtHEX :
-            return printf("%X", number);
+            return Serial1.print(number, HEX);
         default:
             return 0;
             break;
@@ -56,7 +55,7 @@ namespace platform {
     }
     
     size_t PLogmsg::print(const char* string) {
-        return printf("%s", string);
+        return Serial1.print(string);
 
     }
     
@@ -68,24 +67,20 @@ namespace platform {
         switch (type)
         {
         case fmtDEC :
-            return printf("%d\n", number);
+            return Serial1.println(number, DEC);
 //        case BIN :
 //            return printf("%b\n", number);
         case fmtOCT :
-            return printf("%o\n", number);
+            return Serial1.print(number, OCT);
         case fmtHEX :
-            return printf("%X\n", number);
+            return Serial1.print(number, HEX);
         default:
             return 0;
         }
     }
     
     size_t PLogmsg::println(const char* string) {
-        return printf("%s\n", string);
+        return Serial1.println(string);
 
     }
-}
-
-void putchar_(char c){
-    uart_putc(UART_PORT, c);
 }

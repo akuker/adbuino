@@ -26,46 +26,47 @@
 //---------------------------------------------------------------------------
 
 #include "platformmouseparser.h"
+#include <platform_logmsg.h>
 #include "tusb.h"
+#include "pico/mutex.h"
+
 
 void PlatformMouseParser::Parse(const hid_mouse_report_t *report){
-    static MOUSEINFO mouse_info;
+    MOUSEINFO *mouse_info = new MOUSEINFO();
 
-    mouse_info.bmLeftButton = !!(report->buttons & MOUSE_BUTTON_LEFT);
-    mouse_info.bmRightButton = !!(report->buttons & MOUSE_BUTTON_RIGHT);
-    mouse_info.bmMiddleButton = !!(report->buttons & MOUSE_BUTTON_MIDDLE);
-    mouse_info.dX = report->x;
-    mouse_info.dY = report->y;
+    mouse_info->bmLeftButton   = !!(report->buttons & MOUSE_BUTTON_LEFT);
+    mouse_info->bmRightButton  = !!(report->buttons & MOUSE_BUTTON_RIGHT);
+    mouse_info->bmMiddleButton = !!(report->buttons & MOUSE_BUTTON_MIDDLE);
+    mouse_info->dX = report->x;
+    mouse_info->dY = report->y;
 
-    if(mouse_info.dX != 0 || mouse_info.dY != 0) {
-        OnMouseMove(&mouse_info);
+    if(mouse_info->dX != 0 || mouse_info->dY != 0) {
+        OnMouseMove(mouse_info);
     }
 
     // change to mouse left button down
-    if (!prevState.mouseInfo.bmLeftButton && mouse_info.bmLeftButton) {
-        OnLeftButtonDown(&mouse_info);
+    if (!prevState.mouseInfo.bmLeftButton && mouse_info->bmLeftButton) {
+        OnLeftButtonDown(mouse_info);
     }
 
     // change to mouse left button up
-    if (prevState.mouseInfo.bmLeftButton && !mouse_info.bmLeftButton) {
-        OnLeftButtonUp(&mouse_info);
+    if (prevState.mouseInfo.bmLeftButton && !mouse_info->bmLeftButton) {
+        OnLeftButtonUp(mouse_info);
     }
 
-    if (!prevState.mouseInfo.bmRightButton && mouse_info.bmRightButton) {
-        OnRightButtonDown(&mouse_info);
+    if (!prevState.mouseInfo.bmRightButton && mouse_info->bmRightButton) {
+        OnRightButtonDown(mouse_info);
     }
 
-    if (prevState.mouseInfo.bmRightButton && !mouse_info.bmRightButton) {
-        OnRightButtonUp(&mouse_info);
+    if (prevState.mouseInfo.bmRightButton && !mouse_info->bmRightButton) {
+        OnRightButtonUp(mouse_info);
     }
 
-    if (!prevState.mouseInfo.bmMiddleButton && mouse_info.bmMiddleButton) {
-        OnMiddleButtonDown(&mouse_info);
+    if (!prevState.mouseInfo.bmMiddleButton && mouse_info->bmMiddleButton) {
+        OnMiddleButtonDown(mouse_info);
     }
-    if (!prevState.mouseInfo.bmMiddleButton && mouse_info.bmMiddleButton) {
-        OnMiddleButtonUp(&mouse_info);
+    if (!prevState.mouseInfo.bmMiddleButton && mouse_info->bmMiddleButton) {
+        OnMiddleButtonUp(mouse_info);
     }
-
-
-    prevState.mouseInfo = mouse_info;
+    m_mouse_events.enqueue(mouse_info);
 }

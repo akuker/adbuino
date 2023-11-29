@@ -49,7 +49,7 @@ void KbdRptParser::Reset(void)
     while(PendingKeyboardEvent())
     {
         
-        free(m_keyboard_events.dequeue());
+        delete(m_keyboard_events.dequeue());
     }
 
     // QuokkADB handles keyboard LEDs directly

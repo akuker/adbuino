@@ -32,27 +32,8 @@ extern bool global_debug;
 
 bool MouseRptParser::MouseChanged()
 {
-    return ((m_movedx != 0) || (m_movedy != 0) || m_mouse_button_changed);
+    return !m_mouse_events.isEmpty();
 }
-int32_t MouseRptParser::GetDeltaX()
-{
-    return m_movedx;
-}
-int32_t MouseRptParser::GetDeltaY()
-{
-    return m_movedy;
-}
-void MouseRptParser::ResetMouseMovement()
-{
-    m_movedy = 0;
-    m_movedx = 0;
-    m_mouse_button_changed = false;
-}
-bool MouseRptParser::MouseButtonIsPressed()
-{
-    return m_mouse_left_button_is_pressed || m_mouse_right_button_is_pressed;
-}
-
 
 void MouseRptParser::OnMouseMove(MOUSEINFO *mi)
 {
@@ -63,39 +44,32 @@ void MouseRptParser::OnMouseMove(MOUSEINFO *mi)
         Logmsg.print(" dy=");
         Logmsg.println(mi->dY, fmtDEC);
     }
-    m_movedy = mi->dY;
-    m_movedx = mi->dX;
 };
 void MouseRptParser::OnLeftButtonUp(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Logmsg.println("L Butt Up");
+        Logmsg.println("L Bttn Up");
     }
-    m_mouse_left_button_is_pressed = false;
-    m_mouse_button_changed = true;
-};
+ };
 void MouseRptParser::OnLeftButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Logmsg.println("L Butt Dn");
+        Logmsg.println("L Bttn Dn");
     }
-    m_mouse_left_button_is_pressed = true;
-    m_mouse_button_changed = true;
 };
 void MouseRptParser::OnRightButtonUp(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Logmsg.println("R Butt Up");
+        Logmsg.println("R Bttn Up");
     }
     switch (m_right_btn_mode)
     {
         case MouseRightBtnMode::ctrl_click :
 
-            m_mouse_left_button_is_pressed = false;
-            m_mouse_button_changed = true;
+            mi->bmLeftButton = false;
             #ifdef QUOKKADB
             sleep_ms(100);
             #else
@@ -107,8 +81,7 @@ void MouseRptParser::OnRightButtonUp(MOUSEINFO *mi)
 
         break;
         case MouseRightBtnMode::right_click :
-            m_mouse_right_button_is_pressed = false;
-            m_mouse_button_changed = true;
+            mi->bmRightButton = false;
         break;
     }
 
@@ -117,7 +90,7 @@ void MouseRptParser::OnRightButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Logmsg.println("R Butt Dn");
+        Logmsg.println("R Bttn Dn");
     }
     switch (m_right_btn_mode)
     {
@@ -130,13 +103,10 @@ void MouseRptParser::OnRightButtonDown(MOUSEINFO *mi)
             #else
             delay(200);
             #endif
-            m_mouse_left_button_is_pressed = true;
-            m_mouse_button_changed = true;
-
+            mi->bmLeftButton = true;
         break;
         case MouseRightBtnMode::right_click :
-            m_mouse_right_button_is_pressed = true;
-            m_mouse_button_changed = true;
+            mi->bmRightButton = true;
         break;
     }
 };
@@ -144,7 +114,7 @@ void MouseRptParser::OnMiddleButtonUp(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Logmsg.println("M Butt Up");
+        Logmsg.println("M Bttn Up");
     }
 
 };
@@ -152,7 +122,7 @@ void MouseRptParser::OnMiddleButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Logmsg.println("M Butt Dn");
+        Logmsg.println("M Bttn Dn");
     }
     switch (m_right_btn_mode)
     {
@@ -165,3 +135,12 @@ void MouseRptParser::OnMiddleButtonDown(MOUSEINFO *mi)
         
     }
 };
+
+
+void MouseRptParser::Reset(void)
+{
+    while(!m_mouse_events.isEmpty())
+    {
+        delete m_mouse_events.dequeue();
+    }
+}

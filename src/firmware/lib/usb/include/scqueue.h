@@ -20,7 +20,7 @@
 #pragma once
 
 #include <stdlib.h>
-
+#include <platform_logmsg.h>
 #ifdef SCQ_RP2040_MUTEX
 #include "pico/mutex.h"
 #endif
@@ -35,6 +35,7 @@ namespace simple_circular_queue
             T dequeue(void);
             T peek(void);
             bool isEmpty(void);
+            void log_values(void);
 
         private:
             T queue_[allocation_size];

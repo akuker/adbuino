@@ -37,11 +37,13 @@
 //----------------------------------------------------------------------------
 // Mouse handler
 //----------------------------------------------------------------------------
+#define MOUSE_QUEUE_CAPACITY (20)
 
 class PlatformMouseParser : public MouseReportParser {
 
 public:
 
 protected:
+        SCQueue<MOUSEINFO*, MOUSE_QUEUE_CAPACITY> m_mouse_events;
         PlatformKbdParser* m_keyboard;
 };
