@@ -135,3 +135,12 @@ void MouseRptParser::OnMiddleButtonDown(MOUSEINFO *mi)
         
     }
 };
+
+
+void MouseRptParser::Reset(void)
+{
+    while(!m_mouse_events.isEmpty())
+    {
+        delete m_mouse_events.dequeue();
+    }
+}

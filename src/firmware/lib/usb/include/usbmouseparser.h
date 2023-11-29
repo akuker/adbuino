@@ -40,8 +40,8 @@ public:
     bool MouseChanged();
     int32_t GetDeltaX();
     int32_t GetDeltaY();
-    void ResetMouseMovement();
     bool MouseButtonIsPressed();
+    void Reset(void);
 
 protected:
     void OnMouseMove(MOUSEINFO *mi);

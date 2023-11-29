@@ -39,7 +39,6 @@ using simple_circular_queue::SCQueue;
 
 #define MOUSE_QUEUE_CAPACITY (20)
 
-
 //----------------------------------------------------------------------------
 // Mouse handler
 //----------------------------------------------------------------------------
@@ -89,7 +88,7 @@ protected:
         };
 
 
-        SCQueue<MOUSEINFO*, MOUSE_QUEUE_CAPACITY> m_mouse_events; 
+        SCQueue<MOUSEINFO*, MOUSE_QUEUE_CAPACITY> m_mouse_events;
 
         PlatformKbdParser* m_keyboard;
 };

@@ -99,7 +99,6 @@ uint16_t ADBMouseRptParser::GetAdbRegister0()
     // Bits 6-0 = X move counts (Two's compliment. Negative = left, positive = right)
     reg_value |= (EightBitToSevenBitSigned(original_mouse_event->dX) << 0);
 
-    // ResetMouseMovement();
     delete original_mouse_event;
     return reg_value;
 }

@@ -144,6 +144,7 @@ void loop1()
   if (true == usb_reset)
   {
     KeyboardPrs.Reset();
+    MousePrs.Reset();
     usb_reset = false;
   }
 }
