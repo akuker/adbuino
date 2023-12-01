@@ -37,7 +37,7 @@ struct blink_event_t
 class BlinkLed
 {
 public:
-    bool blink(uint8_t times, uint32_t delay_ms = 75);
+    bool blink(uint8_t times, uint32_t delay_ms = 250);
     void led_on(bool force = false);
     void led_off(bool force = false);
     void poll();

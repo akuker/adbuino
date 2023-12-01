@@ -58,40 +58,32 @@ void BlinkLed::poll()
     static blink_event_t *current_event = nullptr;
     static bool on_phase = true;
     static uint8_t blinked = 0;
-    static bool last_delay = false;
+    static bool ending = false;
     static uint32_t start_delay;
+    static uint32_t delay_period;
 
     if (!blinking && !blink_queue.isEmpty())
     {
         current_event = blink_queue.dequeue();
+        delay_period = current_event->delay_ms;
         start_delay = millis();
         LED_ON();
         on_phase = true;
         blinking = true;
         blinked = 0;
-        last_delay = false;
+        ending = false;
     }
 
     if (blinking)
     {
-        if ((uint32_t)(millis() - start_delay) > current_event->delay_ms)
+        if ((uint32_t)(millis() - start_delay) > delay_period)
         {
-            if (last_delay)
+            if (ending)
             {
-                if (on_phase)
-                {
-                    // end of blink routine
-                    last_delay = false;
-                    delete current_event;
-                    blinking = false;
-                }
-                else
-                {
-                    // one more delay so there is an extra delay before starting a new blink sequence
-                    start_delay = millis();
-                    on_phase = true;
-                }
-
+                // end of blink routine
+                ending = false;
+                delete current_event;
+                blinking = false;
             }
             else if (on_phase)
             {
@@ -100,7 +92,8 @@ void BlinkLed::poll()
                 start_delay = millis();
                 if (blinked + 1 >= current_event->times)
                 {
-                    last_delay = true;
+                    delay_period *= 4;
+                    ending = true;
                 }
             }
             else
