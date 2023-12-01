@@ -44,7 +44,7 @@
 #include "adbmouseparser.h"
 #include "flashsettings.h"
 #include "platform_config.h"
-
+#include "blink.h"
 
 // Globals
 extern uint8_t mousepending;
@@ -68,16 +68,20 @@ ADBKbdRptParser KeyboardPrs;
 ADBMouseRptParser MousePrs(KeyboardPrs);
 FlashSettings setting_storage;
 
+/*------------ Pre Core0 and Core1 setup ------------*/
+void initVariant() 
+{ 
+  led_gpio_init();
+  uart_gpio_init();
+  Serial1.begin();
+}
+
 /*------------ Core0 setup ------------*/
 void setup()
 {
   set_sys_clock_khz(125000, true);
-  
-  led_gpio_init();
-  led_blink(1);
-  uart_gpio_init();
+  blink_led.blink(1);
   adb_gpio_init();
-  Serial1.begin();
   setting_storage.init();
   Logmsg.println(PLATFORM_FW_VER_STRING);
   srand(time_us_32());
@@ -108,11 +112,11 @@ void loop()
     }
   }
 
-  led_off();
+  blink_led.led_off();
   cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
   if(setting_storage.settings()->led_on)
   {
-    led_on();
+    blink_led.led_on();
   }  
   adb.ProcessCommand(cmd);
 
@@ -131,14 +135,15 @@ void loop()
 void setup1()
 {
   tuh_init(0);  
-  led_blink(1);
+  sleep_us(500);
 }
 
 /*------------ Core1 main loop ------------*/
 void loop1()
 {
   tuh_task(); // tinyusb host task
-
+  blink_led.poll();
+  
   KeyboardPrs.ChangeUSBKeyboardLEDs();
   
   if (true == usb_reset)

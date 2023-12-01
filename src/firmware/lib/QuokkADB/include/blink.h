@@ -2,7 +2,7 @@
 //
 //	QuokkADB ADB keyboard and mouse adapter
 //
-//     Copyright (C) 2022 Rabbit Hole Computing LLC
+//     Copyright (C) 2023 Rabbit Hole Computing LLC
 //
 //  This file is part of QuokkADB.
 //
@@ -23,36 +23,27 @@
 //  License. See LICENSE in the root of this repository for more info.
 //
 //----------------------------------------------------------------------------
-
-
-
 #pragma once
-#include "stdlib.h"
-#include "hardware/structs/sio.h"
-#include "hardware/gpio.h"
-#include "hardware/uart.h"
 
+#include <scqueue.h>
+#define BLINK_QUEUE_LENGTH 5
 
-// Status LED GPIOs
-#define LED_GPIO     12
-#define LED_ON()    sio_hw->gpio_set = 1 << LED_GPIO
-#define LED_OFF()   sio_hw->gpio_clr = 1 << LED_GPIO
-#define LED_SET(x)  (x ? sio_hw->gpio_set = 1 << LED_GPIO : sio_hw->gpio_clr = 1 << LED_GPIO)
+struct blink_event_t
+{
+  uint8_t times;
+  uint32_t delay_ms;  
+};
 
-// ADB GPIOs
-#define ADB_IN_GPIO   19
-#define ADB_OUT_GPIO  18
-#define ADB_OUT_HIGH() sio_hw->gpio_set = 1 << ADB_OUT_GPIO
-#define ADB_OUT_LOW()  sio_hw->gpio_clr = 1 << ADB_OUT_GPIO
-#define ADB_IN_GET() (gpio_get(ADB_IN_GPIO))
+class BlinkLed
+{
+public:
+    bool blink(uint8_t times, uint32_t delay_ms = 250);
+    void led_on(bool force = false);
+    void led_off(bool force = false);
+    void poll();
+protected:
+    simple_circular_queue::SCQueue<blink_event_t*, BLINK_QUEUE_LENGTH> blink_queue;
+    bool blinking = false;
+};
 
-#define GPIO_TEST 20
-
-// UART out messaging
-#define UART_TX_GPIO    16
-#define UART_TX_BAUD    115200
-#define UART_PORT       uart0
-
-void adb_gpio_init(void);
-void uart_gpio_init(void);
-void led_gpio_init(void);
+extern BlinkLed blink_led;

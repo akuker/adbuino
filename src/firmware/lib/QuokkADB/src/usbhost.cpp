@@ -34,6 +34,7 @@
 #include "platformmouseparser.h"
 #include "usbmouseparser.h"
 #include "adbkbdparser.h"
+#include "blink.h"
 
 #define kModCmd 1
 #define kModOpt 2
@@ -81,11 +82,11 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_re
       if(itf_protocol == HID_ITF_PROTOCOL_KEYBOARD) 
       {
         KeyboardPrs.AddKeyboard(dev_addr, instance);
-        led_blink(2);
+        blink_led.blink(2);
       } 
       else // protocol is mouse
       {
-        led_blink(3);
+        blink_led.blink(3);
       }
     }
   }
@@ -95,7 +96,7 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_re
 void tuh_hid_umount_cb(uint8_t dev_addr, uint8_t instance)
 {
   KeyboardPrs.RemoveKeyboard(dev_addr, instance);
-  led_blink(1);
+  blink_led.blink(1);
 }
 
 // look up new key in previous keys

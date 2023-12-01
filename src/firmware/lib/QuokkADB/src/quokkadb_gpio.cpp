@@ -26,14 +26,8 @@
 
 
 #include "quokkadb_gpio.h"
-#include "pico/mutex.h"
 #include "hardware/gpio.h"
 #include <pico/stdio_uart.h>
-#include <pico/printf.h>
-
-mutex_t led_mutex;
-
-
 
 extern bool global_debug;
 void adb_gpio_init(void) {
@@ -48,35 +42,16 @@ void adb_gpio_init(void) {
 
 }
 
-
-
 void led_gpio_init(void) {
     gpio_init(LED_GPIO);
     gpio_set_function(LED_GPIO, GPIO_FUNC_SIO);
     gpio_set_dir(LED_GPIO, GPIO_OUT);
     LED_OFF();
-    mutex_init(&led_mutex);
-
 }
 
 void uart_gpio_init(void) {
 
     uart_init(UART_PORT, UART_TX_BAUD);
     gpio_set_function(UART_TX_GPIO, GPIO_FUNC_UART);
-}
-    
-
-
-// Blink the led n times
-void led_blink(uint8_t times) {
-    mutex_enter_blocking(&led_mutex);
-    for (uint8_t i = 0; i < times; i++) {
-        LED_ON();
-        sleep_ms(75);
-        LED_OFF();
-        sleep_ms(75);
-    }
-    sleep_ms(75);    
-    mutex_exit(&led_mutex);
 }
 
