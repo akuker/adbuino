@@ -31,6 +31,6 @@ public:
     uint16_t GetAdbRegister0();
 
 protected:
-    uint32_t EightBitToSevenBitSigned(int8_t value);
+    uint32_t EightBitToSevenBitSigned(int32_t value, int32_t compare);
 
 };
