@@ -70,8 +70,8 @@ inline bool AdbInterface::Send16bitRegister(uint16_t reg16)
     // adding randomness as suggested by Apple Guide the Mac. family  Hardware 2nd edition
     // pg 324.  Random time delay will give a max stop to start time of 240us
  
-   uint32_t extra_delay = (rand() % 101);
-   if (!adb_delay_us(140 + extra_delay)) return false; 
+   uint32_t extra_delay = (rand() % 81);
+   if (!adb_delay_us(160 + extra_delay)) return false;
 
   adb_pin_out();
   // start bit
