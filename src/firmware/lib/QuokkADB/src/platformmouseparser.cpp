@@ -27,12 +27,15 @@
 
 #include "platformmouseparser.h"
 #include <platform_logmsg.h>
+#include <adb_platform.h>
 #include "tusb.h"
 #include "pico/mutex.h"
 
 
 void PlatformMouseParser::Parse(const hid_mouse_report_t *report){
     MOUSEINFO *mouse_info = new MOUSEINFO();
+    
+    mouse_info->timestamp = millis();
 
     mouse_info->bmLeftButton   = !!(report->buttons & MOUSE_BUTTON_LEFT);
     mouse_info->bmRightButton  = !!(report->buttons & MOUSE_BUTTON_RIGHT);

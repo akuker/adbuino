@@ -109,9 +109,8 @@ void loop()
   
   if (!mousepending)
   {
-    if (MousePrs.MouseChanged())
+    if (MousePrs.MouseReady())
     {
-      mousereg0 = MousePrs.GetAdbRegister0();
       mousepending = 1;
     }
   }

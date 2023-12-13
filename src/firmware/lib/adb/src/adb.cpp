@@ -33,6 +33,7 @@
 #include "bithacks.h"
 #include "math.h"
 #include <platform_logmsg.h>
+#include <adbmouseparser.h>
 
 uint8_t mouse_addr = MOUSE_DEFAULT_ADDR;
 uint8_t kbd_addr = KBD_DEFAULT_ADDR;
@@ -60,6 +61,7 @@ bool mouse_skip_next_listen_reg3 = false;
 bool kbd_skip_next_listen_reg3 = false;
 
 extern bool global_debug;
+extern ADBMouseRptParser MousePrs;
 // The original data_lo code would just set the bit as an output
 // That works for a host, since the host is doing the pullup on the ADB line,
 // but for a device, it won't reliably pull the line low.  We need to actually
@@ -358,7 +360,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       if (mousepending)
       {
         DetectCollision();
-        if (Send16bitRegister(mousereg0))
+        if (Send16bitRegister(MousePrs.GetAdbRegister0()))
         {
           ResetCollision();
           mousepending = 0;

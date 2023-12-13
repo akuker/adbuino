@@ -23,14 +23,25 @@
 #pragma once
 #include "adbkbdparser.h"
 #include "usbmouseparser.h"
+#define DEFAULT_SENSITIVITY_DIVISOR 4
 
 class ADBMouseRptParser : public MouseRptParser
 {
 public:
     ADBMouseRptParser(ADBKbdRptParser& kbd_parser);
+    bool MouseReady();
     uint16_t GetAdbRegister0();
 
 protected:
     uint32_t EightBitToSevenBitSigned(int32_t value, int32_t compare);
+    uint32_t    m_mouse_delay_ms_x;
+    uint32_t    m_mouse_delay_ms_y;
+    bool        m_mouse_processing;
+    MOUSEINFO*  m_mouse_event;
+    uint8_t     m_divisor;
+    uint32_t    m_mouse_delay_x;
+    uint32_t    m_mouse_delay_y;
+    int8_t      m_x;
+    int8_t      m_y;
 
 };

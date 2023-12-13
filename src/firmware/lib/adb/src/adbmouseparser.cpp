@@ -25,12 +25,17 @@
 
 #include "adbmouseparser.h"
 #include <platform_logmsg.h>
+#include <adb_platform.h>
 
 extern bool global_debug;
 
 ADBMouseRptParser::ADBMouseRptParser(ADBKbdRptParser &kbd_parser)
 {
     m_keyboard = &kbd_parser;
+    m_mouse_delay_ms_x = 0;
+    m_mouse_delay_ms_y = 0;
+    m_mouse_processing = false;
+    m_divisor = DEFAULT_SENSITIVITY_DIVISOR;
 }
 
 uint32_t ADBMouseRptParser::EightBitToSevenBitSigned(int32_t value, int32_t compare)
@@ -55,96 +60,149 @@ uint32_t ADBMouseRptParser::EightBitToSevenBitSigned(int32_t value, int32_t comp
     return ((uint32_t)adjusted_value) & 0x7F;
 }
 
-uint16_t ADBMouseRptParser::GetAdbRegister0()
+bool ADBMouseRptParser::MouseReady()
 {
-    int32_t x = 0;
-    int32_t y = 0;
-    bool static button_change = false;
-    MOUSEINFO* original_mouse_event =  m_mouse_events.dequeue();
-    MOUSEINFO* peek;
-
-    uint16_t reg_value = 0;
-    // this should never occur because the code should always check the queue before
-    // executing this function
-    if (original_mouse_event == NULL)
+    
+    static bool button_change;
+    if (m_mouse_processing)
     {
-        Logmsg.println("Mouse event dequeue failed, queue empty. Releasing mouse buttons.");
-        return 0x88;
-    }
+        bool ready = false;
+        if (m_mouse_delay_x > 0) {
+            if (--m_mouse_delay_x == 0)
+            {
+                m_x = m_mouse_event->dX > 0 ? 1 : -1;
+                ready = true;
+            }
+            else m_x = 0;            
+        }
 
-    x = original_mouse_event->dX;
-    y = original_mouse_event->dY;
 
-    // Never skip USB mouse input if there is a button change
-    if (!button_change)
-    {
+        if (m_mouse_delay_y > 0) {
+            if (--m_mouse_delay_y == 0)
+            {
+                m_y = m_mouse_event->dY > 0 ? 1 : -1;
+                ready = true;
+            }
+            else m_y = 0;
+        }
+        
         while(!m_mouse_events.isEmpty())
         {
-            peek = m_mouse_events.peek();
+            delete m_mouse_events.dequeue();
+        }
+        return ready;
+    }   
+    else if (!m_mouse_events.isEmpty())
+    {
+        m_x = 0;
+        m_y = 0;
+        m_mouse_delay_x = 0;
+        m_mouse_delay_y = 0;
+        m_mouse_event = m_mouse_events.dequeue();
+        uint32_t original_timestamp = m_mouse_event->timestamp;
+        while(!m_mouse_events.isEmpty())
+        {
+            MOUSEINFO* peek = m_mouse_events.peek();
             // If there is no button change, skip all previous mouse movement
             // except for the last one which will be used for the preadjusted
             // ADB mouse movement
-            if (original_mouse_event->bmLeftButton == peek->bmLeftButton &&
-                original_mouse_event->bmMiddleButton == peek->bmMiddleButton &&
-                original_mouse_event->bmRightButton == peek->bmRightButton
+            if (m_mouse_event->bmLeftButton == peek->bmLeftButton &&
+                m_mouse_event->bmMiddleButton == peek->bmMiddleButton &&
+                m_mouse_event->bmRightButton == peek->bmRightButton
             )
             {
-                MOUSEINFO *new_event = m_mouse_events.dequeue();
+                MOUSEINFO *old_event = m_mouse_event;
+                m_mouse_event = m_mouse_events.dequeue();
 
-
-                x = new_event->dX;
-                y = new_event->dY;
-
-                delete new_event;
+                delete old_event;
 
             }
             else
             {
-                button_change = true; 
                 break;
             }
-
         }
-    }
-    else
-    {
-        if (!m_mouse_events.isEmpty())
+        if (m_mouse_event->dX != 0 || m_mouse_event->dY != 0)
         {
-            peek = m_mouse_events.peek();
-            if  (peek->bmLeftButton != original_mouse_event->bmLeftButton ||
-                 peek->bmMiddleButton != original_mouse_event->bmMiddleButton ||
-                 peek->bmRightButton != original_mouse_event->bmRightButton
-                )
+            uint32_t delay;
+            uint32_t time_factor = ((uint32_t)(millis() - original_timestamp)+9) / 10; // 10 ms is the ADB 
+            if (m_mouse_event->dX / m_divisor == 0)
             {
-                button_change = true;
+                delay = m_divisor - abs(m_mouse_event->dX);
+                m_mouse_delay_x = delay; 
             }
-            else
+            else 
             {
-                button_change = false;
+                int32_t x;
+                x = (int32_t) (abs(m_mouse_event->dX) / m_divisor);
+                m_x = (int8_t) (m_mouse_event->dX > 0 ? x : -x);
+                m_mouse_delay_x = 0;
             }
-        }
-        else
-        {
-            button_change = false;
-        }
-    }
 
+            if (m_mouse_event->dY / m_divisor  == 0 )
+            {
+                delay = m_divisor - abs(m_mouse_event->dY);
+
+                m_mouse_delay_y = delay; 
+            }
+            else 
+            {
+                int32_t y;
+                y = (int32_t) (abs(m_mouse_event->dY) / m_divisor);
+                m_y = (int8_t) (m_mouse_event->dY > 0 ? y : -y);
+
+                m_mouse_delay_y = 0;
+            }
+        }
+        if (m_mouse_event->dX == 0)
+        {
+            m_x = 0;
+        }
+        if (m_mouse_event->dY == 0)
+        {
+            m_y = 0;
+        }
+
+        if (m_mouse_delay_x != 0 || m_mouse_delay_y != 0)
+        {
+            m_mouse_processing = true;
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+uint16_t ADBMouseRptParser::GetAdbRegister0()
+{
+    uint16_t reg_value = 0;
+    // this should never occur because the code should always check the queue before
+    // executing this function
+    // Never skip USB mouse input if there is a button change
+ 
     // Bit 15 = Left Button Status; 0=down
-    if (!original_mouse_event->bmLeftButton)
+    if (!m_mouse_event->bmLeftButton)
     {
         reg_value |= (1 << 15);
     }
     // Bit 7 = Right Button Status - introduced in System 8
-    if (!original_mouse_event->bmRightButton)
+    if (!m_mouse_event->bmRightButton)
     {
         reg_value |= (1 << 7);
     }
     // Bits 14-8 = Y move Counts (Two's compliment. Negative = up, positive = down)
-    reg_value |= (EightBitToSevenBitSigned(y, x) << 8);
+    reg_value |= (m_y & 0x7F) << 8;
 
     // Bits 6-0 = X move counts (Two's compliment. Negative = left, positive = right)
-    reg_value |= (EightBitToSevenBitSigned(x, y) << 0);
+    reg_value |= (m_x & 0x7F) << 0;
 
-    delete original_mouse_event;
+    delete m_mouse_event;
+    m_mouse_event = nullptr;
+
+    if (m_mouse_delay_y == 0 && m_mouse_delay_x == 0)
+    {
+        m_mouse_processing = false;
+    }
+
     return reg_value;
 }

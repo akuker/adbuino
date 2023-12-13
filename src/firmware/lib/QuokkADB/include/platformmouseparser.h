@@ -53,6 +53,7 @@ struct MOUSEINFO {
         };
         int8_t dX;
         int8_t dY;
+        uint32_t timestamp;
 };
 
 class PlatformMouseParser {
