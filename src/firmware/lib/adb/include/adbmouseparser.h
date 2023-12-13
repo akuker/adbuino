@@ -23,7 +23,7 @@
 #pragma once
 #include "adbkbdparser.h"
 #include "usbmouseparser.h"
-#define DEFAULT_SENSITIVITY_DIVISOR 4
+#define DEFAULT_SENSITIVITY_DIVISOR 16
 
 class ADBMouseRptParser : public MouseRptParser
 {
@@ -33,15 +33,13 @@ public:
     uint16_t GetAdbRegister0();
 
 protected:
-    uint32_t EightBitToSevenBitSigned(int32_t value, int32_t compare);
-    uint32_t    m_mouse_delay_ms_x;
-    uint32_t    m_mouse_delay_ms_y;
-    bool        m_mouse_processing;
+    bool Accumulate(int8_t usb_move, int32_t &adb_move, int32_t &accumulator);
+    int8_t AdjustMovement(int32_t &adb_move, int32_t &accumulator);
+    int32_t     m_acc_x;
+    int32_t     m_acc_y;
     MOUSEINFO*  m_mouse_event;
     uint8_t     m_divisor;
-    uint32_t    m_mouse_delay_x;
-    uint32_t    m_mouse_delay_y;
-    int8_t      m_x;
-    int8_t      m_y;
+    int32_t      m_x;
+    int32_t      m_y;
 
 };
