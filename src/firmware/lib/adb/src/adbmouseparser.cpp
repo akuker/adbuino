@@ -84,9 +84,9 @@ bool ADBMouseRptParser::MouseReady()
     if (!m_mouse_events.isEmpty())
     {
         m_mouse_event = m_mouse_events.dequeue();
-        bool ready_x = Accumulate(m_mouse_event->dX, m_x, m_acc_x);
-        bool ready_y = Accumulate(m_mouse_event->dY, m_y, m_acc_y);
-        if (ready_x || ready_y) ready = true;
+        Accumulate(m_mouse_event->dX, m_x, m_acc_x);
+        Accumulate(m_mouse_event->dY, m_y, m_acc_y);
+        ready = true;
     }
     return ready;
 }
