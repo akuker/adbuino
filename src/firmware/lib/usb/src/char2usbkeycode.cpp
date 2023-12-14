@@ -92,6 +92,57 @@ usbkey_t char_to_usb_keycode(char character)
         return key;
     }
 
+    if (character == '[')
+    {
+        key.keycode = USB_KEY_LEFTBRACE;
+        key.shift_down = false;
+        return key;
+    }
+
+    if (character == ']')
+    {
+        key.keycode = USB_KEY_RIGHTBRACE;
+        key.shift_down = false;
+        return key;
+    }
+
+    if (character == '=')
+    {
+        key.keycode = USB_KEY_EQUAL;
+        key.shift_down = false;
+        return key;
+    }
+
+    if (character == '+')
+    {
+        key.keycode = USB_KEY_EQUAL;
+        key.shift_down = true;
+        return key;
+    }
+
+    if (character == '(')
+    {
+        key.keycode = USB_KEY_9;
+        key.shift_down = true;
+        return key;
+    }
+
+    if (character == ')')
+    {
+        key.keycode = USB_KEY_0;
+        key.shift_down = true;
+        return key;
+    }
+
+    if (character == '/')
+    {
+        key.keycode = USB_KEY_SLASH;
+        key.shift_down = false;
+        return key;
+    }
+
+
+
     key.keycode = 0;
     key.shift_down = false;
     return key;

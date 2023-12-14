@@ -35,6 +35,7 @@
 #include <Arduino.h>
 
 #include "pico/stdlib.h"
+#include <pico/multicore.h>
 #include "tusb.h"
 #include "host/usbh.h"
 #include "platform_logmsg.h"
@@ -59,7 +60,11 @@ extern uint8_t mousesrq;
 extern uint32_t kbskiptimer;
 extern uint16_t modifierkeys;
 extern bool adb_reset;
+extern bool mouse_flush;
+extern bool kbd_flush;
 bool usb_reset = false;
+bool usb_mouse_reset = false;
+bool usb_kbd_reset = false;
 bool global_debug = false;
 
 AdbInterface adb;
@@ -105,9 +110,8 @@ void loop()
   
   if (!mousepending)
   {
-    if (MousePrs.MouseChanged())
+    if (MousePrs.MouseReady())
     {
-      mousereg0 = MousePrs.GetAdbRegister0();
       mousepending = 1;
     }
   }
@@ -127,6 +131,18 @@ void loop()
     usb_reset = true;
     Logmsg.println("ALL: Resetting devices");
   } 
+
+  if (mouse_flush)
+  {
+    usb_mouse_reset = true;
+    mouse_flush = false;
+  }
+
+  if (kbd_flush)
+  {
+    usb_kbd_reset = true;
+    kbd_flush = false;
+  }
 }
 
 
@@ -145,11 +161,22 @@ void loop1()
   blink_led.poll();
   
   KeyboardPrs.ChangeUSBKeyboardLEDs();
-  
-  if (true == usb_reset)
+
+  if (adb_reset)
+  {
+    MousePrs.Reset();
+  }
+
+  if (usb_mouse_reset)
+  {
+    MousePrs.Reset();
+    usb_mouse_reset = false;
+  }
+
+  if (usb_kbd_reset)
   {
     KeyboardPrs.Reset();
-    MousePrs.Reset();
-    usb_reset = false;
+    usb_kbd_reset = false;
   }
+
 }

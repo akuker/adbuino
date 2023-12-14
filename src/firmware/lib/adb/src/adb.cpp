@@ -33,6 +33,7 @@
 #include "bithacks.h"
 #include "math.h"
 #include <platform_logmsg.h>
+#include <adbmouseparser.h>
 
 uint8_t mouse_addr = MOUSE_DEFAULT_ADDR;
 uint8_t kbd_addr = KBD_DEFAULT_ADDR;
@@ -50,12 +51,17 @@ uint8_t mousesrq = 0;
 uint16_t modifierkeys = 0xFFFF;
 uint64_t kbskiptimer = 0;
 bool adb_reset = false;
+bool mouse_flush = false;
+bool kbd_flush = false;
+bool mouse_reset_to_flush = false;
+bool kbd_reset_to_flush = false;
 volatile bool adb_collision = false; 
 volatile bool collision_detection = false;
 bool mouse_skip_next_listen_reg3 = false;
 bool kbd_skip_next_listen_reg3 = false;
 
 extern bool global_debug;
+extern ADBMouseRptParser MousePrs;
 // The original data_lo code would just set the bit as an output
 // That works for a host, since the host is doing the pullup on the ADB line,
 // but for a device, it won't reliably pull the line low.  We need to actually
@@ -244,7 +250,13 @@ void AdbInterface::ProcessCommand(int16_t cmd)
     switch (cmd & 0x0F)
     {
     case 0x1:
-      Logmsg.println("MOUSE: Got FLUSH request");
+        mousesrq = false;
+        mouse_flush = true;
+        mouse_reset_to_flush = true;
+        if (global_debug)
+        {
+          Logmsg.print("MOUSE: Got FLUSH request");
+        }
       break;
     case 0x8:
       Logmsg.println("MOUSE: Got LISTEN request for register 0");
@@ -348,7 +360,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       if (mousepending)
       {
         DetectCollision();
-        if (Send16bitRegister(mousereg0))
+        if (Send16bitRegister(MousePrs.GetAdbRegister0()))
         {
           ResetCollision();
           mousepending = 0;
@@ -378,6 +390,10 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       {
         Logmsg.println("MOUSE: Got TALK request for register 3");
       }
+      // only talk reg 3 if the device has been reset then flushed
+      if (!mouse_reset_to_flush)
+        break;
+
       // sets device address
       mousereg3 = GetAdbRegister3Mouse();
       DetectCollision();
@@ -418,6 +434,9 @@ void AdbInterface::ProcessCommand(int16_t cmd)
     switch (cmd & 0x0F)
     {
     case 0x1:
+      kbdsrq = false;
+      kbd_flush = true;
+      kbd_reset_to_flush = true;
       if (global_debug)
       {
         Logmsg.println("KBD: Got FLUSH request");
@@ -592,6 +611,10 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       { 
         Logmsg.println("KBD: Got TALK request for register 3");
       }
+
+      // only talk after a reset and a flush
+      if (!kbd_reset_to_flush)
+        break;
       // sets device address
       kbdreg3 = GetAdbRegister3Keyboard();
       DetectCollision();
@@ -677,6 +700,10 @@ uint16_t AdbInterface::GetAdbRegister3Mouse()
 
 void AdbInterface::Reset(void)
 {
+  mousesrq = false;
+  kbdsrq = false;
+  mouse_reset_to_flush = false;
+  kbd_reset_to_flush = false;
   mouse_addr = MOUSE_DEFAULT_ADDR;
   kbd_addr = KBD_DEFAULT_ADDR;
   mouse_handler_id = MOUSE_DEFAULT_HANDLER_ID;

@@ -27,9 +27,22 @@ The stack port carries all four ADB signals.
 
 ## Special Key-combos
 The special keyboad commands start with `CTRL + SHIFT + CAPS LOCK` and a letter key.  Example: `CTRL + SHIFT + CAPS LOCK + V` ghost types the firmware version.
+ - `P` - Ghost types the current settings and a list of the special keys
  - `V` - Ghost types firmware version
- - `L` - Ghost types the busy LED status (ON/OFF) and saves the new status to flash and will be used when the board powers on again. This controls
- whether the LED blinks when accessing the ADB bus or remains off for light sensitive situations.
+ - `L` - Led status toggle on/off . This controls whether the LED blinks when accessing the ADB bus or remains off for light sensitive situations.
+ - `+` - Increases the sensitivity of the mouse - blinks the new divisor setting 
+ - `-` - Decreases the sensitivity of the mouse - blinks the new divisor setting
+ - `S` - Saves the current settings to flash so they stick on future power ups
+ - `R` - Restore factory settings and clear the settings in flash
+
+## Mouse Sensitivity
+The mouse sensitivity is controlled by dividing the USB mouse's reported movement by the `sensitivity divisor`. This currently has a range of 1-16. The smaller this number the 
+more sensitive the mouse feels over the ADB port (the further the cursor will move across the screen).
+
+Using the special key-combos +/- changes this number. Hitting
+the `+` key-combo increases the sensitivity of the mouse, thus decreasing the divisor. The divisor value is printed out when 
+the special key-combo `P` is pressed. And the save action stores this value in flash so you don't have to change it between
+power ups.
 
 ## Flashing firmware updates 
 The firmware version can be found by opening up an empty text document or program that allows typing. 
@@ -75,6 +88,9 @@ disconnected).
  - On keyboard mount (connected to usb) - two blinks
  - On mouse mount (connected to usb)- three blinks
  - On device unmount (disconnected to usb) - one blink
+ - Saving to settings to flash - four blinks
+ - Clearing flash and loading defaults - five blinks
+ - On sensitivity change - blinks the current sensitivity divisor (1-16)
  - Normal operation - very dim light when idle, blinks when there is activity on the ADB bus for the device.
 
 ### Normal LED sequence:

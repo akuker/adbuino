@@ -25,7 +25,8 @@
 
 #include "adbmouseparser.h"
 #include <platform_logmsg.h>
-
+#include <adb_platform.h>
+#include <limits.h>
 extern bool global_debug;
 
 ADBMouseRptParser::ADBMouseRptParser(ADBKbdRptParser &kbd_parser)
@@ -33,72 +34,49 @@ ADBMouseRptParser::ADBMouseRptParser(ADBKbdRptParser &kbd_parser)
     m_keyboard = &kbd_parser;
 }
 
-uint32_t ADBMouseRptParser::EightBitToSevenBitSigned(int8_t value)
+bool ADBMouseRptParser::MouseReady()
 {
-    // Dividing the value by 2 has 2 benefits:
-    //   - Easy way to convert from 8 bit to 7 bit number
-    //   - It "softens" the mouse movement. Modern optical
-    //     mice seem a little jumpy.
-    int32_t adjusted_value = value >> 1;
-    if (adjusted_value == 0 && value != 0)
-    {
-        adjusted_value = (value > 0) ? 1 : -1;
-    }
-  
-
-    return ((uint32_t)adjusted_value) & 0x7F;
+    return MouseChanged();
 }
 
 uint16_t ADBMouseRptParser::GetAdbRegister0()
 {
-    MOUSEINFO* original_mouse_event =  m_mouse_events.dequeue();
-    while(!m_mouse_events.isEmpty())
+    static bool button_left_last;
+    static bool button_right_last;
+    bool button_left = button_left_last;
+    bool button_right = button_right_last;
+    uint16_t reg_value = 0;;
+    MOUSE_CLICK* click = nullptr;
+
+    if (!m_click_events.isEmpty())
     {
-        MOUSEINFO* peek = m_mouse_events.peek();
-        if (original_mouse_event->bmLeftButton == peek->bmLeftButton &&
-            original_mouse_event->bmMiddleButton == peek->bmMiddleButton &&
-            original_mouse_event->bmRightButton == peek->bmRightButton
-        )
-        {
-            MOUSEINFO *new_event = m_mouse_events.dequeue();
-
-
-            original_mouse_event->dX = new_event->dX;
-            original_mouse_event->dY = new_event->dY;
-
-            delete new_event;
-
-        }
-        else 
-            break;
-
-    }
-    
-
-    uint16_t reg_value = 0;
-    if (original_mouse_event == NULL)
-    {
-        Logmsg.println("Mouse event dequeue failed, queue empty. Releasing mouse buttons.");
-        return 0x88;
+        click = m_click_events.dequeue();
+        button_left = click->bmLeftButton;
+        button_right = click->bmRightButton;
     }
 
     // Bit 15 = Left Button Status; 0=down
-    if (!original_mouse_event->bmLeftButton)
+    if (!button_left)
     {
         reg_value |= (1 << 15);
     }
     // Bit 7 = Right Button Status - introduced in System 8
-    if (!original_mouse_event->bmRightButton)
+    if (!button_right)
     {
         reg_value |= (1 << 7);
     }
-
     // Bits 14-8 = Y move Counts (Two's compliment. Negative = up, positive = down)
-    reg_value |= (EightBitToSevenBitSigned(original_mouse_event->dY) << 8);
+    reg_value |= AdjustMovement(m_coarse_y, m_fine_y) << 8;
 
     // Bits 6-0 = X move counts (Two's compliment. Negative = left, positive = right)
-    reg_value |= (EightBitToSevenBitSigned(original_mouse_event->dX) << 0);
+    reg_value |= AdjustMovement(m_coarse_x, m_fine_x) << 0;
 
-    delete original_mouse_event;
+    if (click != nullptr)
+    {
+        button_left_last = click->bmLeftButton;
+        button_right_last = click->bmRightButton;
+        delete click;
+    }
+    m_processed = true;
     return reg_value;
 }

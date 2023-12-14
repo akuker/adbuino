@@ -23,11 +23,15 @@
 //
 //---------------------------------------------------------------------------
 #include "flashsettings.h"
-#include "pico/multicore.h"
+#include "RP2040Support.h"
 #include "string.h"
+#include "platform_config.h"
+
 #define STORAGE_CMD_TOTAL_BYTES 64
 
-void FlashSettings::init(void)
+extern RP2040 rp2040;
+
+void FlashSettings::init()
 {
     // Get Flash info
     uint8_t txbuf[STORAGE_CMD_TOTAL_BYTES] = {0x9f};
@@ -49,21 +53,34 @@ void FlashSettings::init(void)
     {
         // set default values
         _settings.magic_number = QUOKKADB_SETTINGS_MAGIC_NUMBER;
-        _settings.led_on = 1;
+        reset();
     }
+}
 
+void FlashSettings::clear()
+{
+    uint8_t buf[FLASH_PAGE_SIZE];
+    memset(buf, 0, FLASH_PAGE_SIZE);
+    write_settings_page(buf);
+    reset();
+}
+
+void FlashSettings::reset()
+{
+    _settings.led_on = 1;
+    _settings.sensitivity_divisor = DEFAULT_MOUSE_SENSITIVITY_DIVISOR;
 }
 
 void FlashSettings::write_settings_page(uint8_t *buf)
 {
-    multicore_lockout_start_blocking();
+    rp2040.idleOtherCore();
     uint32_t saved_isr_state = save_and_disable_interrupts();
 
     flash_range_erase(_last_sector, FLASH_SECTOR_SIZE);
     flash_range_program(_last_sector, buf, FLASH_PAGE_SIZE);
 
     restore_interrupts(saved_isr_state);
-    multicore_lockout_end_blocking();
+    rp2040.resumeOtherCore();
 }
 
 uint8_t* FlashSettings::read_settings_page(void)
