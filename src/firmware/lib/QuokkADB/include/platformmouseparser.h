@@ -37,7 +37,14 @@
 #include <scqueue.h>
 using simple_circular_queue::SCQueue;
 
-#define MOUSE_QUEUE_CAPACITY (20)
+// USB response 1ms, worst ADB response < 160ms, fastest human clicks per second < 30 or 1 per 33ms
+// Queue length if using a machine USB clicker 160
+// Queue length for humans ~ 5
+// Using 10
+#define MOUSE_CLICK_QUEUE_CAPACITY (10)
+#ifndef DEFAULT_MOUSE_SENSITIVITY_DIVISOR
+#define DEFAULT_MOUSE_SENSITIVITY_DIVISOR 4
+#endif
 
 //----------------------------------------------------------------------------
 // Mouse handler
@@ -53,7 +60,16 @@ struct MOUSEINFO {
         };
         int8_t dX;
         int8_t dY;
-        uint32_t timestamp;
+};
+
+struct MOUSE_CLICK
+{
+        struct {
+                uint8_t bmLeftButton : 1;
+                uint8_t bmRightButton : 1;
+                uint8_t bmMiddleButton : 1;
+                uint8_t bmDummy : 5;
+        };
 };
 
 class PlatformMouseParser {
@@ -89,7 +105,15 @@ protected:
         };
 
 
-        SCQueue<MOUSEINFO*, MOUSE_QUEUE_CAPACITY> m_mouse_events;
+        SCQueue<MOUSE_CLICK*, MOUSE_CLICK_QUEUE_CAPACITY> m_click_events;
 
         PlatformKbdParser* m_keyboard;
+
+        bool m_processed = false;
+        bool m_ready = false;
+        int32_t m_coarse_x = 0;
+        int32_t m_coarse_y = 0;
+        int32_t m_fine_x = 0;
+        int32_t m_fine_y = 0;
+        uint8_t m_sensitivity_divisor = DEFAULT_MOUSE_SENSITIVITY_DIVISOR;
 };

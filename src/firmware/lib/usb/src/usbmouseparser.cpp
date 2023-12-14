@@ -32,7 +32,9 @@ extern bool global_debug;
 
 bool MouseRptParser::MouseChanged()
 {
-    return !m_mouse_events.isEmpty();
+    bool changed = m_ready || !m_click_events.isEmpty();
+    m_ready = false;
+    return changed;
 }
 
 void MouseRptParser::OnMouseMove(MOUSEINFO *mi)
@@ -139,8 +141,8 @@ void MouseRptParser::OnMiddleButtonDown(MOUSEINFO *mi)
 
 void MouseRptParser::Reset(void)
 {
-    while(!m_mouse_events.isEmpty())
+    while(!m_click_events.isEmpty())
     {
-        delete m_mouse_events.dequeue();
+        delete m_click_events.dequeue();
     }
 }

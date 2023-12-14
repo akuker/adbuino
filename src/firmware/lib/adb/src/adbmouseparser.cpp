@@ -32,112 +32,67 @@ extern bool global_debug;
 ADBMouseRptParser::ADBMouseRptParser(ADBKbdRptParser &kbd_parser)
 {
     m_keyboard = &kbd_parser;
-    m_divisor = DEFAULT_SENSITIVITY_DIVISOR;
-    m_acc_x = 0;
-    m_acc_y = 0;
-    m_x = 0;
-    m_y = 0;
-    m_mouse_event = nullptr;
 }
 
-bool ADBMouseRptParser::Accumulate(int8_t usb_move, int32_t &adb_move, int32_t &accumulator)
-{
-    bool ready = false;
-
-    if (usb_move / m_divisor == 0)
-    {
-        // The accumulator keeps track of fine movement
-        accumulator += usb_move;
-        if (accumulator >= m_divisor || accumulator <= -m_divisor)
-        {
-            ready = true;
-        }
-    }
-    else
-    {
-        // standard movement when the adjusted movement is non-zero
-        adb_move += usb_move;
-        ready = true;
-    }
-    return ready;
-}
-
-int8_t ADBMouseRptParser::AdjustMovement(int32_t &adb_move, int32_t &accumulator)
+int8_t ADBMouseRptParser::AdjustMovement(int32_t coarse, int32_t fine)
 {
     // adb_move is currently the sum of all usb movement
     // this is where the sensitivity is adjusted
-    adb_move /= m_divisor;
+    int32_t adjusted = coarse / m_sensitivity_divisor;
 
     // Adjust adb movement with accumulated fine movements
-    int8_t increment = accumulator / m_divisor;
-    adb_move += increment;
+    int8_t increment = fine / m_sensitivity_divisor;
+    adjusted += increment;
 
     // Limits of a 7 bit number
-    if (adb_move > 63) adb_move = 63;
-    if (adb_move < -64) adb_move = -64;
+    if (adjusted > 63) adjusted = 63;
+    if (adjusted < -64) adjusted = -64;
 
-    return (int8_t) adb_move & 0x7F;
+    return (int8_t) adjusted & 0x7F;
 }
 bool ADBMouseRptParser::MouseReady()
 {
-    bool ready = false;
-    if (!m_mouse_events.isEmpty())
-    {
-        m_mouse_event = m_mouse_events.dequeue();
-        Accumulate(m_mouse_event->dX, m_x, m_acc_x);
-        Accumulate(m_mouse_event->dY, m_y, m_acc_y);
-        ready = true;
-    }
-    return ready;
+    return MouseChanged();
 }
 
 uint16_t ADBMouseRptParser::GetAdbRegister0()
 {
-    uint16_t reg_value = 0;
-    MOUSEINFO* peek;
-    MOUSEINFO* new_event;
+    static bool button_left_last;
+    static bool button_right_last;
+    bool button_left = button_left_last;
+    bool button_right = button_right_last;
+    uint16_t reg_value = 0;;
+    MOUSE_CLICK* click = nullptr;
 
-    // As long as the there is no button changes sum all USB movements
-    while (!m_mouse_events.isEmpty())
+    if (!m_click_events.isEmpty())
     {
-        peek = m_mouse_events.peek();
-        if (peek->bmLeftButton != m_mouse_event->bmLeftButton ||
-            peek->bmMiddleButton != m_mouse_event->bmMiddleButton ||
-            peek->bmRightButton != m_mouse_event->bmRightButton)
-        {
-            break;
-        }
-        new_event = m_mouse_events.dequeue();
-        Accumulate(new_event->dX, m_x, m_acc_x);
-        Accumulate(new_event->dY, m_y, m_acc_y);
-
-        delete new_event;
+        click = m_click_events.dequeue();
+        button_left = click->bmLeftButton;
+        button_right = click->bmRightButton;
     }
 
     // Bit 15 = Left Button Status; 0=down
-    if (!m_mouse_event->bmLeftButton)
+    if (!button_left)
     {
         reg_value |= (1 << 15);
     }
     // Bit 7 = Right Button Status - introduced in System 8
-    if (!m_mouse_event->bmRightButton)
+    if (!button_right)
     {
         reg_value |= (1 << 7);
     }
     // Bits 14-8 = Y move Counts (Two's compliment. Negative = up, positive = down)
-    reg_value |= AdjustMovement(m_y, m_acc_y) << 8;
+    reg_value |= AdjustMovement(m_coarse_y, m_fine_y) << 8;
 
     // Bits 6-0 = X move counts (Two's compliment. Negative = left, positive = right)
-    reg_value |= AdjustMovement(m_x, m_acc_x) << 0;
+    reg_value |= AdjustMovement(m_coarse_x, m_fine_x) << 0;
 
-    delete m_mouse_event;
-    m_x = 0;
-    m_y = 0;
-    // Keep left over accumulator movement
-    m_acc_x = m_acc_x % m_divisor;
-    m_acc_y = m_acc_y % m_divisor;
-
-    m_mouse_event = nullptr;
-
+    if (click != nullptr)
+    {
+        button_left_last = click->bmLeftButton;
+        button_right_last = click->bmRightButton;
+        delete click;
+    }
+    m_processed = true;
     return reg_value;
 }
