@@ -23,7 +23,6 @@
 #pragma once
 #include "adbkbdparser.h"
 #include "usbmouseparser.h"
-#define DEFAULT_SENSITIVITY_DIVISOR 4
 
 class ADBMouseRptParser : public MouseRptParser
 {
@@ -34,6 +33,5 @@ public:
 
 protected:
     bool Accumulate(int8_t usb_move, int32_t &adb_move, int32_t &accumulator);
-    int8_t AdjustMovement(int32_t coarse, int32_t fine);
 
 };

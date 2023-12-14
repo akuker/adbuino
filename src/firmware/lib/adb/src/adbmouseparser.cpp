@@ -34,22 +34,6 @@ ADBMouseRptParser::ADBMouseRptParser(ADBKbdRptParser &kbd_parser)
     m_keyboard = &kbd_parser;
 }
 
-int8_t ADBMouseRptParser::AdjustMovement(int32_t coarse, int32_t fine)
-{
-    // adb_move is currently the sum of all usb movement
-    // this is where the sensitivity is adjusted
-    int32_t adjusted = coarse / m_sensitivity_divisor;
-
-    // Adjust adb movement with accumulated fine movements
-    int8_t increment = fine / m_sensitivity_divisor;
-    adjusted += increment;
-
-    // Limits of a 7 bit number
-    if (adjusted > 63) adjusted = 63;
-    if (adjusted < -64) adjusted = -64;
-
-    return (int8_t) adjusted & 0x7F;
-}
 bool ADBMouseRptParser::MouseReady()
 {
     return MouseChanged();

@@ -35,6 +35,7 @@
 #include <Arduino.h>
 
 #include "pico/stdlib.h"
+#include <pico/multicore.h>
 #include "tusb.h"
 #include "host/usbh.h"
 #include "platform_logmsg.h"

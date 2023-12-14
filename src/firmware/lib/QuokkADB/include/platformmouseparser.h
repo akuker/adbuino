@@ -42,9 +42,6 @@ using simple_circular_queue::SCQueue;
 // Queue length for humans ~ 5
 // Using 10
 #define MOUSE_CLICK_QUEUE_CAPACITY (10)
-#ifndef DEFAULT_MOUSE_SENSITIVITY_DIVISOR
-#define DEFAULT_MOUSE_SENSITIVITY_DIVISOR 4
-#endif
 
 //----------------------------------------------------------------------------
 // Mouse handler
@@ -80,6 +77,7 @@ class PlatformMouseParser {
         } prevState;
 
 public:
+
         void Parse(const hid_mouse_report_t* report);
 protected:
 
@@ -104,6 +102,7 @@ protected:
         virtual void OnMiddleButtonDown(MOUSEINFO *mi __attribute__((unused))) {
         };
 
+        int8_t AdjustMovement(int32_t coarse, int32_t fine);
 
         SCQueue<MOUSE_CLICK*, MOUSE_CLICK_QUEUE_CAPACITY> m_click_events;
 
@@ -115,5 +114,4 @@ protected:
         int32_t m_coarse_y = 0;
         int32_t m_fine_x = 0;
         int32_t m_fine_y = 0;
-        uint8_t m_sensitivity_divisor = DEFAULT_MOUSE_SENSITIVITY_DIVISOR;
 };

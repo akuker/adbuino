@@ -29,19 +29,39 @@
 #include <platform_logmsg.h>
 #include <adb_platform.h>
 #include "tusb.h"
-#include "pico/mutex.h"
+#include <pico/mutex.h>
+#include "flashsettings.h"
 
+extern FlashSettings setting_storage;
+
+int8_t PlatformMouseParser::AdjustMovement(int32_t coarse, int32_t fine)
+{
+    uint8_t sensitivity_divisor = setting_storage.settings()->sensitivity_divisor;
+    // adb_move is currently the sum of all usb movement
+    // this is where the sensitivity is adjusted
+    int32_t adjusted = coarse / sensitivity_divisor;
+
+    // Adjust adb movement with accumulated fine movements
+    int8_t increment = fine / sensitivity_divisor;
+    adjusted += increment;
+
+    // Limits of a 7 bit number
+    if (adjusted > 63) adjusted = 63;
+    if (adjusted < -64) adjusted = -64;
+
+    return (int8_t) adjusted & 0x7F;
+}
 
 void PlatformMouseParser::Parse(const hid_mouse_report_t *report){
-    
+    uint8_t sensitivity_divisor = setting_storage.settings()->sensitivity_divisor;
     MOUSEINFO mouse_info = {0};
 
     if (m_processed)
     {
         m_coarse_x = 0;
         m_coarse_y = 0;
-        m_fine_x %= m_sensitivity_divisor;
-        m_fine_y %= m_sensitivity_divisor;
+        m_fine_x %= sensitivity_divisor;
+        m_fine_y %= sensitivity_divisor;
         m_processed = false;
     }
 
@@ -54,8 +74,8 @@ void PlatformMouseParser::Parse(const hid_mouse_report_t *report){
     m_coarse_x += mouse_info.dX;
     m_coarse_y += mouse_info.dY;
 
-    if (mouse_info.dX / m_sensitivity_divisor == 0) m_fine_x += mouse_info.dX;
-    if (mouse_info.dY / m_sensitivity_divisor == 0) m_fine_y += mouse_info.dY;
+    if (mouse_info.dX / sensitivity_divisor == 0) m_fine_x += mouse_info.dX;
+    if (mouse_info.dY / sensitivity_divisor == 0) m_fine_y += mouse_info.dY;
 
     MOUSE_CLICK* click = new MOUSE_CLICK;
     click->bmLeftButton = mouse_info.bmLeftButton;
