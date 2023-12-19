@@ -31,7 +31,7 @@ extern volatile bool adb_collision;
 extern volatile bool collision_detection;
 extern ADBKbdRptParser KeyboardPrs;
 
-bool AdbInterfacePlatform::adb_delay_us(uint32_t delay) 
+bool AdbInterfacePlatform::adb_delay_with_detect_us(uint32_t delay) 
 {
   uint64_t start = time_us_64();
   uint64_t time;
@@ -47,6 +47,18 @@ bool AdbInterfacePlatform::adb_delay_us(uint32_t delay)
   
   return collision_free;
 }
+
+bool AdbInterfacePlatform::adb_delay_us(uint32_t delay) 
+{
+  uint64_t start = time_us_64();
+  uint64_t time;
+  do
+  {
+    time = time_us_64();
+  } while (delay >= time - start);
+  return true;
+}
+
 
 static void adb_in_irq_callback(uint gpio, uint32_t event_mask) {
     // a possible collision occurs when ABD is meant to be high

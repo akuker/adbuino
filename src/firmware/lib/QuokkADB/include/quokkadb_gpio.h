@@ -46,7 +46,10 @@
 #define ADB_OUT_LOW()  sio_hw->gpio_clr = 1 << ADB_OUT_GPIO
 #define ADB_IN_GET() (gpio_get(ADB_IN_GPIO))
 
+// GPIO for triggering test equipment
 #define GPIO_TEST 20
+#define GPIO_TRIGGER_RAISE() sio_hw->gpio_set = 1 << GPIO_TEST
+#define GPIO_TRIGGER_LOWER() sio_hw->gpio_clr = 1 << GPIO_TEST
 
 // UART out messaging
 #define UART_TX_GPIO    16

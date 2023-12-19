@@ -29,7 +29,6 @@
 #include "hardware/gpio.h"
 #include <pico/stdio_uart.h>
 
-extern bool global_debug;
 void adb_gpio_init(void) {
     gpio_init(ADB_OUT_GPIO);
     gpio_set_function(ADB_OUT_GPIO, GPIO_FUNC_SIO);
@@ -38,6 +37,10 @@ void adb_gpio_init(void) {
 
     gpio_init(ADB_IN_GPIO);
     gpio_set_dir(ADB_IN_GPIO, GPIO_IN);
+
+    gpio_init(GPIO_TEST);
+    gpio_set_dir(GPIO_TEST, GPIO_OUT);
+    gpio_put(GPIO_TEST, true);
 
 
 }

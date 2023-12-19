@@ -37,3 +37,8 @@
 
 #define SAVE_TO_FLASH_BLINK_COUNT 4
 #define CLEAR_FLASH_BLINK_COUNT 5
+
+// Must be a power of 2
+#ifndef LOGBUFSIZE
+#define LOGBUFSIZE 65536
+#endif

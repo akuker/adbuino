@@ -28,8 +28,8 @@
 #include <stdint.h>
 #include <adb_platform.h>
 
-#ifndef ADB_START_BIT_DELAY
-#define ADB_START_BIT_DELAY 100000
+#ifndef ADB_ATTENTION_WAIT
+#define ADB_ATTENTION_WAIT 100000
 #endif
 
 #define KBD_DEFAULT_ADDR 0x02
@@ -52,36 +52,67 @@ class AdbInterface : public AdbInterfacePlatform {
     uint16_t GetAdbRegister3Keyboard();
     uint16_t GetAdbRegister3Mouse();
     bool Send16bitRegister(uint16_t reg16);
+    // Had collision detection
+    bool SendTalkRegister3(uint16_t reg16);
     // returns less than zero on a failed receive
     int32_t Receive16bitRegister(void);
     void DetectCollision(void);
     void ResetCollision(void);
 
   private:
+    bool place_stop_bit(void);
     bool place_bit0(void);
     bool place_bit1(void);
     bool send_byte(uint8_t data);
+    bool place_bit0_with_detect(void);
+    bool place_bit1_with_detect(void);
+    bool send_byte_with_detect(uint8_t data);
 };
 
 
 inline bool AdbInterface::Send16bitRegister(uint16_t reg16)
 {
+  // stop to start time / interframe delay - min time 140us, max time 260. 
+  // adding randomness as suggested by Apple Guide the Mac. family  Hardware 2nd edition
+  // pg 324.  Random time delay will give a max stop to start time of 240us
+  int32_t extra_delay = (rand() % 81);
+  adb_delay_us(160 + extra_delay);
+  adb_pin_out();
+  // start bit
+  place_bit1(); 
+  send_byte((reg16 >> 8) & 0x00FF);
+  send_byte(reg16 & 0x00FF);
+  // stop bit
+  
+  place_stop_bit();
+  adb_pin_in();
+  return true;
+}
+
+inline bool AdbInterface::SendTalkRegister3(uint16_t reg16)
+{
     // stop to start time / interframe delay - min time 140us, max time 260. 
     // adding randomness as suggested by Apple Guide the Mac. family  Hardware 2nd edition
     // pg 324.  Random time delay will give a max stop to start time of 240us
  
-   uint32_t extra_delay = (rand() % 81);
-   if (!adb_delay_us(160 + extra_delay)) return false;
-
+  uint32_t extra_delay = (rand() % 81);
+  DetectCollision();
+  if (!adb_delay_with_detect_us(160 + extra_delay)) goto collision;
   adb_pin_out();
   // start bit
-  if (!place_bit1()) return false; 
-  if (!send_byte((reg16 >> 8) & 0x00FF))  return false;
-  if (!send_byte(reg16 & 0x00FF))  return false;
+  if (!place_bit1_with_detect()) goto collision; 
+  if (!send_byte_with_detect((reg16 >> 8) & 0x00FF))  goto collision;
+  if (!send_byte_with_detect(reg16 & 0x00FF))  goto collision;
+  ResetCollision();
   // stop bit
-  if (!place_bit0()) return false;
+  place_stop_bit();
   adb_pin_in();
   return true;
+  
+  collision:
+    ResetCollision();
+    return false;
+
 }
 
 
@@ -137,8 +168,8 @@ inline int32_t AdbInterface::Receive16bitRegister(void)
   }
 
   // stop bit
-  low_time = wait_data_hi(130);
-  if (!low_time || low_time > 70)
+  low_time = wait_data_hi(80);
+  if (!low_time || low_time < 60)
   {  
     return -4;
   }
