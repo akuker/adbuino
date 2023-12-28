@@ -53,7 +53,7 @@ class AdbInterface : public AdbInterfacePlatform {
     uint16_t GetAdbRegister3Mouse();
     bool Send16bitRegister(uint16_t reg16);
     // Had collision detection
-    bool SendTalkRegister3(uint16_t reg16);
+    bool SendTalkRegister3(uint16_t reg16, uint32_t delay = 0);
     // returns less than zero on a failed receive
     int32_t Receive16bitRegister(void);
     void DetectCollision(void);
@@ -89,15 +89,16 @@ inline bool AdbInterface::Send16bitRegister(uint16_t reg16)
   return true;
 }
 
-inline bool AdbInterface::SendTalkRegister3(uint16_t reg16)
+inline bool AdbInterface::SendTalkRegister3(uint16_t reg16, uint32_t delay)
 {
     // stop to start time / interframe delay - min time 140us, max time 260. 
     // adding randomness as suggested by Apple Guide the Mac. family  Hardware 2nd edition
     // pg 324.  Random time delay will give a max stop to start time of 240us
  
-  uint32_t extra_delay = (rand() % 81);
+  if (delay == 0)
+    delay = 160 +  (rand() % 81);
   DetectCollision();
-  if (!adb_delay_with_detect_us(160 + extra_delay)) goto collision;
+  if (!adb_delay_with_detect_us(delay)) goto collision;
   adb_pin_out();
   // start bit
   if (!place_bit1_with_detect()) goto collision; 

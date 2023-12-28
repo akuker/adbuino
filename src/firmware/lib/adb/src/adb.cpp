@@ -53,8 +53,6 @@ uint64_t kbskiptimer = 0;
 bool adb_reset = false;
 bool mouse_flush = false;
 bool kbd_flush = false;
-bool mouse_reset_to_flush = false;
-bool kbd_reset_to_flush = false;
 volatile bool adb_collision = false; 
 volatile bool collision_detection = false;
 bool mouse_skip_next_listen_reg3 = false;
@@ -313,6 +311,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
   {  
     Logmsg.print("ALL: Address: "); Logmsg.print((cmd >> 4) & 0x0F, fmtHEX); Logmsg.print(" cmd: "); Logmsg.println(cmd, fmtHEX);
   }
+
   // see if it is addressed to us
   if (((cmd >> 4) & 0x0F) == mouse_addr)
   {
@@ -325,7 +324,6 @@ void AdbInterface::ProcessCommand(int16_t cmd)
     case 0x1:
         mousesrq = false;
         mouse_flush = true;
-        mouse_reset_to_flush = true;
         if (global_debug)
         {
           Logmsg.print("MOUSE: Got FLUSH request");
@@ -490,7 +488,6 @@ void AdbInterface::ProcessCommand(int16_t cmd)
     case 0x1:
       kbdsrq = false;
       kbd_flush = true;
-      kbd_reset_to_flush = true;
       if (global_debug)
       {
         Logmsg.println("KBD: Got FLUSH request");
@@ -641,7 +638,7 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       if (kbd_addr == 0x2)
       {
         kbdreg3 = GetAdbRegister3Keyboard();
-        if (!SendTalkRegister3(kbdreg3))
+        if (!SendTalkRegister3(kbdreg3, 260))
         {
           kbd_skip_next_listen_reg3 = true;
           if (global_debug)
@@ -721,8 +718,6 @@ void AdbInterface::Reset(void)
   kbdsrq = false;
   kbd_skip_next_listen_reg3 = false;
   mouse_skip_next_listen_reg3 = false;
-  mouse_reset_to_flush = false;
-  kbd_reset_to_flush = false;
   mouse_addr = MOUSE_DEFAULT_ADDR;
   kbd_addr = KBD_DEFAULT_ADDR;
   mouse_handler_id = MOUSE_DEFAULT_HANDLER_ID;
