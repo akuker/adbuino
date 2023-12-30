@@ -144,7 +144,8 @@ int16_t AdbInterface::ReceiveCommand(uint8_t srq)
   uint8_t bits; 
   uint16_t lo, hi;
   int16_t data = 0;
-  
+  uint8_t address;
+
   // find attention & start bit
   if (g_global_reset)
   {
@@ -156,10 +157,13 @@ int16_t AdbInterface::ReceiveCommand(uint8_t srq)
     hi = wait_data_lo(ADB_ATTENTION_WAIT); 
     if (!hi)
     {
-      Logmsg.println("ALL: Waiting for attention failed, already low");
+      if (global_debug)
+      {
+        Logmsg.println("ALL: Waiting for attention failed, already low");
+      }
     }
   }
-
+  GPIO_TRIGGER_LOWER();  
   do 
   {
 
@@ -202,7 +206,6 @@ int16_t AdbInterface::ReceiveCommand(uint8_t srq)
     }
   }
   while(true);
-  GPIO_TRIGGER_LOWER();
   hi = wait_data_lo(100);
   if (!hi && hi > 70 && hi < 40)
   {
@@ -238,6 +241,24 @@ int16_t AdbInterface::ReceiveCommand(uint8_t srq)
       data |= 1;
     }
   }
+  // Don't SRQ if we are at the correct address
+  address = ((data >> 4) & 0x0F);
+  if (mouse_addr == address && mousesrq == true)
+  {
+    if (kbdsrq == false)
+    {
+      srq = false;
+    }
+  }
+  
+  if (kbd_addr == address && kbdsrq == true)
+  {
+    if (mousesrq == false)
+    {
+      srq = false;
+    }
+  }
+
 
   if (srq)
   {
@@ -251,6 +272,7 @@ int16_t AdbInterface::ReceiveCommand(uint8_t srq)
     wait_data_hi(400);
   }
   return data;
+
 out:
   if (global_debug)
   {
@@ -330,13 +352,22 @@ void AdbInterface::ProcessCommand(int16_t cmd)
         }
       break;
     case 0x8:
-      Logmsg.println("MOUSE: Got LISTEN request for register 0");
+      if (global_debug)
+      {
+          Logmsg.println("MOUSE: Got LISTEN request for register 0");
+      }
       break;
     case 0x9:
-      Logmsg.println("MOUSE: Got LISTEN request for register 1");
+      if (global_debug)
+      {
+        Logmsg.println("MOUSE: Got LISTEN request for register 1");
+      }
       break;
     case 0xA:
-      Logmsg.println("MOUSE: Got LISTEN request for register 2");
+      if (global_debug)
+      {
+        Logmsg.println("MOUSE: Got LISTEN request for register 2");
+      }
       break;
     case 0xB:
       listen_register = Receive16bitRegister();
@@ -443,37 +474,44 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       }
       break;
     case 0xD: // talk register 1
-      Logmsg.println("MOUSE: Got TALK request for register 1");
+      if (global_debug)
+      {
+        Logmsg.println("MOUSE: Got TALK request for register 1");
+      }
       break;
     case 0xE: // talk register 2
-      Logmsg.println("MOUSE Got TALK request for register 2");
+      if (global_debug)
+      {
+        Logmsg.println("MOUSE Got TALK request for register 2");
+      }
       break;
     case 0xF: // talk register 3
-      // only respond to talk if the mouse address is on 0x3
-      if (mouse_addr == 0x3)
+      mousereg3 = GetAdbRegister3Mouse();
+      if(!SendTalkRegister3(mousereg3))
       {
-        mousereg3 = GetAdbRegister3Mouse();
-        if(!SendTalkRegister3(mousereg3))
+        mouse_skip_next_listen_reg3 = true;
+        if (global_debug)
         {
-          mouse_skip_next_listen_reg3 = true;
-          if (global_debug)
-          {
-            Logmsg.print("MOUSE: Collision TALK register 3 at 0x");
-            Logmsg.println(mouse_addr, fmtHEX);
-          }
+          Logmsg.print("MOUSE: Collision TALK register 3 at 0x");
+          Logmsg.println(mouse_addr, fmtHEX);
         }
       }
       break;
     default:
-      Logmsg.print("MOUSE: Unknown cmd: 0x");
-      Logmsg.println(cmd, fmtHEX);
+      if (global_debug)
+      {
+        Logmsg.print("MOUSE: Unknown cmd: 0x");
+        Logmsg.println(cmd, fmtHEX);
+      }
       break;
     }
   }
   else
   {
     if (mousepending)
+    {
       mousesrq = 1;
+    }
   }
 
   if (((cmd >> 4) & 0x0F) == kbd_addr)
@@ -494,11 +532,16 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       }
       break;
     case 0x8:
-      Logmsg.println("KBD: Got LISTEN request for register 0");
-      
+      if (global_debug)
+      {
+        Logmsg.println("KBD: Got LISTEN request for register 0");
+      }
       break;
     case 0x9:
-      Logmsg.println("KBD: Got LISTEN request for register 1");
+      if (global_debug)
+      {
+        Logmsg.println("KBD: Got LISTEN request for register 1");
+      }
       break;
     case 0xA:
       if (global_debug)
@@ -612,7 +655,10 @@ void AdbInterface::ProcessCommand(int16_t cmd)
         {
           // Check timestamp and don't process the key event if it came right after a 255
           // This is meant to avoid a glitch where releasing a key sends 255->keydown instead
-          Logmsg.println("Too little time since bugged keyup, skipping this keydown event");
+          if (global_debug)
+          {
+            Logmsg.println("Too little time since bugged keyup, skipping this keydown event");
+          }
           kbdpending = 0;
           break;
         }
@@ -624,7 +670,10 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       }
       break;
     case 0xD: // talk register 1
-      Logmsg.println("KBD: Got TALK request for register 1");
+      if (global_debug)
+      {
+        Logmsg.println("KBD: Got TALK request for register 1");
+      }
       break;
     case 0xE: // talk register 2
       if (global_debug) 
@@ -634,24 +683,23 @@ void AdbInterface::ProcessCommand(int16_t cmd)
       Send16bitRegister(kbdreg2);
       break;
     case 0xF: // talk register 3
-      // only respond to talk reg if keyboard is on address 0x2
-      if (kbd_addr == 0x2)
+      kbdreg3 = GetAdbRegister3Keyboard();
+      if (!SendTalkRegister3(kbdreg3))
       {
-        kbdreg3 = GetAdbRegister3Keyboard();
-        if (!SendTalkRegister3(kbdreg3, 260))
+        kbd_skip_next_listen_reg3 = true;
+        if (global_debug)
         {
-          kbd_skip_next_listen_reg3 = true;
-          if (global_debug)
-          {
-            Logmsg.print("KBD: Collision TALK register 3 at 0x");
-            Logmsg.println(kbd_addr, fmtHEX);           
-          }
+          Logmsg.print("KBD: Collision TALK register 3 at 0x");
+          Logmsg.println(kbd_addr, fmtHEX);           
         }
-      }
+      }   
       break;
     default:
-      Logmsg.print("KBD: Unknown cmd: 0x");
-      Logmsg.println(cmd, fmtHEX);           
+      if (global_debug)
+      {
+        Logmsg.print("KBD: Unknown cmd: 0x");
+        Logmsg.println(cmd, fmtHEX);           
+      }
       break;
     }
   }

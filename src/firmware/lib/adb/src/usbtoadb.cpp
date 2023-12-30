@@ -38,6 +38,8 @@
 #include <platform_logmsg.h>
 
 extern uint8_t kbd_handler_id;
+extern bool global_debug;
+
 #define IS_EXTENDED_KEYBOARD() (0x3 == kbd_handler_id)
 
 // Virtual Keycodes for the Mac QWERTY Layout
@@ -283,8 +285,11 @@ uint8_t usb_keycode_to_adb_code(uint8_t usb_code)
 
 
     default:
-        Logmsg.print("Unknown keycode found: ");
-        Logmsg.println(usb_code, fmtHEX);
+        if (global_debug)
+        {
+            Logmsg.print("Unknown keycode found: ");
+            Logmsg.println(usb_code, fmtHEX);
+        }
         return 0xFF;
 
         // 0x37        USB_KEY_Cmd (Apple)

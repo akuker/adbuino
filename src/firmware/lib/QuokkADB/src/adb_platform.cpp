@@ -63,10 +63,12 @@ bool AdbInterfacePlatform::adb_delay_us(uint32_t delay)
 static void adb_in_irq_callback(uint gpio, uint32_t event_mask) {
     // a possible collision occurs when ABD is meant to be high
     // but the the bus is set low by another device
-    volatile bool gpio_in_low = !gpio_get(ADB_IN_GPIO);
-    volatile bool gpio_out_high = gpio_get(ADB_OUT_GPIO);
+    bool gpio_in_low = !gpio_get(ADB_IN_GPIO);
+    bool gpio_out_high = gpio_get(ADB_OUT_GPIO);
     if (collision_detection && gpio == ADB_IN_GPIO  && gpio_out_high && gpio_in_low && (event_mask & GPIO_IRQ_EDGE_FALL) ) {
+        ADB_OUT_HIGH();
         adb_collision = true;
+        GPIO_TRIGGER_RAISE();
     } 
 }
 

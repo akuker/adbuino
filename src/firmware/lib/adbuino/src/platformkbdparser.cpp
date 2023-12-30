@@ -123,7 +123,10 @@ void PlatformKbdParser::SendString(const char * message)
         }    
         else
         {
-            Logmsg.println("Warning! unable to queue CAPSLOCK key up");
+            if (global_debug)
+            {
+                Logmsg.println("Warning! unable to queue CAPSLOCK key up");
+            }
         }
 
         while(message[i] != '\0')        
@@ -191,6 +194,9 @@ void PlatformKbdParser::TaskKeyboard(bool first)
     {
       adb.Reset();
       adb_reset = false;
-      Logmsg.println("ALL: Resetting devices");
+      if (global_debug)
+      {
+        Logmsg.println("ALL: Resetting devices");
+      }
     } 
 }

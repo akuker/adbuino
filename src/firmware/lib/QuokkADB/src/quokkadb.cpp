@@ -123,14 +123,14 @@ void loop()
 
   blink_led.led_off();
   time = millis();
-  
+
   cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
   if(setting_storage.settings()->led_on)
   {
     blink_led.led_on();
   }  
   adb.ProcessCommand(cmd);
-  GPIO_TRIGGER_RAISE();
+
   if (adb_reset)
   {
     adb.Reset();
