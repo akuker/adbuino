@@ -25,7 +25,7 @@
 #pragma once
 
 // Use macros for version number
-#define FW_VER_NUM      "0.4.0"
+#define FW_VER_NUM      "0.5.0"
 #define FW_VER_SUFFIX   "beta"
 #define PLATFORM_FW_VERSION FW_VER_NUM "-" FW_VER_SUFFIX 
 #define PRODUCT_NAME "QuokkADB"
@@ -37,3 +37,8 @@
 
 #define SAVE_TO_FLASH_BLINK_COUNT 4
 #define CLEAR_FLASH_BLINK_COUNT 5
+
+// Must be a power of 2
+#ifndef LOGBUFSIZE
+#define LOGBUFSIZE 65536
+#endif

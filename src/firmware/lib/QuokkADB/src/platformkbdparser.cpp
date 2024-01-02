@@ -40,6 +40,7 @@
 extern uint16_t modifierkeys;
 extern bool set_hid_report_ready;
 extern FlashSettings setting_storage;
+extern bool global_debug;
 
 uint8_t inline findModifierKey(hid_keyboard_report_t const *report, const hid_keyboard_modifier_bm_t mod ) {
         return (mod & report->modifier) ? 1 : 0;
@@ -266,8 +267,12 @@ void PlatformKbdParser::SendString(const char * message)
         }    
         else
         {
-            Logmsg.println("Warning! unable to queue CAPSLOCK key up");
+            if (global_debug)
+            {
+                Logmsg.println("Warning! unable to queue CAPSLOCK key up");
+            }
         }
+
 
         while(message[i] != '\0')
         {

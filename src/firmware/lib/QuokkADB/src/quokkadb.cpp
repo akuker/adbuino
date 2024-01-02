@@ -46,6 +46,7 @@
 #include "flashsettings.h"
 #include "platform_config.h"
 #include "blink.h"
+#include "log_cache.h"
 
 // Globals
 extern uint8_t mousepending;
@@ -77,8 +78,7 @@ FlashSettings setting_storage;
 void initVariant() 
 { 
   led_gpio_init();
-  uart_gpio_init();
-  Serial1.begin();
+
 }
 
 /*------------ Core0 setup ------------*/
@@ -88,6 +88,9 @@ void setup()
   blink_led.blink(1);
   adb_gpio_init();
   setting_storage.init();
+  uart_gpio_init();
+  log_init();
+  Serial1.begin();
   Logmsg.println(PLATFORM_FW_VER_STRING);
   srand(time_us_32());
 }
@@ -117,6 +120,7 @@ void loop()
   }
 
   blink_led.led_off();
+
   cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
   if(setting_storage.settings()->led_on)
   {
@@ -129,9 +133,13 @@ void loop()
     adb.Reset();
     adb_reset = false;
     usb_reset = true;
-    Logmsg.println("ALL: Resetting devices");
+    if (global_debug)
+    {
+      Logmsg.println("ALL: Resetting devices");
+    }
   } 
 
+  
   if (mouse_flush)
   {
     usb_mouse_reset = true;
@@ -159,6 +167,7 @@ void loop1()
 {
   tuh_task(); // tinyusb host task
   blink_led.poll();
+  log_poll();
   
   KeyboardPrs.ChangeUSBKeyboardLEDs();
 

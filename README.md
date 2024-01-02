@@ -5,7 +5,7 @@ This is a fork of Difegue's version of the [adbuino](https://github.com/Difegue/
 ![ADBuino picture](images/adbuino_0p9.png)
 
 # QuokkADB
-
+![QuokkADB picture](images/quokkadb-in-case.jpg)
 QuokkADB is a modified version of [adbuino](https://github.com/akuker/adbuino). It is targeted to the Rabbit Hole Computing's QuokkADB device. QuokkADB is a Raspberry Pi RP2040 based device that takes in USB inputs from a keyboard and/or mouse and outputs Apple's ADB (Apple Desktop Bus).  Further information can be found in the [QuokkADB.md](QuokkADB.md) file. 
 
 # Hack-y Alternative

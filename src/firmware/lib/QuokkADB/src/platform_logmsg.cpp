@@ -28,26 +28,30 @@
 #include <Arduino.h>
 #include "platform_logmsg.h"
 #include "quokkadb_gpio.h"
+#include "log_cache.h"
 
 platform::PLogmsg Logmsg;
 
 namespace platform {
      
     size_t PLogmsg::print(int number) {
-        return print(number, fmtDEC);
+        log_raw(number);
+        return 0;
     }
 
     size_t PLogmsg::print(int number, print_type type) {
         switch (type)
         {
         case fmtDEC :
-            return Serial1.print(number, DEC);
+            log_raw(number);
+            return 0;
 //        case BIN :
 //            return printf("%b", number);
-        case fmtOCT :
-            return Serial1.print(number, OCT);
+        // case fmtOCT :
+        //     return Serial1.print(number, OCT);
         case fmtHEX :
-            return Serial1.print(number, HEX);
+            log_raw((uint32_t)number);
+            return 0;
         default:
             return 0;
             break;
@@ -55,32 +59,35 @@ namespace platform {
     }
     
     size_t PLogmsg::print(const char* string) {
-        return Serial1.print(string);
-
+        log_raw(string);
+        return 0;
     }
     
     size_t PLogmsg::println(int number) {
-        return println(number, fmtDEC);
+        log_raw(number, "\n");
+        return 0;
     }
     
     size_t PLogmsg::println(int number, print_type type) {
         switch (type)
         {
         case fmtDEC :
-            return Serial1.println(number, DEC);
+            log_raw(number, "\n");
+            return 0;
 //        case BIN :
 //            return printf("%b\n", number);
-        case fmtOCT :
-            return Serial1.print(number, OCT);
+        // case fmtOCT :
+        //     return Serial1.print(number, OCT);
         case fmtHEX :
-            return Serial1.print(number, HEX);
+            log_raw((uint32_t) number, "\n");
+            return 0;
         default:
             return 0;
         }
     }
     
     size_t PLogmsg::println(const char* string) {
-        return Serial1.println(string);
-
+        log_raw(string, "\n");
+        return 0;
     }
 }
