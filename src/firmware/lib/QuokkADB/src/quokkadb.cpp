@@ -98,8 +98,6 @@ void setup()
 /*------------ Core0 main loop ------------*/
 void loop()
 {
-  static uint32_t time = 0;
-  static uint32_t stop = 0;
   int16_t cmd = 0;
 
   if (!kbdpending)
@@ -122,7 +120,6 @@ void loop()
   }
 
   blink_led.led_off();
-  time = millis();
 
   cmd = adb.ReceiveCommand(mousesrq | kbdsrq);
   if(setting_storage.settings()->led_on)

@@ -163,7 +163,6 @@ int16_t AdbInterface::ReceiveCommand(uint8_t srq)
       }
     }
   }
-  GPIO_TRIGGER_LOWER();  
   do 
   {
 

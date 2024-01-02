@@ -40,7 +40,7 @@ void adb_gpio_init(void) {
 
     gpio_init(GPIO_TEST);
     gpio_set_dir(GPIO_TEST, GPIO_OUT);
-    gpio_put(GPIO_TEST, true);
+    gpio_put(GPIO_TEST, false);
 
 
 }

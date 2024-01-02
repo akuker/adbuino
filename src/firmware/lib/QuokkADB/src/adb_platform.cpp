@@ -68,7 +68,6 @@ static void adb_in_irq_callback(uint gpio, uint32_t event_mask) {
     if (collision_detection && gpio == ADB_IN_GPIO  && gpio_out_high && gpio_in_low && (event_mask & GPIO_IRQ_EDGE_FALL) ) {
         ADB_OUT_HIGH();
         adb_collision = true;
-        GPIO_TRIGGER_RAISE();
     } 
 }
 

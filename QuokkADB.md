@@ -1,11 +1,10 @@
 # QuokkADB
 A USB keyboard and mouse to ADB (Apple Desktop Bus) keyboard and mouse emulator.
-The firmware is based upon the ADBuino and is kept in-sync with the upstream repository at [https://github.com/akuker/adbuino](https://github.com/akuker/adbuino).
-
+The firmware is based upon the ADBuino.
 ## How to use
 1. Attach any USB keyboards/mice to your QuokkADB.
 2. Before powering on your Macintosh, make sure the QuokkADB is plugged into the ADB chain and
-the ADB chain is connected to the host computer. The host computer writes settings to the QuokkADB at boot and does not rewrite settings on reconnect. *DO NOT* unplug the QuokkADB from the ADB chain while the computer is on, as the QuokkADB will lose its settings).
+the ADB chain is connected to the host computer. The host computer writes settings to the QuokkADB at boot and does not rewrite settings on reconnect. *DO NOT* unplug the QuokkADB from the ADB chain while the computer is on, as the QuokkADB will lose its settings.
 4. The button on the QuokkADB will turn on any ADB-equipped Macintosh which supports soft power-on. Otherwise, you must use the power switch on the computer.
 5. Once the power is turned on LEDs on the QuokkADB will blink once for power and then blink for all devices found on the USB bus.
 6. The QuokkADB LED should blink rapidly and brightly whenever the QuokkADB is reading or writing to the ADB bus. It should be very dim otherwise.
@@ -72,7 +71,7 @@ disconnected).
  - Rear facing and front facing ADB can be connected to host (Mac)
  or used to connected to another ADB device
  - Mouse and keyboard readdressing implemented so multiple QuokkADBs, other ADB keyboards, and/or mice can be used 
- - Multiple USB keyboards or mice can be attached and will work.
+ - Multiple USB keyboards or mice can be attached and will work
 
 ## Parity with USB Wombat
  - Context menu for Mac OS 8.1 and above - middle mouse button switches right click mode
@@ -109,7 +108,6 @@ Inserting a new mouse:
  1. Three blinks
 
 ## Known Bugs
- - Repeatedly pressing buttons that toggle LED states, such as caps lock, num lock, and scroll lock results in the LEDs no longer changing state, after many LED toggles. The keyboard functions normally and functions like caps lock still works, but the LED status indicators no longer change.
  - Some USB hubs do not seem to work.
 
 ## Compiling
@@ -127,4 +125,4 @@ Open the directory `src/firmware` from the project root directory with VSCode
 1) Select the environment `quokkadb`
 2)  Click Build under the PlatformIO panel
 
-In either case the uf2 file should be in the directory `src/firmware/.pio/quokkadb/build`
+In either case the uf2 file should be in the directory `src/firmware/.pio/build/quokkadb`
