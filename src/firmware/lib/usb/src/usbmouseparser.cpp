@@ -22,131 +22,70 @@
 //
 //----------------------------------------------------------------------------
 
-
+#include <Arduino.h>
 #include "usbmouseparser.h"
-#include "usb_hid_keys.h"
-#ifdef QUOKKADB
-#include "rp2040_serial.h"
-using rp2040_serial::Serial;
-#endif
+#include <platform_logmsg.h>
+
 
 extern bool global_debug;
 
 bool MouseRptParser::MouseChanged()
 {
-    return ((m_movedx != 0) || (m_movedy != 0) || m_mouse_button_changed);
+    bool changed = m_ready || !m_click_events.isEmpty();
+    m_ready = false;
+    return changed;
 }
-int32_t MouseRptParser::GetDeltaX()
-{
-    return m_movedx;
-}
-int32_t MouseRptParser::GetDeltaY()
-{
-    return m_movedy;
-}
-void MouseRptParser::ResetMouseMovement()
-{
-    m_movedy = 0;
-    m_movedx = 0;
-    m_mouse_button_changed = false;
-}
-bool MouseRptParser::MouseButtonIsPressed()
-{
-    return m_mouse_left_button_is_pressed || m_mouse_right_button_is_pressed;
-}
-
 
 void MouseRptParser::OnMouseMove(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.print("dx=");
-        Serial.print(mi->dX, DEC);
-        Serial.print(" dy=");
-        Serial.println(mi->dY, DEC);
+        Logmsg.print("dx=");
+        Logmsg.print(mi->dX, fmtDEC);
+        Logmsg.print(" dy=");
+        Logmsg.println(mi->dY, fmtDEC);
     }
-    m_movedy = mi->dY;
-    m_movedx = mi->dX;
 };
 void MouseRptParser::OnLeftButtonUp(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("L Butt Up");
+        Logmsg.println("L Bttn Up");
     }
-    m_mouse_left_button_is_pressed = false;
-    m_mouse_button_changed = true;
-};
+
+ };
 void MouseRptParser::OnLeftButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("L Butt Dn");
+        Logmsg.println("L Bttn Dn");
     }
-    m_mouse_left_button_is_pressed = true;
-    m_mouse_button_changed = true;
+    MOUSE_CLICK* click = new MOUSE_CLICK;
+    click->bmLeftButton = true;
+    if (!m_click_events.enqueue(click))
+    {
+        Logmsg.println("Warning! unable to enqueue Click Down");
+    }
 };
 void MouseRptParser::OnRightButtonUp(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("R Butt Up");
+        Logmsg.println("R Bttn Up");
     }
-    switch (m_right_btn_mode)
-    {
-        case MouseRightBtnMode::ctrl_click :
-
-            m_mouse_left_button_is_pressed = false;
-            m_mouse_button_changed = true;
-            #ifdef QUOKKADB
-            sleep_ms(100);
-            #else
-            delay(100);
-            #endif
-            while(m_keyboard->PendingKeyboardEvent());
-            m_keyboard->OnKeyUp(0, USB_KEY_LEFTCTRL);
-            while(m_keyboard->PendingKeyboardEvent());
-
-        break;
-        case MouseRightBtnMode::right_click :
-            m_mouse_right_button_is_pressed = false;
-            m_mouse_button_changed = true;
-        break;
-    }
-
 };
 void MouseRptParser::OnRightButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("R Butt Dn");
-    }
-    switch (m_right_btn_mode)
-    {
-        case MouseRightBtnMode::ctrl_click :
-            while(m_keyboard->PendingKeyboardEvent());
-            m_keyboard->OnKeyDown(0, USB_KEY_LEFTCTRL);
-            while(m_keyboard->PendingKeyboardEvent());
-            #ifdef QUOKKADB
-            sleep_ms(200);
-            #else
-            delay(200);
-            #endif
-            m_mouse_left_button_is_pressed = true;
-            m_mouse_button_changed = true;
-
-        break;
-        case MouseRightBtnMode::right_click :
-            m_mouse_right_button_is_pressed = true;
-            m_mouse_button_changed = true;
-        break;
+        Logmsg.println("R Bttn Dn");
     }
 };
 void MouseRptParser::OnMiddleButtonUp(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("M Butt Up");
+        Logmsg.println("M Bttn Up");
     }
 
 };
@@ -154,16 +93,15 @@ void MouseRptParser::OnMiddleButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
-        Serial.println("M Butt Dn");
-    }
-    switch (m_right_btn_mode)
-    {
-        case MouseRightBtnMode::ctrl_click :
-            m_right_btn_mode = MouseRightBtnMode::right_click; 
-        break;
-        case MouseRightBtnMode::right_click :
-            m_right_btn_mode = MouseRightBtnMode::ctrl_click;
-        break;
-        
+        Logmsg.println("M Bttn Dn");
     }
 };
+
+
+void MouseRptParser::Reset(void)
+{
+    while(!m_click_events.isEmpty())
+    {
+        delete m_click_events.dequeue();
+    }
+}

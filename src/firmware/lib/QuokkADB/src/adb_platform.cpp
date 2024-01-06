@@ -27,7 +27,11 @@
 #include "hardware/gpio.h"
 #include <time.h>
 
-bool AdbInterfacePlatform::adb_delay_us(uint32_t delay) 
+extern volatile bool adb_collision;
+extern volatile bool collision_detection;
+extern ADBKbdRptParser KeyboardPrs;
+
+bool AdbInterfacePlatform::adb_delay_with_detect_us(uint32_t delay) 
 {
   uint64_t start = time_us_64();
   uint64_t time;
@@ -44,16 +48,25 @@ bool AdbInterfacePlatform::adb_delay_us(uint32_t delay)
   return collision_free;
 }
 
-extern volatile bool adb_collision;
-extern volatile bool collision_detection;
-extern ADBKbdRptParser KeyboardPrs;
+bool AdbInterfacePlatform::adb_delay_us(uint32_t delay) 
+{
+  uint64_t start = time_us_64();
+  uint64_t time;
+  do
+  {
+    time = time_us_64();
+  } while (delay >= time - start);
+  return true;
+}
+
 
 static void adb_in_irq_callback(uint gpio, uint32_t event_mask) {
     // a possible collision occurs when ABD is meant to be high
     // but the the bus is set low by another device
-    volatile bool gpio_in_low = !gpio_get(ADB_IN_GPIO);
-    volatile bool gpio_out_high = gpio_get(ADB_OUT_GPIO);
+    bool gpio_in_low = !gpio_get(ADB_IN_GPIO);
+    bool gpio_out_high = gpio_get(ADB_OUT_GPIO);
     if (collision_detection && gpio == ADB_IN_GPIO  && gpio_out_high && gpio_in_low && (event_mask & GPIO_IRQ_EDGE_FALL) ) {
+        ADB_OUT_HIGH();
         adb_collision = true;
     } 
 }

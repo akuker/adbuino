@@ -28,9 +28,10 @@ class ADBMouseRptParser : public MouseRptParser
 {
 public:
     ADBMouseRptParser(ADBKbdRptParser& kbd_parser);
+    bool MouseReady();
     uint16_t GetAdbRegister0();
 
 protected:
-    uint32_t EightBitToSevenBitSigned(int8_t value);
+    bool Accumulate(int8_t usb_move, int32_t &adb_move, int32_t &accumulator);
 
 };

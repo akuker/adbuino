@@ -38,6 +38,7 @@ namespace simple_circular_queue {
         // no overwriting, return false if queue is full
         if (!is_empty_ && first_ == new_last) {
             enqueued = false;
+            delete item;
         }
         else {
             if(is_empty_) {
@@ -71,7 +72,7 @@ namespace simple_circular_queue {
                 item = queue_[old_first];
             }
         }
-        mutexUnlock();     
+        mutexUnlock();
         return item;
     }
    
@@ -106,5 +107,15 @@ namespace simple_circular_queue {
 #ifdef SCQ_RP2040_MUTEX        
         mutex_exit(&scq_mutex_);
 #endif
+    }
+    template <typename T, size_t allocation_size> 
+    void SCQueue<T, allocation_size>::log_values()
+    {
+        Logmsg.print("SCQ: head ");
+        Logmsg.print(first_, fmtDEC);
+        Logmsg.print(" tail ");
+        Logmsg.print(last_, fmtDEC);
+        Logmsg.print(" len ");
+        Logmsg.println(capacity_, fmtDEC);
     }
 }

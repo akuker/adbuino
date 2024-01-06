@@ -2,7 +2,7 @@
 //
 //	QuokkADB ADB keyboard and mouse adapter
 //
-//     Copyright (C) 2022 Rabbit Hole Computing LLC
+//     Copyright (C) 2023 Rabbit Hole Computing LLC
 //
 //  This file is part of QuokkADB.
 //
@@ -23,8 +23,27 @@
 //  License. See LICENSE in the root of this repository for more info.
 //
 //----------------------------------------------------------------------------
-
-
 #pragma once
 
-int quokkadb(void);
+#include <scqueue.h>
+#define BLINK_QUEUE_LENGTH 5
+
+struct blink_event_t
+{
+  uint8_t times;
+  uint32_t delay_ms;  
+};
+
+class BlinkLed
+{
+public:
+    bool blink(uint8_t times, uint32_t delay_ms = 250);
+    void led_on(bool force = false);
+    void led_off(bool force = false);
+    void poll();
+protected:
+    simple_circular_queue::SCQueue<blink_event_t*, BLINK_QUEUE_LENGTH> blink_queue;
+    bool blinking = false;
+};
+
+extern BlinkLed blink_led;

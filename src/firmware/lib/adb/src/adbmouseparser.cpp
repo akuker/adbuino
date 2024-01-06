@@ -24,12 +24,9 @@
 
 
 #include "adbmouseparser.h"
-#ifdef QUOKKADB
-#include "quokkadb_gpio.h"
-#include "rp2040_serial.h"
-using rp2040_serial::Serial;
-#endif
-
+#include <platform_logmsg.h>
+#include <adb_platform.h>
+#include <limits.h>
 extern bool global_debug;
 
 ADBMouseRptParser::ADBMouseRptParser(ADBKbdRptParser &kbd_parser)
@@ -37,36 +34,49 @@ ADBMouseRptParser::ADBMouseRptParser(ADBKbdRptParser &kbd_parser)
     m_keyboard = &kbd_parser;
 }
 
-uint32_t ADBMouseRptParser::EightBitToSevenBitSigned(int8_t value)
+bool ADBMouseRptParser::MouseReady()
 {
-    // Dividing the value by 2 has 2 benefits:
-    //   - Easy way to convert from 8 bit to 7 bit number
-    //   - It "softens" the mouse movement. Modern optical
-    //     mice seem a little jumpy.
-    return (uint32_t)((value/2) & 0x7F);
+    return MouseChanged();
 }
 
 uint16_t ADBMouseRptParser::GetAdbRegister0()
 {
-    uint16_t reg_value = 0;
+    static bool button_left_last;
+    static bool button_right_last;
+    bool button_left = button_left_last;
+    bool button_right = button_right_last;
+    uint16_t reg_value = 0;;
+    MOUSE_CLICK* click = nullptr;
+
+    if (!m_click_events.isEmpty())
+    {
+        click = m_click_events.dequeue();
+        button_left = click->bmLeftButton;
+        button_right = click->bmRightButton;
+    }
+
     // Bit 15 = Left Button Status; 0=down
-    if (!IsLeftButtonPressed())
+    if (!button_left)
     {
         reg_value |= (1 << 15);
     }
     // Bit 7 = Right Button Status - introduced in System 8
-    if (!IsRightButtonPressed())
+    if (!button_right)
     {
         reg_value |= (1 << 7);
     }
-
     // Bits 14-8 = Y move Counts (Two's compliment. Negative = up, positive = down)
-    reg_value |= (EightBitToSevenBitSigned(GetDeltaY()) << 8);
+    reg_value |= AdjustMovement(m_coarse_y, m_fine_y) << 8;
 
     // Bits 6-0 = X move counts (Two's compliment. Negative = left, positive = right)
-    reg_value |= (EightBitToSevenBitSigned(GetDeltaX()) << 0);
+    reg_value |= AdjustMovement(m_coarse_x, m_fine_x) << 0;
 
-    ResetMouseMovement();
-
+    if (click != nullptr)
+    {
+        button_left_last = click->bmLeftButton;
+        button_right_last = click->bmRightButton;
+        delete click;
+    }
+    m_processed = true;
     return reg_value;
 }

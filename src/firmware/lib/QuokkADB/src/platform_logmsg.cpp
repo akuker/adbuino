@@ -24,66 +24,70 @@
 //
 //----------------------------------------------------------------------------
 
-// Minimal implementation of Arudino's Serial class
-#include "rp2040_serial.h"
+// Logging system based on Arduino Serial library
+#include <Arduino.h>
+#include "platform_logmsg.h"
 #include "quokkadb_gpio.h"
-#include <pico/printf.h>
+#include "log_cache.h"
 
-namespace rp2040_serial {
- 
-    RPSerial Serial;
-    size_t RPSerial::print(int number) {
-        return print(number, DEC);
+platform::PLogmsg Logmsg;
+
+namespace platform {
+     
+    size_t PLogmsg::print(int number) {
+        log_raw(number);
+        return 0;
     }
 
-    size_t RPSerial::print(int number, print_type type) {
+    size_t PLogmsg::print(int number, print_type type) {
         switch (type)
         {
-        case DEC :
-            return printf("%d", number);
+        case fmtDEC :
+            log_raw(number);
+            return 0;
 //        case BIN :
 //            return printf("%b", number);
-        case OCT :
-            return printf("%o", number);
-        case HEX :
-            return printf("%X", number);
+        // case fmtOCT :
+        //     return Serial1.print(number, OCT);
+        case fmtHEX :
+            log_raw((uint32_t)number);
+            return 0;
         default:
             return 0;
             break;
         }
     }
     
-    size_t RPSerial::print(const char* string) {
-        return printf("%s", string);
-
+    size_t PLogmsg::print(const char* string) {
+        log_raw(string);
+        return 0;
     }
     
-    size_t RPSerial::println(int number) {
-        return println(number, DEC);
+    size_t PLogmsg::println(int number) {
+        log_raw(number, "\n");
+        return 0;
     }
     
-    size_t RPSerial::println(int number, print_type type) {
+    size_t PLogmsg::println(int number, print_type type) {
         switch (type)
         {
-        case DEC :
-            return printf("%d\n", number);
+        case fmtDEC :
+            log_raw(number, "\n");
+            return 0;
 //        case BIN :
 //            return printf("%b\n", number);
-        case OCT :
-            return printf("%o\n", number);
-        case HEX :
-            return printf("%X\n", number);
+        // case fmtOCT :
+        //     return Serial1.print(number, OCT);
+        case fmtHEX :
+            log_raw((uint32_t) number, "\n");
+            return 0;
         default:
             return 0;
         }
     }
     
-    size_t RPSerial::println(const char* string) {
-        return printf("%s\n", string);
-
+    size_t PLogmsg::println(const char* string) {
+        log_raw(string, "\n");
+        return 0;
     }
-}
-
-void putchar_(char c){
-    uart_putc(UART_PORT, c);
 }

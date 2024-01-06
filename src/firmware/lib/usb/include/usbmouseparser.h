@@ -28,11 +28,6 @@
 
 #include "platformmouseparser.h"
 
-enum class MouseRightBtnMode {
-    ctrl_click,
-    right_click
-};
-
 
 class MouseRptParser : public PlatformMouseParser
 {
@@ -40,8 +35,8 @@ public:
     bool MouseChanged();
     int32_t GetDeltaX();
     int32_t GetDeltaY();
-    void ResetMouseMovement();
     bool MouseButtonIsPressed();
+    void Reset(void);
 
 protected:
     void OnMouseMove(MOUSEINFO *mi);
@@ -60,10 +55,4 @@ private:
     bool m_mouse_left_button_is_pressed = false;
     bool m_mouse_right_button_is_pressed = false;
     bool m_mouse_button_changed = false;
-    #ifdef QUOKKADB
-    MouseRightBtnMode m_right_btn_mode = MouseRightBtnMode::ctrl_click;
-    #else
-    MouseRightBtnMode m_right_btn_mode = MouseRightBtnMode::right_click;
-    #endif
-
 };

@@ -47,11 +47,13 @@ class AdbInterfacePlatform
     void adb_pin_in();
 
     uint8_t data_in();
+    void wait_low_indefinitely();
     uint16_t wait_data_lo(uint32_t us);
     uint16_t wait_data_hi(uint32_t us);
+    bool adb_delay_us(uint32_t delay);
     // delay for set amount unless a collision is detected then return false
     // otherwise return true
-    bool adb_delay_us(uint32_t delay);
+    bool adb_delay_with_detect_us(uint32_t delay);
 
     void adb_irq_init(void);
     void adb_irq_disable(void);
@@ -80,6 +82,11 @@ inline void AdbInterfacePlatform::adb_pin_out()
 }
 inline void AdbInterfacePlatform::adb_pin_in()
 {
+}
+
+inline void AdbInterfacePlatform::wait_low_indefinitely()
+{
+  while(data_in());
 }
 
 inline uint16_t AdbInterfacePlatform::wait_data_lo(uint32_t us)

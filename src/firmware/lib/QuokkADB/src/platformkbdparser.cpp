@@ -24,18 +24,15 @@
 //  See LICENSE in the root of this repository for more info.
 //
 //---------------------------------------------------------------------------
-
+#include <Arduino.h>
 #include "platformkbdparser.h"
 #include "usb_hid_keys.h"
 #include "platform_config.h"
 #include "char2usbkeycode.h"
 #include "flashsettings.h"
 #include <tusb.h>
-
-#if QUOKKADB
-#include "rp2040_serial.h"
-using rp2040_serial::Serial;
-#endif
+#include "platform_logmsg.h"
+#include "blink.h"
 
 #define VALUE_WITHIN(v,l,h) (((v)>=(l)) && ((v)<=(h)))
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
@@ -43,6 +40,7 @@ using rp2040_serial::Serial;
 extern uint16_t modifierkeys;
 extern bool set_hid_report_ready;
 extern FlashSettings setting_storage;
+extern bool global_debug;
 
 uint8_t inline findModifierKey(hid_keyboard_report_t const *report, const hid_keyboard_modifier_bm_t mod ) {
         return (mod & report->modifier) ? 1 : 0;
@@ -143,7 +141,7 @@ void PlatformKbdParser::Parse(uint8_t dev_addr, uint8_t instance, hid_keyboard_r
                 prevState.bInfo[i] = current_state.bInfo[i];
 
 }
-bool tuh_hid_set_report(uint8_t dev_addr, uint8_t instance, uint8_t report_id, uint8_t report_type, void* report, uint16_t len);
+//bool tuh_hid_set_report(uint8_t dev_addr, uint8_t instance, uint8_t report_id, uint8_t report_type, void* report, uint16_t len);
 
 void PlatformKbdParser::SetUSBkeyboardLEDs(bool capslock, bool numlock, bool scrollock){
         // Send LEDs statuses to USB keyboard
@@ -160,9 +158,9 @@ bool PlatformKbdParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
         // Special keycombo actions
         uint8_t special_key_count = 0;
         uint8_t special_key = 0;
-        uint8_t special_keys[] = { USB_KEY_V, USB_KEY_L};
+        uint8_t special_keys[] = { USB_KEY_V, USB_KEY_L, USB_KEY_P, USB_KEY_EQUAL, USB_KEY_MINUS, USB_KEY_KPPLUS, USB_KEY_KPMINUS, USB_KEY_S, USB_KEY_R};
         uint8_t caps_lock_down = false;
-        
+        char print_buf[512];
         for (uint8_t i = 0; i < 6; i++)
         {
                 if (cur_kbd_info->Keys[i] == USB_KEY_CAPSLOCK) {
@@ -191,20 +189,54 @@ bool PlatformKbdParser::SpecialKeyCombo(KBDINFO *cur_kbd_info)
                 case USB_KEY_V:
                         SendString(PLATFORM_FW_VER_STRING);
                 break;
+                case USB_KEY_P:
+                        snprintf(print_buf, sizeof(print_buf),
+                                "Current Settings\n"
+                                "================\n"
+                                "LED: %s\n"
+                                "Mouse Sensitivity Divisor: %u\n"
+                                "(higher = less sensitive)\n"
+                                "\n"
+                                "Special Keys - CAPS + Ctrl + Shift + [Key]\n"
+                                "------------------------------------------\n"
+                                "[V]: print firmware version\n"
+                                "[S]: save settings to flash\n"
+                                "[R]: remove settings from flash\n"
+                                "[L]: toggle status LED On/Off\n"
+                                "[+]: increase sensitivity\n"
+                                "[-]: decrease sensitivity\n",
+                                setting_storage.settings()->led_on ? "On": "Off",
+                                setting_storage.settings()->sensitivity_divisor);
+                        SendString(print_buf);
+                break;
+                case USB_KEY_S:
+                        setting_storage.save();
+                        blink_led.blink(SAVE_TO_FLASH_BLINK_COUNT);
+                break;
+                case USB_KEY_R:
+                        setting_storage.clear();
+                        blink_led.blink(CLEAR_FLASH_BLINK_COUNT);
                 case USB_KEY_L:
                         setting_storage.settings()->led_on = ~setting_storage.settings()->led_on;
-                        setting_storage.save();
-                        if (setting_storage.settings()->led_on) 
-                        {
-                                SendString("Busy LED is on");
-                        }   
+                break;
+                case USB_KEY_KPPLUS:
+                case USB_KEY_EQUAL:
+                        if (setting_storage.settings()->sensitivity_divisor <= 1)
+                                setting_storage.settings()->sensitivity_divisor = 1;
                         else
-                        {
-                                SendString("Busy LED is off");
-                        }                 
-                break;        
+                                setting_storage.settings()->sensitivity_divisor--;
+                        blink_led.blink(setting_storage.settings()->sensitivity_divisor);
+                break;
+                case USB_KEY_KPMINUS:
+                case USB_KEY_MINUS:
+                        if (setting_storage.settings()->sensitivity_divisor >= 16)
+                                setting_storage.settings()->sensitivity_divisor = 16;
+                        else
+                                setting_storage.settings()->sensitivity_divisor++;
+                        blink_led.blink(setting_storage.settings()->sensitivity_divisor);
+                break;
                 }
-                
+
                 return true;
         }
         return false;
@@ -235,10 +267,14 @@ void PlatformKbdParser::SendString(const char * message)
         }    
         else
         {
-            Serial.println("Warning! unable to queue CAPSLOCK key up");
+            if (global_debug)
+            {
+                Logmsg.println("Warning! unable to queue CAPSLOCK key up");
+            }
         }
 
-        while(message[i] != '\0')        
+
+        while(message[i] != '\0')
         {
                 while(PendingKeyboardEvent());
 
@@ -287,8 +323,7 @@ void PlatformKbdParser::ChangeUSBKeyboardLEDs(void)
                         printf("KBD: tuh_hid_set_report failed, dev addr: %hhx, instance: %hhx\n",
                                 keyboards_list[i].device_addr, 
                                 keyboards_list[i].instance);  
-                        
-                }        
+                }
         }
 
         if (!keyboards_list[i].in_use || !try_again)

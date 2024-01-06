@@ -34,6 +34,14 @@
 #include <stdint.h>
 #include "tusb.h"
 #include "platformkbdparser.h"
+#include <scqueue.h>
+using simple_circular_queue::SCQueue;
+
+// USB response 1ms, worst ADB response < 160ms, fastest human clicks per second < 30 or 1 per 33ms
+// Queue length if using a machine USB clicker 160
+// Queue length for humans ~ 5
+// Using 10
+#define MOUSE_CLICK_QUEUE_CAPACITY (10)
 
 //----------------------------------------------------------------------------
 // Mouse handler
@@ -51,6 +59,21 @@ struct MOUSEINFO {
         int8_t dY;
 };
 
+struct MOUSE_CLICK
+{
+        struct {
+                uint8_t bmLeftButton : 1;
+                uint8_t bmRightButton : 1;
+                uint8_t bmMiddleButton : 1;
+                uint8_t bmDummy : 5;
+        };
+};
+
+enum class MouseRightBtnMode {
+    ctrl_click,
+    right_click
+};
+
 class PlatformMouseParser {
 
         union {
@@ -59,6 +82,7 @@ class PlatformMouseParser {
         } prevState;
 
 public:
+
         void Parse(const hid_mouse_report_t* report);
 protected:
 
@@ -83,5 +107,18 @@ protected:
         virtual void OnMiddleButtonDown(MOUSEINFO *mi __attribute__((unused))) {
         };
 
+        int8_t AdjustMovement(int32_t coarse, int32_t fine);
+
+        SCQueue<MOUSE_CLICK*, MOUSE_CLICK_QUEUE_CAPACITY> m_click_events;
+
         PlatformKbdParser* m_keyboard;
+
+        bool m_processed = false;
+        bool m_ready = false;
+        int32_t m_coarse_x = 0;
+        int32_t m_coarse_y = 0;
+        int32_t m_fine_x = 0;
+        int32_t m_fine_y = 0;
+
+        MouseRightBtnMode m_right_btn_mode = MouseRightBtnMode::ctrl_click;
 };
