@@ -69,6 +69,11 @@ struct MOUSE_CLICK
         };
 };
 
+enum class MouseRightBtnMode {
+    ctrl_click,
+    right_click
+};
+
 class PlatformMouseParser {
 
         union {
@@ -114,4 +119,6 @@ protected:
         int32_t m_coarse_y = 0;
         int32_t m_fine_x = 0;
         int32_t m_fine_y = 0;
+
+        MouseRightBtnMode m_right_btn_mode = MouseRightBtnMode::ctrl_click;
 };

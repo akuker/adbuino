@@ -31,6 +31,7 @@
 #include "tusb.h"
 #include <pico/mutex.h>
 #include "flashsettings.h"
+#include <usb_hid_keys.h>
 
 extern FlashSettings setting_storage;
 
@@ -77,55 +78,130 @@ void PlatformMouseParser::Parse(const hid_mouse_report_t *report){
     if (mouse_info.dX / sensitivity_divisor == 0) m_fine_x += mouse_info.dX;
     if (mouse_info.dY / sensitivity_divisor == 0) m_fine_y += mouse_info.dY;
 
-    MOUSE_CLICK* click = new MOUSE_CLICK;
-    click->bmLeftButton = mouse_info.bmLeftButton;
-    click->bmMiddleButton = mouse_info.bmMiddleButton;
-    click->bmRightButton = mouse_info.bmRightButton;
-    if (m_click_events.isEmpty())
-    {
-        m_click_events.enqueue(click);
-    }
-    else
-    {
-        MOUSE_CLICK* peek;
-        peek = m_click_events.peek();
-        if (peek->bmLeftButton != click->bmLeftButton ||
-            peek->bmMiddleButton != click->bmMiddleButton ||
-            peek->bmRightButton != click->bmRightButton
-            )
-        {
-            m_click_events.enqueue(click);
-        }
-    }
-
     if(mouse_info.dX != 0 || mouse_info.dY != 0) {
         OnMouseMove(&mouse_info);
     }
 
+    bool left_change = false;
+    bool right_change = false;
     // change to mouse left button down
     if (!prevState.mouseInfo.bmLeftButton && mouse_info.bmLeftButton) {
         OnLeftButtonDown(&mouse_info);
+        left_change = true;
     }
 
     // change to mouse left button up
     if (prevState.mouseInfo.bmLeftButton && !mouse_info.bmLeftButton) {
         OnLeftButtonUp(&mouse_info);
+        left_change = true;
     }
 
     if (!prevState.mouseInfo.bmRightButton && mouse_info.bmRightButton) {
         OnRightButtonDown(&mouse_info);
+        right_change = true;
     }
 
     if (prevState.mouseInfo.bmRightButton && !mouse_info.bmRightButton) {
         OnRightButtonUp(&mouse_info);
+        right_change = true;
     }
 
     if (!prevState.mouseInfo.bmMiddleButton && mouse_info.bmMiddleButton) {
         OnMiddleButtonDown(&mouse_info);
+        switch (m_right_btn_mode)
+        {
+            case MouseRightBtnMode::ctrl_click :
+                m_right_btn_mode = MouseRightBtnMode::right_click;
+            break;
+            case MouseRightBtnMode::right_click :
+                m_right_btn_mode = MouseRightBtnMode::ctrl_click;
+            break;
+        }
     }
+
     if (!prevState.mouseInfo.bmMiddleButton && mouse_info.bmMiddleButton) {
         OnMiddleButtonUp(&mouse_info);
     }
 
+    if (left_change || right_change)
+    {
+        if (right_change)
+        {
+            if (mouse_info.bmRightButton)
+            {
+                MOUSE_CLICK* click;
+                switch (m_right_btn_mode)
+                {
+                    case MouseRightBtnMode::ctrl_click :
+                        while(m_keyboard->PendingKeyboardEvent());
+                        m_keyboard->OnKeyDown(0, USB_KEY_LEFTCTRL);
+                        while(m_keyboard->PendingKeyboardEvent());
+                        sleep_ms(200);
+                        click = new MOUSE_CLICK;
+                        click->bmLeftButton = true;
+                        click->bmMiddleButton = mouse_info.bmMiddleButton;
+                        click->bmRightButton = false;
+                        if (!m_click_events.enqueue(click))
+                        {
+                            Logmsg.println("Warning! unable to enqueue Ctrl + Click Down");
+                        }
+                    break;
+                    case MouseRightBtnMode::right_click :
+                        click = new MOUSE_CLICK;
+                        click->bmRightButton = true;
+                        click->bmMiddleButton = mouse_info.bmMiddleButton;
+                        click->bmLeftButton = mouse_info.bmLeftButton;
+                        if (!m_click_events.enqueue(click))
+                        {
+                            Logmsg.println("Warning! unable to enqueue Right Click Down");
+                        }
+                    break;
+                }
+            }
+            else
+            {
+                MOUSE_CLICK* click;
+                switch (m_right_btn_mode)
+                {
+                    case MouseRightBtnMode::ctrl_click :
+                        click = new MOUSE_CLICK;
+                        click->bmLeftButton = false;
+                        click->bmMiddleButton = mouse_info.bmMiddleButton;
+                        click->bmRightButton = false;
+                        if (!m_click_events.enqueue(click))
+                        {
+                            Logmsg.println("Warning! unable to enqueue Ctrl + Click Up");
+                        }
+                        while(!m_click_events.isEmpty());
+                        sleep_ms(100);
+                        while(m_keyboard->PendingKeyboardEvent());
+                        m_keyboard->OnKeyUp(0, USB_KEY_LEFTCTRL);
+                        while(m_keyboard->PendingKeyboardEvent());
+                    break;
+                    case MouseRightBtnMode::right_click :
+                        click = new MOUSE_CLICK;
+                        click->bmRightButton = false;
+                        click->bmLeftButton = mouse_info.bmLeftButton;
+                        if (!m_click_events.enqueue(click))
+                        {
+                            Logmsg.println("Warning! unable to enqueue new Right Click Up");
+                        }
+                    break;
+                }
+            }
+        }
+        else
+        {
+            MOUSE_CLICK* click = new MOUSE_CLICK;
+            click->bmLeftButton = mouse_info.bmLeftButton;
+            click->bmMiddleButton = mouse_info.bmMiddleButton;
+            click->bmRightButton = mouse_info.bmRightButton;
+            if (!m_click_events.enqueue(click))
+            {
+                Logmsg.println("Warning! unable to enqueue Left Click event");
+            }
+        }
+    }
+    memcpy(prevState.bInfo, &mouse_info, sizeof(prevState.bInfo));
     m_ready = true;
 }

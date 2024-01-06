@@ -38,6 +38,7 @@ namespace simple_circular_queue {
         // no overwriting, return false if queue is full
         if (!is_empty_ && first_ == new_last) {
             enqueued = false;
+            delete item;
         }
         else {
             if(is_empty_) {

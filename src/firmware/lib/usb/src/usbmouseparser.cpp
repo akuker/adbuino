@@ -24,7 +24,6 @@
 
 #include <Arduino.h>
 #include "usbmouseparser.h"
-#include "usb_hid_keys.h"
 #include <platform_logmsg.h>
 
 
@@ -53,12 +52,19 @@ void MouseRptParser::OnLeftButtonUp(MOUSEINFO *mi)
     {
         Logmsg.println("L Bttn Up");
     }
+
  };
 void MouseRptParser::OnLeftButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
         Logmsg.println("L Bttn Dn");
+    }
+    MOUSE_CLICK* click = new MOUSE_CLICK;
+    click->bmLeftButton = true;
+    if (!m_click_events.enqueue(click))
+    {
+        Logmsg.println("Warning! unable to enqueue Click Down");
     }
 };
 void MouseRptParser::OnRightButtonUp(MOUSEINFO *mi)
@@ -67,49 +73,12 @@ void MouseRptParser::OnRightButtonUp(MOUSEINFO *mi)
     {
         Logmsg.println("R Bttn Up");
     }
-    switch (m_right_btn_mode)
-    {
-        case MouseRightBtnMode::ctrl_click :
-
-            mi->bmLeftButton = false;
-            #ifdef QUOKKADB
-            sleep_ms(100);
-            #else
-            delay(100);
-            #endif
-            while(m_keyboard->PendingKeyboardEvent());
-            m_keyboard->OnKeyUp(0, USB_KEY_LEFTCTRL);
-            while(m_keyboard->PendingKeyboardEvent());
-
-        break;
-        case MouseRightBtnMode::right_click :
-            mi->bmRightButton = false;
-        break;
-    }
-
 };
 void MouseRptParser::OnRightButtonDown(MOUSEINFO *mi)
 {
     if (global_debug)
     {
         Logmsg.println("R Bttn Dn");
-    }
-    switch (m_right_btn_mode)
-    {
-        case MouseRightBtnMode::ctrl_click :
-            while(m_keyboard->PendingKeyboardEvent());
-            m_keyboard->OnKeyDown(0, USB_KEY_LEFTCTRL);
-            while(m_keyboard->PendingKeyboardEvent());
-            #ifdef QUOKKADB
-            sleep_ms(200);
-            #else
-            delay(200);
-            #endif
-            mi->bmLeftButton = true;
-        break;
-        case MouseRightBtnMode::right_click :
-            mi->bmRightButton = true;
-        break;
     }
 };
 void MouseRptParser::OnMiddleButtonUp(MOUSEINFO *mi)
@@ -125,16 +94,6 @@ void MouseRptParser::OnMiddleButtonDown(MOUSEINFO *mi)
     if (global_debug)
     {
         Logmsg.println("M Bttn Dn");
-    }
-    switch (m_right_btn_mode)
-    {
-        case MouseRightBtnMode::ctrl_click :
-            m_right_btn_mode = MouseRightBtnMode::right_click; 
-        break;
-        case MouseRightBtnMode::right_click :
-            m_right_btn_mode = MouseRightBtnMode::ctrl_click;
-        break;
-        
     }
 };
 

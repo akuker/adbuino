@@ -31,6 +31,7 @@ namespace simple_circular_queue
     class SCQueue {
         public:
             SCQueue(void);
+            // Queues a pointer, if the queue is full it deletes the pointer
             bool enqueue(T item);
             T dequeue(void);
             T peek(void);
