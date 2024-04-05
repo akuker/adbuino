@@ -5,7 +5,7 @@
 - ORIGINAL PS/2 version - In the beginning - bbraun created the adbuino project and generously open sourced it. The links aren't working anymore, but the original SVN repo was [bbraun's](http://synack.net/svn/adbduino/)
 - Difegue PS/2 version - 2020 - Difegue's version of the [adbuino](https://github.com/Difegue/Chaotic-Realm), modified [bbraun's](http://synack.net/svn/adbduino/) version, with some extra code added to alleviate issues with his own PS/2 keyboard.
 - akuker USB version - 2022 - akuker converted Difegue's version to use a USB controller and created a PCB design using KiCad.
-- [QuokkADB](QuokkADB.md) - 2023 - [Rabbit Hole computing](https://github.com/rabbitholecomputing) created a new PCB based on the RP2040 (instead of Atmel chip). [Morio](https://github.com/morio), ported the code to RP2040 and updated it to a PlatformIO project. Morio graciously merged their code changes back into [akuker/adbuino](http://github.com/akuker/adbuino)
+- [QuokkADB](QuokkADB.md) - 2023 - [Rabbit Hole computing](https://github.com/rabbitholecomputing) created a new PCB based on the RP2040 (instead of Atmel chip). [Morio](https://github.com/morio), ported the code to the dual core RP2040, removed the dependency on the expensive MAX3421E USB controller and updated it to a PlatformIO project. Morio graciously merged their code changes back into [akuker/adbuino](http://github.com/akuker/adbuino)
 - [HIDHopper_ADB](https://github.com/TechByAndroda/HIDHopper_ADB) - 2023 - [TechByAndroda](https://github.com/TechByAndroda) forked the repo and made a new PCB that uses a Raspberry Pi Pico (instead of a chip-down RP2040)
 
 Its GPL code. It belongs to the community. Do fun GPL stuff with it. 
